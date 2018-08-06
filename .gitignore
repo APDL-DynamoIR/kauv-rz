@@ -1,0 +1,11 @@
+build-*
+!build-group.pri
+!build-root.pri
+src/ka-lacadam/old
+src/ka-lacadam/rz-graph-build/bak
+src/Relae/relae-graph/old
+src/ka-sonic/ka-sexpresso
+targets
+Contents
+*.pro.user
+

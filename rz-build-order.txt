@@ -1,0 +1,33 @@
+/rz-kauvir              rz-graph-core   
+/rz-kauvir              rz-graph-token
+/rz-kauvir              rz-graph-build
+/rz-kauvir              rz-graph-embed
+/rz-kauvir              rz-function-def
+/rz-kauvir              rz-code-elements
+/rz-kauvir              rz-graph-valuer
+/rz-kauvir              rz-graph-embed-run
+/rz-kauvir              rz-graph-run
+/rz-kauvir              rz-graph-visit
+/rz-kauvir              rz-code-generators
+/rz-kauvir              rz-graph-sre
+/rz-kauvir              rz-graph-code
+/external               sexpr
+/rz-kauvir              rz-graph-lisp-console
+/kauvir-kcm             kauvir-type-system
+/kcm-runtime-eval       kcm-scopes
+/kcm-runtime-eval       kcm-env
+/kcm-runtime-eval       fn-doc
+/kauvir-kcm             kauvir-code-model 
+/kauvir-runtime         kcm-command-package
+/rz-dynamo              rz-dynamo-generator
+/kauvir-kcm             kcm-lisp-bridge
+/kauvir-runtime         kcm-command-runtime   
+/kcm-runtime-eval       kcm-direct-eval       
+/rz-dynamo              rz-dynamo-console
+/rz-dynamo              rz-graph-dynamo-console
+/kcm-runtime-eval       basic-functions
+/rz-dynamo              rz-dynamo-runtime-console
+/rz-dynamo              rz-graph-dynamo-runtime-console
+
+Note:  git config --local credential.helper ""
+
