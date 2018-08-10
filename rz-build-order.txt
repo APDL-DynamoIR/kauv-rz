@@ -29,5 +29,5 @@
 /rz-dynamo              rz-dynamo-runtime-console
 /rz-dynamo              rz-graph-dynamo-runtime-console
 
-Note:  git config --local credential.helper ""
+
 
