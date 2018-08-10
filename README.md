@@ -9,18 +9,17 @@ Be sure to clone the repo to a folder called "cpp"
 (do not let git choose the folder name automaticallly).
 
 To build the code, open the projects in Qt Creator and 
-build them in the order listed in 'rz-build-order.txt".
+build them in the order listed in "rz-build-order.txt".
 
 Create a folder sibling to "cpp" called "data", and inside 
 that a folder called "scripts", and inside that a folder called 
 "rz", and inside that a file called "t1.rz" (unless you want to 
-edit the paths coded into the "main.cpp" files.
+edit the paths coded into the "main.cpp" files).
 
 Run the compiler with rz-graph-dynamo-runtime-console or 
 one of the other executables.  The t1.rz file can have 
 sample code like: 
 ```
-
 ,fnd ::: Fn_Doc*;
 fnd \== default; 
 
