@@ -22,6 +22,8 @@ RE_Token::RE_Token(QString raw_text, QString prefix,
   if( (prefix.size() == 0) && (suffix.size() == 0) )
   {
    flags.is_do = true;
+   special_token_ =
+    RE_Code_Representation::check_special_token(raw_text_, false);
    return;
   }
  }
