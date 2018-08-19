@@ -72,6 +72,10 @@ class RZ_Dynamo_Form
  caon_ptr<RZ_Code_Statement> code_statement_;
  caon_ptr<RZ_Expression_Review> expression_review_;
 
+ QMap<caon_ptr<RZ_Dynamo_Form>, QPair<QString, int>> wrapped_inner_elements_;
+
+ int hdcode_;
+
  void mark_unsurrounded_nested();
  void add_string_token(QString tok);
 
@@ -95,6 +99,7 @@ public:
  ACCESSORS(caon_ptr<RZ_Code_Statement> ,code_statement)
  ACCESSORS(caon_ptr<RZ_Expression_Review> ,expression_review)
 
+ void add_expression_wrapper(caon_ptr<RZ_Dynamo_Form> form, QString text, int hdcode);
 
  void init_type_declaration(QString cmd);
  void init_expression();
@@ -107,6 +112,7 @@ public:
 
  void check_write_first_nested_is_assignment_leave(QTextStream& qts);
 
+ void mark_deferred(int hdcode);
  void mark_as_assignment_expression();
  void mark_as_fn_no_block();
 

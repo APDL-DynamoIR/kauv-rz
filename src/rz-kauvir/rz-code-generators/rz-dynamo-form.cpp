@@ -36,7 +36,7 @@ RZ_Dynamo_Form::RZ_Dynamo_Form(caon_ptr<RZ_Dynamo_Form> parent)
      assignment_token_(MS_Token::Null()),
      annotation_(nullptr),
      code_statement_(nullptr),
-     expression_review_(nullptr)
+     expression_review_(nullptr), hdcode_(0)
 {
 
 }
@@ -138,7 +138,16 @@ void RZ_Dynamo_Form::write(QTextStream& qts)
  }
  else if(expression_)
  {
-  expression_->write(qts);
+  if(ANNOTATION_FLAG(is_deferred))
+  {
+   qts << "kb::hold-deferred " << hdcode_ << " '(progn (;; annotation_flag_ deferred ...\n";
+   expression_->write(qts);
+   qts << "\n)) ;; ... annotation_flag_ deferred\n";
+  }
+  else
+  {
+   expression_->write(qts);
+  }
  }
  else if(!raw_text_.isEmpty())
  {
@@ -148,6 +157,12 @@ void RZ_Dynamo_Form::write(QTextStream& qts)
  {
   write_unmediated(qts);
  }
+}
+
+void RZ_Dynamo_Form::add_expression_wrapper(caon_ptr<RZ_Dynamo_Form> form,
+  QString text, int hdcode)
+{
+ wrapped_inner_elements_[form] = {text, hdcode};
 }
 
 void RZ_Dynamo_Form::add_expression(caon_ptr<RZ_Dynamo_Form> form)
@@ -506,9 +521,35 @@ void RZ_Dynamo_Form::write_unmediated(QTextStream& qts)
   {
    MS_Token mst {MS_Token_Kinds::Nested_Back,
      QString("%1-%2").arg(nesting_level_).arg(nfb_count)};
-   qts << "\n(kb::enter-nested-form " << mst.encode() << ")\n";
 
-   qts << "( ; nested-form-body_ \n";
+   auto fnd = wrapped_inner_elements_.find(nf);
+   if(fnd == wrapped_inner_elements_.end())
+   {
+    qts << "\n(kb::enter-nested-form " << mst.encode() << ")\n";
+    qts << "( ; nested-form-body_ \n";
+   }
+   else
+   {
+    QString note = fnd.value().first;
+    int hdcode = fnd.value().second;
+    MS_Token cmst {MS_Token_Kinds::Literal, QString::number(hdcode)};
+    if(note.endsWith('\''))
+    {
+     note.chop(1);
+     MS_Token nmst{MS_Token_Kinds::Note_Symbol, note};
+     qts << "\n(kb::enter-nested-form " << nmst.encode() << " "
+          << cmst.encode() << " "<< mst.encode() << ")\n";
+     qts << "( ; nested-form-body_ \n";
+     nf->mark_deferred(hdcode);
+    }
+    else
+    {
+     MS_Token nmst{MS_Token_Kinds::Note_Symbol, note};
+     qts << "\n(kb::enter-nested-form " << nmst.encode() << " "
+          << cmst.encode() << " "<< mst.encode() << ")\n";
+     qts << "( ; nested-form-body_ \n";
+    }
+   }
   }
   else
   {
@@ -572,6 +613,14 @@ void RZ_Dynamo_Form::mark_unsurrounded_nested()
 {
  check_init_annotation();
  annotation_->flags.unsurrounded_nested = true;
+}
+
+
+void RZ_Dynamo_Form::mark_deferred(int hdcode)
+{
+ check_init_annotation();
+ annotation_->flags.is_deferred = true;
+ hdcode_ = hdcode;
 }
 
 void RZ_Dynamo_Form::mark_parent_implict_end_form_before_nested_written()

@@ -800,6 +800,13 @@ caon_ptr<tNode> RZ_Lisp_Graph_Visitor::normalize_run_call(int depth, int pos, tN
  caon_ptr<RE_Call_Entry> srce = start_node.re_call_entry();
  CAON_PTR_DEBUG(RE_Call_Entry ,srce)
 
+ if(node_to_change)
+ {
+  caon_ptr<RE_Node> ntc = *node_to_change;
+  CAON_PTR_DEBUG(RE_Node ,ntc)
+  CAON_DEBUG_NOOP
+ }
+
 
  caon_ptr<RE_Call_Entry> effective_rce = carried_call_entry;
 
@@ -829,29 +836,39 @@ caon_ptr<tNode> RZ_Lisp_Graph_Visitor::normalize_run_call(int depth, int pos, tN
 
   if(n1)
   {
-   n = n1;
-   if(n2)
+   if(cross_flag)
    {
-    if(n2 != n1)
+
+   }
+   else
+   {
+    n = n1;
+    if(n2)
+    {
+     if(cross_flag)
+     {
+      if(n2 != n1)
+      {
+       qDebug() << "Problem at: " << __LINE__;
+      }
+     }
+    }
+    else
     {
      qDebug() << "Problem at: " << __LINE__;
     }
-   }
-   else
-   {
-    qDebug() << "Problem at: " << __LINE__;
-   }
-
-   if(effective_rce)
-   {
-    qDebug() << "Check effective RCE: " << __LINE__;
-   }
-   else
-   {
-    effective_rce = srce;
+    if(effective_rce)
+    {
+     qDebug() << "Check effective RCE: " << __LINE__;
+    }
+    else
+    {
+     effective_rce = srce;
+    }
    }
   }
-  else if(n2)
+
+  if(!n)
   {
    // //  can we always do this?
    n = n2;
@@ -867,7 +884,11 @@ caon_ptr<tNode> RZ_Lisp_Graph_Visitor::normalize_run_call(int depth, int pos, tN
 
   if(n)
   {
+   CAON_PTR_DEBUG(RE_Node ,n)
    n = normalize_run_call(depth, pos, start_node, *n, rq_.Run_Call_Entry, srce, effective_rce);
+
+   check_cross_do(&start_node);
+
    if(n)
     return n;
    else
@@ -962,7 +983,9 @@ caon_ptr<tNode> RZ_Lisp_Graph_Visitor::normalize_run_call(int depth, int pos, tN
   }
  }
  CAON_PTR_DEBUG(RE_Node ,function_node)
+
  // //  this is not only for 'nested' except vis-a-vis RCE chains...
+  //     well not sure?
  normalize_nested_run_call(srce, depth, *function_node);
  return nullptr;
 }
@@ -1051,7 +1074,7 @@ caon_ptr<RZ_Lisp_Graph_Visitor::tNode>
  else
  {
   // //  If not, assume the start node is a function symbol
-  if(  (crce && crce->flags.is_statement_entry) ) //(rce && rce->flags.is_statement_entry)
+  if(  (crce && crce->flags.is_statement_entry) )
   {
    caon_ptr<RZ_Code_Statement> st = new RZ_Code_Statement(
      RZ_Code_Statement::Statement_Kinds::Expression, &start_node);
@@ -1143,7 +1166,7 @@ caon_ptr<RZ_Lisp_Graph_Visitor::tNode>
  // //  we can assume statement kind is expression ...
 
  //if(depth == 0)
- if(crce && crce->flags.is_statement_entry) //(rce && rce->flags.is_statement_entry)
+ if(crce && crce->flags.is_statement_entry)
  {
   caon_ptr<RZ_Code_Statement> st = new RZ_Code_Statement(
     RZ_Code_Statement::Statement_Kinds::Expression, &start_node);
@@ -1277,6 +1300,9 @@ void RZ_Lisp_Graph_Visitor::normalize_nested_run_call(
    normalize_run_call(depth + 1, count, *previous_node, *next_node, rq_.Run_Call_Entry,
                       nullptr, carried_rce, &next_node);
 
+   // // is this the right place for this?
+   check_cross_do(next_node);
+
 
    // //  don't do the continuation on count == 0 because those are not nested ...
    if(count == 0)
@@ -1294,20 +1320,92 @@ void RZ_Lisp_Graph_Visitor::normalize_nested_run_call(
  }
 }
 
+void RZ_Lisp_Graph_Visitor::check_cross_do(caon_ptr<RE_Node> n)
+{
+ if(caon_ptr<RE_Node> don = rq_.Run_Cross_Do(n))
+ {
+  CAON_PTR_DEBUG(RE_Node ,don)
+  don->debug_connections();
+  if(caon_ptr<RE_Node> arn = rq_.Run_Call_Sequence(don))
+  {
+   CAON_PTR_DEBUG(RE_Node ,arn)
+   if(caon_ptr<RZ_Lisp_Token> rzlt = arn->lisp_token())
+   {
+    CAON_PTR_DEBUG(RZ_Lisp_Token ,rzlt)
+    if(caon_ptr<RE_Node> fdef_node = rq_.Run_Function_Def_Entry(arn))
+    {
+     if(caon_ptr<RE_Function_Def_Entry> fdef = fdef_node->re_function_def_entry())
+     {
+      caon_ptr<RE_Node> pn = fdef->prior_node();
+      CAON_PTR_DEBUG(RE_Node ,pn)
+      CAON_PTR_DEBUG(RE_Function_Def_Entry ,fdef)
+      caon_ptr<RZ_Function_Def_Info> new_fdi = valuer_->new_function_def_info(fdef);
+      rzlt->set_value(new_fdi);
+
+     }
+    }
+   }
+  }
+ }
+}
+
 caon_ptr<RZ_Lisp_Graph_Visitor::tNode>
  RZ_Lisp_Graph_Visitor::normalize_nested_run_call_continuation(int depth, int pos,
   caon_ptr<tNode> previous_node, caon_ptr<tNode> function_node)
 {
  CAON_PTR_DEBUG(tNode ,previous_node)
  CAON_PTR_DEBUG(tNode ,function_node)
- if(caon_ptr<tNode> next_node = rq_.Run_Cross_Sequence(previous_node))
+
+ caon_ptr<RE_Node> pnnode = rq_.Run_Cross_Sequence(previous_node);
+ caon_ptr<RE_Node> fnnode = rq_.Run_Cross_Sequence(function_node);
+
+ caon_ptr<tNode> fnext_node = nullptr;
+ caon_ptr<tNode> next_node = nullptr;
+
+ if(fnnode)
  {
+  // //  only for do?
+  if(caon_ptr<RE_Call_Entry> rce = function_node->re_call_entry() )
+  {
+   CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+   if(rce->flags.is_do_lambda)
+   {
+    fnext_node = fnnode;
+   }
+  }
+ }
+
+ if(pnnode)
+ {
+  if(fnext_node)
+  {
+   qDebug() << "Warning: " << __LINE__;
+  }
+  next_node = pnnode;
+ }
+
+ if(fnext_node)
+ {
+  normalize_run_call(depth, pos + 1, *function_node, *fnext_node, rq_.Run_Cross_Sequence,
+                     nullptr, nullptr, &fnext_node);
+
+  //normalize_nested_run_call(function_node->re_call_entry(), depth, *fnext_node);
+  CAON_PTR_DEBUG(RE_Node ,next_node)
+  return nullptr; //normalize_nested_run_call_continuation(depth, pos, function_node, fnext_node);
+ }
+
+ else if(next_node)
+ {
+  CAON_PTR_DEBUG(RE_Node ,next_node)
   // //  Because of how Run_Cross_Sequence is used
    //     for both continuations in Lambda4 -- maybe separate them out?
   if(caon_ptr<RE_Call_Entry> rce = next_node->re_call_entry())
   {
+   CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+
    normalize_run_call(depth, pos, *function_node, *next_node, rq_.Run_Cross_Sequence,
                       nullptr, nullptr, &next_node);
+   CAON_PTR_DEBUG(RE_Node ,next_node)
    return normalize_nested_run_call_continuation(depth, pos, function_node, next_node);
   }
   else

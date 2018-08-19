@@ -105,6 +105,8 @@ private:
  // debug ...
 
  int map_key_sequence_order_;
+ caon_ptr<RZ_Function_Def_Info> ref_fdi_;
+
 
 public:
 
@@ -115,6 +117,8 @@ public:
  ACCESSORS(caon_ptr<RE_Function_Def_Entry> ,function_def_entry)
  ACCESSORS(caon_ptr<RE_Node> ,map_key_sequence_ref_node)
  ACCESSORS(int ,map_key_sequence_order)
+ ACCESSORS(caon_ptr<RZ_Function_Def_Info> ,ref_fdi)
+
 
  QString channel_string(const RZ_Function_Def_Syntax& syntax, caon_ptr<RE_Node> sequence_node);
  QString lambda_channel_string(const RZ_Function_Def_Syntax& syntax);

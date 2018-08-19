@@ -53,6 +53,7 @@ public:
   bool skip_close_paren_on_parent_written:1;
   bool is_fn_no_block:1;
   bool child_implict_end_form_before_nested_written:1;
+  bool is_deferred:1;
  _flags
 
 

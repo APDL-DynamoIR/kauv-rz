@@ -135,16 +135,16 @@ QString RZ_Lisp_Graph_Visitor_Dynamo::function_name_from_token_text(QString text
    {"let", "kb::write-qreg-type-binding-statement"},
    {"\\=", "kb::si"},
    {"\\==", "kb::symbol-init-via-type"},
-   //?{"/->", "kb::s1c"},
    {"/->", "kb::write-s1-expression"},
    {"do", "kb::write-anon-fdef"},
    {"elsif", ""},
    {"if", "kb::if-without-elsif"},
    {"KAUVIR_DECLARE_INTERACTIVE", "kb::sr"},
-     //?
-   {"qpr", "kb::write-qpr"},
-   {"\\=>>", "kb::write-overloadable-fdef"},
 
+   //? {"qpr", "kb::write-qpr"},
+
+   {"\\=>>", "kb::write-overloadable-fdef"},
+   {"=?", "equal"},
   }};
 
  return static_map.value(text, text);

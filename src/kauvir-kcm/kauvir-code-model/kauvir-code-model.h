@@ -111,11 +111,17 @@ class Kauvir_Code_Model
  QMap<QPair<KCM_Type_Object*,
    KCM_Type_Object::Modifiers>, KCM_Type_Object*> kcm_type_object_modifier_map_;
 
- QStack<QPair<KCM_Expression*, QPair<int, int>>> current_nested_expression_coords_;
+ // //  stack or queue?
+ // // QStack<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>> current_nested_expression_coords_;
+ QQueue<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>> current_nested_expression_coords_;
 
  QMap<QString, KCM_Callable_Value*> current_anon_codes_;
 
  const KCM_Type_Object* generic_anon_callable_value_type_object_;
+ const KCM_Type_Object* callable_lisp_deferred_value_type_object_;
+ const KCM_Type_Object* argument_vector_type_object_;
+
+ QStack<QPair<KCM_Expression*, QPair<int, int>>> current_held_deferred_coords_;
 
 public:
 
@@ -138,6 +144,7 @@ public:
 
  void init_scope_system();
  void prepare_nested_expression(KCM_Expression* kcx, int level, int index);
+ void prepare_nested_defer_expression(KCM_Expression* kcx, int hdcode, int level, int index);
 
  KCM_Statement* promote_type_binding_to_statement_with_nested_block(QString symbol_name, const KCM_Type_Object* kto);
 
@@ -146,6 +153,7 @@ public:
  KCM_Runtime_Scope* get_current_runtime_scope();
 
  void hold_runtime_list(QString key, quint64 clo);
+ void hold_deferred(int hdcode, quint64 clo);
 
 
  const KCM_Type_Object* get_kcm_type_by_kauvir_type_object(const Kauvir_Type_Object*);

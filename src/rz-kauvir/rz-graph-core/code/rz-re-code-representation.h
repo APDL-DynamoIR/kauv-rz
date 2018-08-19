@@ -14,6 +14,7 @@
 #include <QString>
 #include <QMap>
 
+
 #include "rzns.h"
 RZNS_(RECore)
 
@@ -69,9 +70,13 @@ public:
    }};
 
   if(do_parse)
+  {
    return static_map.value(token_string, special_token_na);
+  }
   else
+  {
    return special_token_na;
+  }
  }
 
 private:

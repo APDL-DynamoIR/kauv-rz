@@ -24,6 +24,8 @@ typedef void*& pvrt;
 
 typedef pvt pvft;
 
+typedef quint64 u64t;
+typedef quint32 u32t;
 
 typedef void(Kauvir_Universal_Class::*fn0_type)();
 typedef void(Kauvir_Universal_Class::*fn1_type)(void*&);
@@ -49,12 +51,35 @@ typedef void*(*s0_fn1_p_type)(pvft);
 typedef void*(*s0_fn1_r_type)(quint64&);
 typedef void*(*s0_fn1_s_type)(QString);
 
+typedef void*(*s0_fn1_p_p_type)(pvft, pvft);
+typedef void(*_s0_fn1_p_p_type)(pvft, pvft);
+
+typedef void(*_s0_fn1_64_64_type)(u64t, u64t);
+typedef void(*_s0_fn1_32_32_type)(u32t, u32t);
+
+typedef void*(*s0_fn1_64_64_type)(u64t, u64t);
+typedef void*(*s0_fn1_32_32_type)(u32t, u32t);
+
+typedef void(*_s0_fn1_64_32_type)(u64t, u32t);
+typedef void(*_s0_fn1_32_64_type)(u32t, u64t);
+typedef void*(*s0_fn1_64_32_type)(u64t, u32t);
+typedef void*(*s0_fn1_32_64_type)(u32t, u64t);
+
+typedef void*(*s0_fn1_64_type)(u64t);
+typedef void*(*s0_fn1_32_type)(u32t);
+typedef void(*_s0_fn1_64_type)(u64t);
+typedef void(*_s0_fn1_32_type)(u32t);
+
+typedef void*(*s0_fn1_void_type)();
+typedef void(*_s0_fn1_void_type)();
+typedef QString(*s0_fn1_void__s_type)();
+
 
 typedef QString(*s0_fn1_p__s_type)(pvft);
 typedef QString(*s0_fn1_r__s_type)(quint64&);
 typedef QString(*s0_fn1_s__s_type)(QString);
 
-
+typedef QString(*s0_fn1_p_p__s_type)(pvft, pvft);
 
 
 typedef void*(*s0_fng_type)();

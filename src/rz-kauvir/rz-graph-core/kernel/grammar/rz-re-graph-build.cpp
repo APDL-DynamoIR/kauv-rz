@@ -24,6 +24,7 @@ USING_RZNS(RECore)
 
 #include "kernel/rz-re-dominion.h"
 
+
 #include "token/rz-re-token.h"
 
 
@@ -184,7 +185,8 @@ void RE_Graph_Build::complete_function_declaration()
 
 }
 
-void RE_Graph_Build::add_semis(QString raw_text, QString space_to_end_of_line)
+void RE_Graph_Build::add_semis(QString raw_text, QString suffix,
+                               QString space_to_end_of_line)
 {
  int length = raw_text.length();
  if(length > 6)
@@ -192,13 +194,17 @@ void RE_Graph_Build::add_semis(QString raw_text, QString space_to_end_of_line)
   raw_text.truncate(6);
   length = 6;
  }
+
  switch(length)
  {
  case 1:
-  markup_position_.close_statement();
+  if(suffix.isEmpty())
+    markup_position_.close_statement();
+  else
+    markup_position_.leave_lexical_scope(2, suffix);
   return;
  case 2:
-  markup_position_.leave_lexical_scope(2);
+  markup_position_.leave_lexical_scope(2, suffix);
   return;
  case 5:
   terminate_parse();
@@ -585,7 +591,6 @@ void RE_Graph_Build::add_run_token(QString prefix, QString raw_text,
  bool matches_expected_token_end = false;
  bool this_token_closes_expression = false;
 
-
  if(flags.next_token_closes_expression)
  {
   flags.next_token_closes_expression = false;
@@ -659,26 +664,6 @@ void RE_Graph_Build::add_run_token(QString prefix, QString raw_text,
    markup_position_.hold_mapkey_node(node);
   }
  }
-// else if(token->special_token() == RE_Code_Representation::Special_Tokens::Pending_Call_Arrow_Via_Lisp_Callback)
-// {
-//  parse_context_.flags.arrow_pending_symbol_modify_to_method = true;
-//  markup_position_.add_token_node(node);
-// }
-// else if(token->special_token() == RE_Code_Representation::Special_Tokens::Call_Arrow_Via_Lisp_Callback)
-// {
-//  markup_position_.add_token_node(node);
-// }
-// else if(token->special_token() == RE_Code_Representation::Special_Tokens::Default_With_Matching)
-// {
-//  token->flags.is_match_literal = true;
-//  token->set_raw_text("_");
-//  markup_position_.add_token_node(node);
-// }
-// else if(token->special_token() == RE_Code_Representation::Special_Tokens::Matching_Default)
-// {
-//  token->set_raw_text("_");
-//  markup_position_.add_token_node(node);
-// }
  else if(token->special_token() == RE_Code_Representation::Special_Tokens::Auto_Expand_To_Null_Test)
  {
   markup_position_.add_call_entry(false);
@@ -712,7 +697,9 @@ void RE_Graph_Build::add_run_token(QString prefix, QString raw_text,
   break;
  case RE_Code_Representation::Special_Token_Kind::Auto_Statement_End_If_EOL:
   if(!space_to_end_of_line.isEmpty())
+  {
    markup_position_.close_statement();
+  }
   break;
  case RE_Code_Representation::Special_Token_Kind::Text_Map_Leave:
   markup_position_.close_statement();

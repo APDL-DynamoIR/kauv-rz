@@ -98,6 +98,17 @@ void KCM_Lisp_Bridge::kcm_prepare_nested_expression(KCM_Expression* kcx, int lev
  kcm_.prepare_nested_expression(kcx, level, index);
 }
 
+void KCM_Lisp_Bridge::kcm_prepare_nested_defer_expression(KCM_Expression* kcx,
+  int hdcode, int level, int index)
+{
+ kcm_.prepare_nested_defer_expression(kcx, hdcode, level, index);
+}
+
+void KCM_Lisp_Bridge::kcm_hold_deferred(int hdcode, quint64 qclo)
+{
+ kcm_.hold_deferred(hdcode, qclo);
+}
+
 void KCM_Lisp_Bridge::_kcm_hold_opaque_lisp_value(QString key, Opaque_Lisp_Value olv)
 {
  // // does the cl_object fall out of scope somehow?
@@ -129,7 +140,7 @@ void KCM_Lisp_Bridge::_kcm_hold_opaque_lisp_value(QString key, Opaque_Lisp_Value
 
 void KCM_Lisp_Bridge::kcm_finalize_nested_form_group(KCM_Expression* kcx)
 {
-
+ //?
 }
 
 quint64 KCM_Lisp_Bridge::get_value_of_symbol(QString symbol_name,
@@ -139,8 +150,10 @@ quint64 KCM_Lisp_Bridge::get_value_of_symbol(QString symbol_name,
  const KCM_Type_Object* ckto = nullptr;
  KCM_Expression* kcx = nullptr;
  QString encoded_value;
+ QPair<int, quint64> qclo_value;
 
- void* raw_value = scopes->find_raw_value_from_current_scope(symbol_name, kcx, kto, ckto, encoded_value, rkto);
+ void* raw_value = scopes->find_raw_value_from_current_scope(symbol_name, kcx,
+   kto, ckto, encoded_value, qclo_value, rkto);
 
  quint64 result = (quint64) raw_value;
 
@@ -389,14 +402,14 @@ void KCM_Lisp_Bridge::kcg_add_sigma_carrier_via_symbol(KCM_Channel_Group* kcg, Q
 }
 
 void KCM_Lisp_Bridge::kcg_add_sigma_carrier_via_symbol_with_cast(KCM_Channel_Group* kcg,
-  QString symbol_name, KCM_Type_Object* ckto)
+  QString symbol_name, const KCM_Type_Object* kto, const KCM_Type_Object* ckto)
 {
- //?kcg->add_sigma_carrier_via_symbol_with_cast(kcg, symbol_name, ckto);
+ kcg->add_sigma_carrier_via_symbol_with_cast(symbol_name, kto, ckto);
 }
 
 void KCM_Lisp_Bridge::kcg_add_sigma_carrier_via_literal(KCM_Channel_Group* kcg, QString text)
 {
- //?
+ kcg->add_sigma_carrier_via_literal(text);
 }
 
 KCM_Statement* KCM_Lisp_Bridge::kcm_promote_expression_to_statement(KCM_Expression* kcx)

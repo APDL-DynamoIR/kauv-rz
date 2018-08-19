@@ -64,6 +64,14 @@ public:
  Q_INVOKABLE void kcg_lambda_carrier_from_result_channel(KCM_Channel_Group* kcg, int level, int index);
  Q_INVOKABLE void kcm_prepare_nested_expression(KCM_Expression* kcx, int level, int index);
 
+ Q_INVOKABLE void kcm_prepare_nested_defer_expression(KCM_Expression* kcx,
+               int hdcode, int level, int index);
+
+ Q_INVOKABLE void kcm_hold_deferred(int hdcode, quint64 qclo);
+
+
+
+
  Q_INVOKABLE void _kcm_hold_opaque_lisp_value(QString key, Opaque_Lisp_Value olv);
 
  Q_INVOKABLE void _kcm_load_bridge(QString key, Opaque_Lisp_Value olv);
@@ -132,7 +140,7 @@ public:
 
  Q_INVOKABLE void kcg_add_sigma_carrier_via_symbol(KCM_Channel_Group* kcg, QString symbol_name);
  Q_INVOKABLE void kcg_add_sigma_carrier_via_symbol_with_cast(KCM_Channel_Group* kcg,
-   QString symbol_name, KCM_Type_Object* ckto);
+   QString symbol_name, const KCM_Type_Object* kto, const KCM_Type_Object* ckto);
  Q_INVOKABLE void kcg_add_sigma_carrier_via_literal(KCM_Channel_Group* kcg, QString text);
 
  Q_INVOKABLE void kcg_add_lambda_carrier_via_literal(KCM_Channel_Group* kcg, QString text);

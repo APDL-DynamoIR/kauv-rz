@@ -52,10 +52,12 @@ private:
 
  int qmetatype_ptr_code_;
 
+ int byte_code_;
+
 public:
 
  KCM_Type_Object(KCM_Channel_Group* channel_group);
- KCM_Type_Object(const Kauvir_Type_Object* kauvir_type_object);
+ KCM_Type_Object(const Kauvir_Type_Object* kauvir_type_object, int byte_code = 0);
  KCM_Type_Object();
 
 
@@ -65,11 +67,14 @@ public:
  ACCESSORS(Modifiers ,modifier)
  ACCESSORS(int ,qmetatype_ptr_code)
 
+ ACCESSORS(int ,byte_code)
+
  static Modifiers get_modifier_by_string(QString str);
 
  bool is_string_like() const;
  bool is_lisp_list_like() const;
-
+ bool is_callable_lisp_deferred_value_like() const;
+ bool is_argvec_like() const;
 
  void report(QTextStream& qts, Kauvir_Code_Model& kcm, KCM_Report_Syntax& kcrs) const;
 

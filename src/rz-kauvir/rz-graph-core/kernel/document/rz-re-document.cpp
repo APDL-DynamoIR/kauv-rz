@@ -16,6 +16,8 @@
 
 #include "kernel/graph/rz-re-graph.h"
 
+#include "textio.h"
+
 
 #include "rzns.h"
 
@@ -26,6 +28,7 @@
 #include <QRegularExpression>
 
 USING_RZNS(RECore)
+USING_KANS(TextIO)
 
 
 RE_Document::RE_Document(QString path)
@@ -36,6 +39,51 @@ RE_Document::RE_Document(QString path)
   load_file(path);
 }
 
+void RE_Document::finalize_raw_text()
+{
+ QMap<QPair<int, int>, QString> posmap;
+ int index = 0;
+ while( (index = raw_text_.indexOf("<#", index)) != -1 )
+ {
+  int end = raw_text_.indexOf(">", index);
+  if(end == -1)
+    break;
+  QString fn = raw_text_.mid(index + 2, end - index - 2);
+  if(fn.contains('\n'))
+    break;
+  posmap[{index, end - index + 1}] = fn;
+  index = end + 1;
+ }
+
+ int diff = 0;
+ QMapIterator<QPair<int, int>, QString> it(posmap);
+ while(it.hasNext())
+ {
+  it.next();
+  int index = it.key().first;
+  int end = it.key().second;
+  QString fn = it.value();
+  if(fn.endsWith('#'))
+  {
+   fn.chop(1);
+  }
+  else if(!fn.contains('.'))
+  {
+   fn.append(".rz");
+  }
+  if(!fn.contains('/'))
+  {
+   fn.prepend(local_directory_ + '/');
+  }
+
+  QString nt;
+  nt = ::load_file(fn);
+  raw_text_.replace(index + diff, end, nt);
+  diff += nt.size() - end;
+ }
+ report_raw_text("..raw.txt", "_");
+
+}
 
 void RE_Document::load_file(QString path)
 {
@@ -46,6 +94,7 @@ void RE_Document::load_file(QString path)
   local_path_ = path;
   QFileInfo qfi(local_path_);
   local_directory_ = qfi.absoluteDir().absolutePath();
+  finalize_raw_text();
  }
 }
 
@@ -63,6 +112,20 @@ void RE_Document::resolve_report_path(QString& path)
   {
   }
  }
+}
+
+void RE_Document::report_raw_text(QString path, QString pre)
+{
+ resolve_report_path(path);
+ int index = path.lastIndexOf('/');
+ path.insert(index + 1, pre);
+ ::save_file(path, raw_text_);
+}
+
+void RE_Document::report_raw_text(QString path)
+{
+ resolve_report_path(path);
+ ::save_file(path, raw_text_);
 }
 
 void RE_Document::report_graph(QString path)

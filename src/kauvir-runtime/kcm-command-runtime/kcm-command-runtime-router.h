@@ -282,9 +282,11 @@ public:
  void proceed_s0();
  void proceed_s1();
 
- void proceed_s0_0();
+ void proceed_s0_argvec(s0_fn1_p_type fn, void** pResult);
+
+ void proceed_s0_0(void** pResult);
  void proceed_s0_1(void** pResult);
- void proceed_s0_2();
+ void proceed_s0_2(void** pResult);
 
  void proceed_s1_0(void** pResult, void* raw_value);
  void proceed_s1_1(void** pResult, void* raw_value);
@@ -295,10 +297,11 @@ public:
  void proceed_s1_2_uc(void** pResult, void* raw_value);
 
  FN_Codes check_init_raw_value(KCM_Command_Runtime_Argument* kcra,
-   FN_Codes fnc, quint64& mem, QString* qs_mem, void*& result);
+   FN_Codes fnc, quint64& mem, QPair<int, quint64>& qclo_value, QString* qs_mem, void*& result);
 
  FN_Codes check_init_raw_value(KCM_Command_Runtime_Argument* kcra,
-   FN_Codes fnc, quint64& mem, QString* qs_mem, void*& result, int& ptr_depth);
+   FN_Codes fnc, quint64& mem, QPair<KCM_Scope_System*, QPair<int, quint64>>& qclo_value,
+   QString* qs_mem, void*& result, int& ptr_depth);
 
  FN_Codes add_string_cast_to_fn_code(FN_Codes fnc);
  FN_Codes add_ptr_cast_to_fn_code(FN_Codes fnc);

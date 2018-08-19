@@ -49,6 +49,10 @@ public:
   bool equalizer_context_number:1;
   bool equalizer_context_string:1;
 
+  bool is_do_closed_with_follow:1;
+  bool follows_closed_do:1;
+  bool is_deferred:1;
+
 
  _flags
 

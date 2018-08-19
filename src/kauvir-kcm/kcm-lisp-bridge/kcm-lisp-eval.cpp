@@ -6,12 +6,13 @@
 
 #include "kcm-lisp-eval.h"
 #include "kcm-lisp-runtime.h"
-#include "kcm-lisp-embed-environment.h"-
+#include "kcm-lisp-embed-environment.h"
 
 #include "kcm-lisp-runtime-argument.h"
 
-#include "rz-dynamo/rz-dynamo-generator/rz-dynamo-generator.h"
+#include "kcm-runtime-eval/kcm-scopes/kcm-scope-system.h"
 
+#include "rz-dynamo/rz-dynamo-generator/rz-dynamo-generator.h"
 
 #include "kauvir-code-model/kcm-channel-bridge.h"
 #include "kauvir-runtime/kcm-command-runtime/kcm-command-runtime-router.h"
@@ -230,9 +231,43 @@ void* KCM_Lisp_Eval::opaque_lisp_value_to_pVoid(Opaque_Lisp_Value olv)
 void KCM_Lisp_Eval::run_held_lisp_list(quint64 lisp_val, quint64& mem)
 {
  cl_object result = cl_eval( (cl_object) lisp_val);
- quint32 value = ecl_to_fixnum(result);
+ quint64 value = ecl_to_fixnum(result);
  mem = value;
 }
+
+void KCM_Lisp_Eval::eval_held_form(quint64 qclo)
+{
+ cl_eval( (cl_object) qclo);
+}
+
+void KCM_Lisp_Eval::eval_lisp_callable_deferred_value(quint64 qclo,
+  quint64& result, QString convention)
+{
+ QPair<KCM_Scope_System*, QPair<int, quint64>>* pr = (QPair<KCM_Scope_System*, QPair<int, quint64>>*) qclo;
+ KCM_Scope_System* scopes = pr->first;
+ int hdcode = pr->second.first;
+ cl_object clo = (cl_object) pr->second.second;
+ cl_object clo_result = cl_eval(clo);
+ quint64 h = scopes->find_held_value_by_hdcode(hdcode);
+ if(h)
+ {
+  cl_object oldr = clo_result;
+  clo_result = cl_eval( (cl_object) h );
+ }
+ if(convention == "fixnum")
+ {
+  result = ecl_to_fixnum(clo_result);
+ }
+ else if(convention == "bool")
+ {
+  result = ecl_to_bool(clo_result);
+ }
+ else
+ {
+  result = (quint64) clo_result;
+ }
+}
+
 
 void KCM_Lisp_Eval::parse_opaque_lisp_value(Opaque_Lisp_Value olv,
   Opaque_Lisp_Value_Types& olvt, QString& encoded_value)
@@ -438,6 +473,37 @@ void KCM_Lisp_Eval::prepare_dynamo_callbacks(void** pass_on)
   }, "KB", "WRITE-PROMOTE-EXPRESSION", pass_on);
 
 
+ define_callback(
+  [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
+  {
+   KCM_Lisp_Runtime* runtime = reinterpret_cast<KCM_Lisp_Runtime*>( ((void**) pass_on)[0]);
+   KCM_Lisp_Eval* reval = reinterpret_cast<KCM_Lisp_Eval*>( ((void**) pass_on)[1]);
+
+   RZ_Dynamo_Generator* rdg = runtime->rdg();
+   int size = arglist->frame.size;
+   cl_object clo = 0;
+   int hdcode = 0;
+   if(size > 1)
+   {
+    cl_object cclo = cl_cxx_backend::nth_arg(arglist, 1);
+    hdcode = ecl_to_fixnum(cclo);
+    clo = cl_cxx_backend::nth_arg(arglist, 2);
+    //clo1 = cl_cxx_backend::nth_arg(arglist, 1);
+   }
+   if(rdg)
+   {
+    quint64 qclo = 0;
+    rdg->hold_deferred(hdcode, (quint64) clo, qclo);
+    if(qclo)
+    {
+     reval->eval_held_form(qclo);
+     rdg->finalize_hold_deferred();
+    }
+   }
+   return ECL_NIL;
+  }, "KB", "HOLD-DEFERRED", pass_on);
+
+
 
  define_callback(
   [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
@@ -447,7 +513,6 @@ void KCM_Lisp_Eval::prepare_dynamo_callbacks(void** pass_on)
 
    RZ_Dynamo_Generator* rdg = runtime->rdg();
 
-   cl_object result_size = cl_cxx_backend::nth_arg(arglist, 0);
    int size = arglist->frame.size;
    if(size > 0)
    {

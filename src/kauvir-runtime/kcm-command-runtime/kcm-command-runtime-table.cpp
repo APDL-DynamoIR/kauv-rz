@@ -40,6 +40,7 @@ KCM_Channel_Group* KCM_Command_Runtime_Table::find_channel_group(const KCM_Chann
 
 KCM_Channel_Group* KCM_Command_Runtime_Table::add_s0_declared_function(QString name, const KCM_Channel_Group& channels)
 {
+ strip_hyphens(name);
  KCM_Channel_Group* result = find_channel_group(channels);
  s0_declared_functions_.insertMulti(name, result);
  return result;
@@ -48,6 +49,7 @@ KCM_Channel_Group* KCM_Command_Runtime_Table::add_s0_declared_function(QString n
 
 KCM_Channel_Group* KCM_Command_Runtime_Table::add_s1_declared_function(QString name, const KCM_Channel_Group& channels)
 {
+ strip_hyphens(name);
  KCM_Channel_Group* result = find_channel_group(channels);
  s1_declared_functions_.insertMulti(name, result);
  return result;
@@ -78,14 +80,31 @@ s1_fng_type KCM_Command_Runtime_Table::find_s1_declared_function_0(QString name,
  return nullptr;
 }
 
-s0_fn1_p_type KCM_Command_Runtime_Table::find_s0_declared_function_1(QString name,
-  KCM_Channel_Group* kcg, const KCM_Type_Object** pkto)
+
+s0_fn1_p_type KCM_Command_Runtime_Table::find_argvec_function(QString name)
 {
  for(QPair<KCM_Channel_Group*, s0_fng_type> pr : s0_declared_functions_generic_.values(name))
  {
+  KCM_Channel_Group* k_ = pr.first;
+  int byte_code = k_->get_lambda_byte_code();
+  if(byte_code == 99)
+  {
+   return (s0_fn1_p_type)(pr.second);
+  }
+ }
+ return nullptr;
+}
+
+
+s0_fn1_p_type KCM_Command_Runtime_Table::find_s0_declared_function_1(QString name,
+  KCM_Channel_Group* kcg, const KCM_Type_Object** pkto, int& byte_code)
+{
+ for(QPair<KCM_Channel_Group*, s0_fng_type> pr : s0_declared_functions_generic_.values(name))
+ {
+  KCM_Channel_Group* k_ = pr.first;
+  byte_code = k_->get_lambda_byte_code();
   if(pkto)
   {
-   KCM_Channel_Group* k_ = pr.first;
    KCM_Channel& result = k_->result();
    if(!result.carriers().isEmpty())
    {

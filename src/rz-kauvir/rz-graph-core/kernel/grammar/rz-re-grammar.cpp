@@ -54,16 +54,6 @@ void RE_Grammar::init(RE_Parser& p, RE_Graph& g, RE_Graph_Build& graph_build)
    graph_build.finalize_take_a_space();
   } );
 
- // // is this used?
-// add_rule(flags_all_(parse_context ,inside_run_acc), run_context,
-//  "possible-run-acc-end",
-//  ".script-word. | ."
-//  ,[&]
-// {
-//  QString s = p.match_text();
-//  graph_build.check_run_acc(s);
-// });
-
  add_rule( flags_all_(parse_context ,inside_string_literal), run_context,
   "string-literal-character",
   " (?: [^\\\"] | \\\\\" )+ ",
@@ -183,9 +173,9 @@ void RE_Grammar::init(RE_Parser& p, RE_Graph& g, RE_Graph_Build& graph_build)
  });
 
 
- add_rule( run_context, "run-tuple-indicator-with-name",
+ add_rule( run_context, "run-tuple-indicator-opens",
   " (?<name> \\w* ) "
-  " (?<prefix> [;,:_+`'#$%^*~!@\\-\\.]* )"
+  " (?<prefix> [;,:_+`'#$%*~\\\\^!@\\-\\.]* )"
   " (?<entry> (?: \\{{2,3} ) | "
   "   (?: \\[{2,3} ) | [ [({ ] )"
   " (?<suffix> [*~]* (?=\\s) )?"
@@ -198,10 +188,10 @@ void RE_Grammar::init(RE_Parser& p, RE_Graph& g, RE_Graph_Build& graph_build)
   graph_build.enter_tuple(name, prefix, entry, suffix);
  });
 
- add_rule( run_context, "run-tuple-indicator",
-  " (?<prefix> [;,:_+`'#$%^*~!@\\-\\.]* )"
-  " (?<entry> (?: \\{{2,3} ) | (?: \\}{2,3}) | "
-  "   (?: \\[{2,3} ) | (?: \\]{2,3}) | [ [({}\\])] )"
+ add_rule( run_context, "run-tuple-indicator-closes",
+  " (?<prefix> [;:\\.]* )"
+  " (?<entry> (?: \\}{2,3}) | "
+  "   (?: \\]{2,3}) | [\\])] )"
   " (?<suffix> [*~]* (?=\\s) )?"
    ,[&]
  {
@@ -275,12 +265,14 @@ void RE_Grammar::init(RE_Parser& p, RE_Graph& g, RE_Graph_Build& graph_build)
 
  add_rule( run_context, "run-token-semis",
   " (?<word> ;+ )"
+  " (?<suffix> [,/.]? )"
   " (?<eol> .space-to-end-of-line. \\n)?",
    [&]
  {
   QString m = p.matched("word");
-  QString s = p.matched("eol");
-  graph_build.add_semis(m, s);
+  QString s = p.matched("suffix");
+  QString e = p.matched("eol");
+  graph_build.add_semis(m, s, e);
  });
 
 }

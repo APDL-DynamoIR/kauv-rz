@@ -26,7 +26,9 @@ Kauvir_Type_System::Kauvir_Type_System()
     type_object__callable_lisp_code_(Kauvir_Type_Object("clc")),
     type_object__callable_lisp_function_(Kauvir_Type_Object("clf")),
     type_object__opaque_void_pointer_(Kauvir_Type_Object("opv")),
-    type_object__kcm_callable_value_(Kauvir_Type_Object("kcv"))
+    type_object__kcm_callable_value_(Kauvir_Type_Object("kcv")),
+    type_object__callable_lisp_deferred_value_(Kauvir_Type_Object("cldv")),
+    type_object__argument_vector_(Kauvir_Type_Object("argvec"))
 {
 
 }

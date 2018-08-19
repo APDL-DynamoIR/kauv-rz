@@ -8,6 +8,8 @@
 
 #include <QRegularExpression>
 
+#include <QDebug>
+
 #include "rzns.h"
 
 USING_RZNS(RECore)
@@ -118,6 +120,41 @@ RE_Token::RE_Token(QString raw_text, QString prefix,
 
  special_token_ =
   RE_Code_Representation::check_special_token(raw_text_, parse_special_token);
+
+}
+
+QString RE_Token::special_token_kind_string() const
+{
+ switch(special_token_kind())
+ {
+ case RE_Code_Representation::Special_Token_Kind::Arrow:
+  return "Arrow";
+
+ case RE_Code_Representation::Special_Token_Kind::Auto_Statement_End_If_EOL:
+  return "Auto_Statement_End_If_EOL";
+
+ case RE_Code_Representation::Special_Token_Kind::Auto_Statement_End:
+  return "Auto_Statement_End";
+
+ case RE_Code_Representation::Special_Token_Kind::Text_Map_Leave_In_Statement:
+  return "Text_Map_Leave_In_Statement";
+
+ case RE_Code_Representation::Special_Token_Kind::Text_Map_Leave:
+  return "Text_Map_Leave";
+
+ case RE_Code_Representation::Special_Token_Kind::Text_Map_Enter:
+  return "Text_Map_Enter";
+
+ case RE_Code_Representation::Special_Token_Kind::Normal:
+  return "Normal";
+
+ case RE_Code_Representation::Special_Token_Kind::N_A:
+  return "N_A";
+
+ default:
+   return "??";
+
+ }
 }
 
 QString RE_Token::clasp_string_value() const

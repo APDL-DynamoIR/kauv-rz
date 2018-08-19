@@ -11,8 +11,6 @@
 USING_KANS(KCM)
 USING_KANS(Kauvir)
 
-//KCM_Lexical_Block
-
 
 KCM_Report_Syntax::KCM_Report_Syntax()
   :  Flags(0)

@@ -86,10 +86,6 @@ USING_RZNS(RZClasp)
 
 RZNS_(GVal)
 
-//class RZ_Lisp_Graph_User_Package;
-//class RZ_Lisp_Graph_User_Class;
-//class RZ_Lisp_Graph_User_Namespace;
-
 class RZ_Opaque_Type_Symbol;
 class RZ_Lisp_Symbol;
 class RZ_Lisp_Graph_Rvalue;
@@ -340,6 +336,9 @@ public:
  caon_ptr<RZ_Lisp_Graph_Valuer::tNode> initialize_data_entry(tNode& node);
 
  caon_ptr<tNode> retval_follow(caon_ptr<tNode> n);
+
+ caon_ptr<RZ_Function_Def_Info> new_function_def_info(caon_ptr<RE_Function_Def_Entry> fdef);
+
 
 
  QString node_to_string(tNode& n);

@@ -53,6 +53,7 @@ class RE_Document
 
  void preprocess_raw_text();
  static QString insert_block_map_signatures(QString original_source, QString sig);
+ void finalize_raw_text();
 
 public:
 
@@ -72,6 +73,10 @@ public:
 
  void load_file(QString path);
  void report_graph(QString path);
+
+ void report_raw_text(QString path);
+
+ void report_raw_text(QString path, QString pre);
 
  void write_report(QString path);
 

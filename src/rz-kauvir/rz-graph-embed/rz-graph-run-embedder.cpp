@@ -60,7 +60,7 @@ void RZ_Graph_Run_Embedder::redirect_to_noop(RZ_Lisp_Graph_Result_Holder& rh,
  tNode& current_start_node)
 {
  caon_ptr<tNode> arg = &current_start_node;
- if(caon_ptr<tNode> n = rh.get_lead_function_node(arg)) //&current_start_node))
+ if(caon_ptr<tNode> n = rh.get_lead_function_node(arg))
  {
   redirect_to_noop(*n);
  }

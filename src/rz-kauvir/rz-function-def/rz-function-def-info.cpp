@@ -41,7 +41,7 @@ RZ_Function_Def_Info::RZ_Function_Def_Info(RE_Function_Def_Entry& function_def_e
    monad_channel_entry_node_(nullptr),
    context_channel_entry_node_(nullptr),
    map_key_sequence_ref_node_(nullptr),
-   map_key_sequence_order_(0)
+   map_key_sequence_order_(0), ref_fdi_(nullptr)
 {
  caon_ptr<tNode> fdef_node = function_def_entry.node();
  switch(function_def_entry.kind())

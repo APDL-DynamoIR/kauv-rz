@@ -11,8 +11,6 @@
 USING_KANS(KCM)
 USING_KANS(Kauvir)
 
-//KCM_Lexical_Block
-
 KCM_Source_Function::KCM_Source_Function(KCM_Channel_Group* kcg)
   :  kcg_(kcg), cl_object_(0)
 {

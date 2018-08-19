@@ -6,6 +6,8 @@
 
 #include "kcm-channel-group.h"
 
+#include "kcm-type-object.h"
+
 #include "kans.h"
 
 USING_KANS(KCM)
@@ -107,6 +109,12 @@ void KCM_Channel_Group::add_sigma_carrier(kcm_type_object_pair_type tos,
  sigma_.add_carrier(tos, ep, symbol_name);
 }
 
+void KCM_Channel_Group::add_sigma_carrier_via_symbol_with_cast(QString value_name,
+  const KCM_Type_Object* kto, const KCM_Type_Object* ckto)
+{
+ add_sigma_carrier({kto, ckto}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
+}
+
 void KCM_Channel_Group::add_capture_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name)
 {
@@ -117,6 +125,17 @@ void KCM_Channel_Group::add_gamma_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name)
 {
  gamma_.add_carrier(tos, ep, symbol_name);
+}
+
+int KCM_Channel_Group::get_lambda_byte_code()
+{
+ int result = 9;
+ for(const KCM_Carrier& c : lambda_.carriers())
+ {
+  result *= 10;
+  result += c.type_object()->byte_code();
+ }
+ return result;
 }
 
 void KCM_Channel_Group::add_lambda_carrier_from_result_channel(int level, int index)

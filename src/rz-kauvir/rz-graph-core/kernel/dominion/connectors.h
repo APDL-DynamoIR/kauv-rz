@@ -1,3 +1,10 @@
+
+//           Copyright Nathaniel Christen 2018.
+//  Distributed under the Boost Software License, Version 1.0.
+//     (See accompanying file LICENSE_1_0.txt or copy at
+//           http://www.boost.org/LICENSE_1_0.txt)
+
+
 DOMINION_CONNECTOR(N_A, "No Connection")
 DOMINION_CONNECTOR(Text_Map_Key_Sequence, "text-map-key-sequence")
 DOMINION_CONNECTOR(Residual_Node, "residual-node")
@@ -33,7 +40,9 @@ DOMINION_CONNECTOR(Run_Map_Key_Sequence, "run-map-key-sequence")
 DOMINION_CONNECTOR(Run_Map_Key_Value, "run-map-key-value")
 DOMINION_CONNECTOR(Code_Map_Key_Sequence, "code-map-key-sequence")
 DOMINION_CONNECTOR(Code_Map_Key_Value, "code-map-key-value")
-DOMINION_CONNECTOR(Tag_Command_Entry, "tag-command-entry")
+
+DOMINION_CONNECTOR(Run_Cross_Do, "run-cross-do")
+
 DOMINION_CONNECTOR(Run_Lexical_Scope, "run-lexical-scope")
 DOMINION_CONNECTOR(Run_Embed_Redirect, "run-embed-redirect")
 
@@ -42,7 +51,10 @@ DOMINION_CONNECTOR(Run_Cross_Sequence_Direct, "run-cross-sequence-direct")
 DOMINION_CONNECTOR(Run_Call_Entry_Direct, "run-call-entry-direct")
 
 DOMINION_CONNECTOR(Run_Embed_Rename, "run-embed-rename")
+
+
 DOMINION_CONNECTOR(Static_Init_Value, "static-init-value")
+
 DOMINION_CONNECTOR(Run_Proxy_Value, "run-proxy-value")
 DOMINION_CONNECTOR(Run_Fundef_Map_Key_Sequence, "run-fundef-map-key-sequence")
 DOMINION_CONNECTOR(String_Plex_Value, "string-plex-value")
@@ -55,6 +67,7 @@ DOMINION_CONNECTOR(Element_Review, "element-review")
 
 DOMINION_CONNECTOR(Run_Nested_Block_Continue, "run-nested-block-continue")
 DOMINION_CONNECTOR(Type_Indicator, "type-indicator")
+
 
 DOMINION_CONNECTOR(Element_Association, "element-association")
 DOMINION_CONNECTOR(Retval_Follow, "retval-follow")

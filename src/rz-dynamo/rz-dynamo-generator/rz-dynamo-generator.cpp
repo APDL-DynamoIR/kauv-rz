@@ -198,6 +198,18 @@ void RZ_Dynamo_Generator::write_s1_expression(QList<MS_Token>& tokens)
  (*qts_) << "\n(setq kcx (ka::kc :|kcm_dissolve_to_nested_expression| kcg))";
 }
 
+void RZ_Dynamo_Generator::hold_deferred(int hdcode, quint64 clo, quint64& eval_clo)
+{
+ (*qts_) << "\n(ka::kc :|kcm_hold_deferred| "
+         << hdcode << " '(progn \n;; held ...\n";
+ eval_clo = clo;
+}
+
+void RZ_Dynamo_Generator::finalize_hold_deferred()
+{
+ (*qts_) << "\n));; ... held \n\n";
+}
+
 void RZ_Dynamo_Generator::write_set_kto(const MS_Token& mst)
 {
  switch(mst.kind)
@@ -864,7 +876,26 @@ void RZ_Dynamo_Generator::elsif_with_elsif(QList<MS_Token>& tokens)
 
 void RZ_Dynamo_Generator::enter_nested_form(QList<MS_Token>& tokens)
 {
- MS_Token mst = tokens.at(0);
+ int ts = tokens.size();
+ QString note;
+ int hdcode = 0;
+ if(ts == 3)
+ {
+  MS_Token nmst = tokens.at(0);
+  if(nmst.kind == MS_Token_Kinds::Note_Symbol)
+  {
+   note = nmst.raw_text;
+  }
+  MS_Token cmst = tokens.at(1);
+  if(cmst.kind == MS_Token_Kinds::Literal)
+  {
+   hdcode = cmst.first_number();
+  }
+ }
+
+
+ MS_Token mst = tokens.at(ts - 1);
+
  if(mst.kind == MS_Token_Kinds::Nested_Back)
  {
   QPair<int, int> pr = mst.to_number_pair();
@@ -885,8 +916,17 @@ void RZ_Dynamo_Generator::enter_nested_form(QList<MS_Token>& tokens)
     // need a stack?
     current_nested_form_index_ = index;
     current_nested_form_level_ = level;
-    (*qts_) << "\n(ka::kc :|kcm_prepare_nested_expression| kcx "
-      << level << ' ' << index << ')';
+    if(note.isEmpty())
+    {
+     (*qts_) << "\n(ka::kc :|kcm_prepare_nested_expression| kcx "
+       << level << ' ' << index << ')';
+    }
+    else
+    {
+     (*qts_) << "\n(ka::kc :|kcm_prepare_nested_" << note
+                << "_expression| kcx "
+       << hdcode << ' ' << level << ' ' << index << ')';
+    }
    }
    else
    {

@@ -81,7 +81,6 @@ void RE_Node::swap_relation(const RE_Connectors& connector,
   targets_.insert(&connector, n2);
  #endif //NO_CAON
 
- //caon_ptr<RE_Node>& old = n1->targets_.
 }
 
 

@@ -131,6 +131,10 @@ void KCM_Lisp_Runtime::kcm_call_void_return(QString method_name,
  case 4:
   kcm_call_3_v(method_name, klras, params);
   break;
+
+ case 5:
+  kcm_call_4_v(method_name, klras, params);
+  break;
  }
 }
 
@@ -173,6 +177,15 @@ void KCM_Lisp_Runtime::kcm_call(QString method_name, QString return_type_name,
    kcm_call_3_i(method_name, return_type_name, klras, params);
   else
    kcm_call_3_s(method_name, return_type_name, klras, params);
+  break;
+
+ case 5:
+  if(return_type_name.endsWith('*'))
+   kcm_call_4_p(method_name, return_type_name, klras, params);
+  else if(return_type_name == "int")
+   kcm_call_4_i(method_name, return_type_name, klras, params);
+  else
+   kcm_call_4_s(method_name, return_type_name, klras, params);
   break;
  }
 }
@@ -357,5 +370,75 @@ void KCM_Lisp_Runtime::kcm_call_3_s(QString method_name, QString return_type_nam
      *klras[2].pointer_for_qarg()),
    QArgument<void*>(params[2],
      *klras[3].pointer_for_qarg()));
+ klras[0].set_string(str);
+}
+
+
+
+
+void KCM_Lisp_Runtime::kcm_call_4_v(QString method_name,
+  QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
+{
+ QMetaObject::invokeMethod(&bridge_,
+   method_name.toLatin1(),
+   QArgument<void*>(params[0],
+     *klras[1].pointer_for_qarg()),
+   QArgument<void*>(params[1],
+     *klras[2].pointer_for_qarg()),
+   QArgument<void*>(params[2],
+     *klras[3].pointer_for_qarg()),
+   QArgument<void*>(params[3],
+     *klras[4].pointer_for_qarg()));
+}
+
+void KCM_Lisp_Runtime::kcm_call_4_p(QString method_name, QString return_type_name,
+  QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
+{
+ void* pv;
+ QMetaObject::invokeMethod(&bridge_, method_name.toLatin1(),
+   QReturnArgument<void*>(return_type_name.toLatin1(), pv),
+   QArgument<void*>(params[0],
+     *klras[1].pointer_for_qarg()),
+   QArgument<void*>(params[1],
+     *klras[2].pointer_for_qarg()),
+   QArgument<void*>(params[2],
+     *klras[3].pointer_for_qarg()),
+   QArgument<void*>(params[3],
+     *klras[4].pointer_for_qarg()));
+ klras[0].set_pVoid(pv);
+}
+
+void KCM_Lisp_Runtime::kcm_call_4_i(QString method_name, QString return_type_name,
+  QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
+{
+ int i;
+ QMetaObject::invokeMethod(&bridge_, method_name.toLatin1(),
+   QReturnArgument<int>(return_type_name.toLatin1(), i),
+   QArgument<void*>(params[0],
+     *klras[1].pointer_for_qarg()),
+   QArgument<void*>(params[1],
+     *klras[2].pointer_for_qarg()),
+   QArgument<void*>(params[2],
+     *klras[3].pointer_for_qarg()),
+   QArgument<void*>(params[3],
+     *klras[4].pointer_for_qarg()));
+ klras[0].set_as_fixnum(i);
+}
+
+void KCM_Lisp_Runtime::kcm_call_4_s(QString method_name, QString return_type_name,
+  QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
+{
+ QString str;
+ QMetaObject::invokeMethod(&bridge_, method_name.toLatin1(),
+   QReturnArgument<QString>("QString", str),
+   QArgument<void*>(params[0],
+     *klras[1].pointer_for_qarg()),
+   QArgument<void*>(params[1],
+     *klras[2].pointer_for_qarg()),
+   QArgument<void*>(params[2],
+     *klras[3].pointer_for_qarg()),
+   QArgument<void*>(params[3],
+     *klras[4].pointer_for_qarg())
+   );
  klras[0].set_string(str);
 }

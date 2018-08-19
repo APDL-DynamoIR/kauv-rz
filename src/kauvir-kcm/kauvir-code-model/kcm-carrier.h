@@ -27,9 +27,6 @@ class KCM_Type_Object;
 class Kauvir_Code_Model;
 class KCM_Report_Syntax;
 
-//class KCM_Lexical_Symbol;
-//class KCM_Lexical_Statement;
-
 
 class KCM_Carrier
 {

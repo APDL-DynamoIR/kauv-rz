@@ -27,7 +27,11 @@ RE_Call_Entry::RE_Call_Entry(int call_id, QString prefix) //caon_ptr<RE_Node> pa
 {
  if(!prefix.isEmpty())
  {
-  if(prefix == "`")
+  if(prefix == "\\")
+  {
+   flags.is_deferred = true;
+  }
+  else if(prefix == "`")
   {
    flags.is_backquoted = true;
    flags.no_normalize = true;

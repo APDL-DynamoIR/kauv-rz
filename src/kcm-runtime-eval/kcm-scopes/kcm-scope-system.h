@@ -55,14 +55,18 @@ public:
 
  quint64* find_raw_value_from_current_scope(QString bind_code,
    KCM_Expression* kcm_expression, const KCM_Type_Object*& kto,
-   const KCM_Type_Object*& ckto, QString& encoded_value, const KCM_Type_Object** skto = nullptr);
+   const KCM_Type_Object*& ckto, QString& encoded_value,
+   QPair<int, quint64>& qclo_value, const KCM_Type_Object** skto = nullptr);
 
  quint64* find_raw_value_from_scope(KCM_Runtime_Scope* scope,
    QString bind_code, KCM_Expression* kcm_expression, const KCM_Type_Object*& kto,
-   const KCM_Type_Object*& ckto, QString& encoded_value, const KCM_Type_Object** skto = nullptr);
+   const KCM_Type_Object*& ckto, QString& encoded_value,
+   QPair<int, quint64>& qclo_value, const KCM_Type_Object** skto = nullptr);
 
  void enter_scope();
  void leave_scope();
+
+ quint64 find_held_value_by_hdcode(int hdcode);
 
  const KCM_Type_Object* get_type_object_from_symbol_name(QString sn);
 

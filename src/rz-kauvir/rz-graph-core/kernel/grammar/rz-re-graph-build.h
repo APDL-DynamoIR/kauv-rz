@@ -228,7 +228,7 @@ public:
 
  void add_token_plus_block(QString token, QString block_entry);
 
- void add_semis(QString raw_text, QString space_to_end_of_line);
+ void add_semis(QString raw_text, QString suffix, QString space_to_end_of_line);
  void add_run_token(QString raw_text, QString space_to_end_of_line);
 
  void acc(QString s);

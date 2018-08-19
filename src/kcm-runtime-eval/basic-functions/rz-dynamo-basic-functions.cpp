@@ -19,19 +19,152 @@
 
 #include "kauvir-runtime/kcm-command-runtime/kcm-command-runtime-router.h"
 
+#include "kcm-lisp-bridge/kcm-lisp-eval.h"
+
 #include <QTextStream>
 
 #include <QDebug>
 
 #include <QEventLoop>
 
+
+USING_KANS(KCL)
+
 KANS_(Dynamo)
 
 
-void testcall(KCM_Callable_Value* kcv)
+void test_call(KCM_Callable_Value* kcv)
 {
  KCM_Command_Runtime_Router* kcrr = kcv->kcrr();
  kcrr->run_callable_value(kcv);
+}
+
+void test_void()
+{
+ qDebug() << "OK";
+}
+
+void test_dfr_call(quint64 qclo, KCM_Callable_Value* kcv)
+{
+ quint64 result;
+ KCM_Lisp_Eval::eval_lisp_callable_deferred_value(qclo, result, "fixnum");
+ qDebug() << result;
+
+ KCM_Command_Runtime_Router* kcrr = kcv->kcrr();
+ kcrr->run_callable_value(kcv);
+}
+
+
+void test_int_call(int num, KCM_Callable_Value* kcv)
+{
+ qDebug() << num;
+
+ KCM_Command_Runtime_Router* kcrr = kcv->kcrr();
+ kcrr->run_callable_value(kcv);
+}
+
+
+
+void test_dfr(quint64 qclo, quint64 qclo1)
+{
+ quint64 x = (quint64) qclo;
+ quint64 y = (quint64) qclo1;
+
+ void* vx = (void*) x;
+ void* vy = (void*) y;
+
+ QPair<KCM_Scope_System*, QPair<int, quint64>>* pr2 =
+   (QPair<KCM_Scope_System*, QPair<int, quint64>>*) qclo;
+
+ QPair<KCM_Scope_System*, QPair<int, quint64>>* pr3 =
+   (QPair<KCM_Scope_System*, QPair<int, quint64>>*) qclo1;
+
+ quint64 result;
+ KCM_Lisp_Eval::eval_lisp_callable_deferred_value(qclo, result, "fixnum");
+ qDebug() << result;
+
+ KCM_Lisp_Eval::eval_lisp_callable_deferred_value(qclo1, result, "fixnum");
+ qDebug() << result;
+}
+
+
+
+void test_calls(KCM_Callable_Value* kcv, KCM_Callable_Value* kcv1)
+{
+ KCM_Command_Runtime_Router* kcrr = kcv->kcrr();
+ kcrr->run_callable_value(kcv);
+
+ KCM_Command_Runtime_Router* kcrr1 = kcv1->kcrr();
+ kcrr1->run_callable_value(kcv1);
+}
+
+
+void test_arg_vec_calls(quint64 args_ptr)
+{
+ QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
+
+ for(quint64 qui: args)
+ {
+  KCM_Callable_Value** kcv = (KCM_Callable_Value**) qui;
+  KCM_Command_Runtime_Router* kcrr = (*kcv)->kcrr();
+  kcrr->run_callable_value(*kcv);
+ }
+}
+
+void test_arg_vec_dfr_call(quint64 args_ptr)
+{
+ QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
+
+ int i = 0;
+ for(quint64 qui: args)
+ {
+  if(i % 2)
+  {
+   KCM_Callable_Value** kcv = (KCM_Callable_Value**) qui;
+   KCM_Command_Runtime_Router* kcrr = (*kcv)->kcrr();
+   kcrr->run_callable_value(*kcv);
+  }
+  else
+  {
+   quint64 qclo = *((quint64*)qui);
+
+   quint64 result;
+   KCM_Lisp_Eval::eval_lisp_callable_deferred_value(qclo, result, "fixnum");
+   qDebug() << result;
+  }
+  ++i;
+ }
+}
+
+void test_if_then_else(quint64 args_ptr)
+{
+ QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
+
+ int i = 0;
+ bool test = false;
+ for(quint64 qui: args)
+ {
+  if(i % 2)
+  {
+   if(test)
+   {
+    KCM_Callable_Value** kcv = (KCM_Callable_Value**) qui;
+    KCM_Command_Runtime_Router* kcrr = (*kcv)->kcrr();
+    kcrr->run_callable_value(*kcv);
+    return;
+   }
+  }
+  else
+  {
+   quint64 qclo = *((quint64*)qui);
+
+   quint64 result;
+   KCM_Lisp_Eval::eval_lisp_callable_deferred_value(qclo, result, "bool");
+   qDebug() << result;
+   test = (bool) result;
+  }
+  ++i;
+ }
 }
 
 void* envv(void* kind)
@@ -60,11 +193,16 @@ void prn(int num)
  qDebug() << num;
 }
 
-void prfn(int num)
+
+void pr_two_n(int num, int n1)
 {
- qDebug() << num;
+ qDebug() << num << ", " << n1;
 }
 
+void prdn(quint64 num, quint64 n1)
+{
+ qDebug() << num << ", " << n1;
+}
 
 int let_num(int num)
 {
@@ -94,6 +232,50 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
   g1.clear_all();
  }
 
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-arg-vec-calls", g1);
+  table.add_s0_declared_function("test-arg-vec-calls", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_arg_vec_calls));
+  g1.clear_all();
+ }
+
+
+ {
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-void", g1);
+  table.add_s0_declared_function("test-void", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_void));
+  g1.clear_all();
+ }
+
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-arg-vec-dfr-call", g1);
+  table.add_s0_declared_function("test-arg-vec-dfr-call", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_arg_vec_dfr_call));
+  g1.clear_all();
+ }
+
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-if-then-else", g1);
+  table.add_s0_declared_function("test-if-then-else", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_if_then_else));
+  g1.clear_all();
+ }
+
  {
   g1.add_lambda_carrier(
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
@@ -110,9 +292,28 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("prfn", g1);
-  table.add_s0_declared_function("prfn", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&prfn));
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("pr-two-n", g1);
+  table.add_s0_declared_function("pr-two-n", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&pr_two_n));
+  g1.clear_all();
+ }
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ), nullptr},
+     QString()
+    );
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("prdn", g1);
+  table.add_s0_declared_function("prdn", kcg, reinterpret_cast<_s0_fn1_p_type>
+                              (&prdn));
   g1.clear_all();
  }
 
@@ -123,9 +324,85 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("testcall", g1);
-  table.add_s0_declared_function("testcall", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&testcall));
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-call", g1);
+  table.add_s0_declared_function("test-call", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_call));
+  g1.clear_all();
+ }
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ),
+     nullptr},
+     QString()
+    );
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ),
+     nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-dfr", g1);
+  table.add_s0_declared_function("test-dfr", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_dfr));
+  g1.clear_all();
+ }
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__kcm_callable_value() ),
+     nullptr},
+     QString()
+    );
+
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__kcm_callable_value() ),
+     nullptr},
+     QString()
+    );
+
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-calls", g1);
+  table.add_s0_declared_function("test-calls", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_calls));
+  g1.clear_all();
+ }
+
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ),
+     nullptr},
+     QString()
+    );
+
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__kcm_callable_value() ),
+     nullptr},
+     QString()
+    );
+
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-dfr-call", g1);
+  table.add_s0_declared_function("test-dfr-call", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_dfr_call));
+  g1.clear_all();
+ }
+
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ),
+     nullptr},
+     QString()
+    );
+
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__kcm_callable_value() ),
+     nullptr},
+     QString()
+    );
+
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-int-call", g1);
+  table.add_s0_declared_function("test-int-call", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_int_call));
   g1.clear_all();
  }
 

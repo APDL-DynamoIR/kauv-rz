@@ -28,6 +28,7 @@
 /kcm-runtime-eval       basic-functions
 /rz-dynamo              rz-dynamo-runtime-console
 /rz-dynamo              rz-graph-dynamo-runtime-console
+/rz-dynamo              rz-multi-console
 
 
 

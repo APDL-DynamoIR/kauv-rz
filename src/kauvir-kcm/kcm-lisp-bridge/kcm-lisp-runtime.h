@@ -98,6 +98,15 @@ public:
  void kcm_call_3_s(QString method_name, QString return_type_name,
    QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params);
 
+ void kcm_call_4_v(QString method_name,
+   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params);
+ void kcm_call_4_p(QString method_name, QString return_type_name,
+   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params);
+ void kcm_call_4_i(QString method_name, QString return_type_name,
+   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params);
+ void kcm_call_4_s(QString method_name, QString return_type_name,
+   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params);
+
 };
 
 _KANS(KCL)

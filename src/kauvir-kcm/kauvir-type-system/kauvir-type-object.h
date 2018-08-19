@@ -20,10 +20,6 @@ class Fn_Doc_Info;
 
 KANS_(Kauvir)
 
-
-//class Kauvir_Lexical_Symbol;
-//class Kauvir_Lexical_Statement;
-
 class Kauvir_Channel_Group;
 
 class Kauvir_Runtime;

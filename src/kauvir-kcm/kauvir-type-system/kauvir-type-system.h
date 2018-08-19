@@ -39,7 +39,8 @@ class Kauvir_Type_System
  Kauvir_Type_Object type_object__opaque_void_pointer_;
 
  Kauvir_Type_Object type_object__kcm_callable_value_;
-
+ Kauvir_Type_Object type_object__callable_lisp_deferred_value_;
+ Kauvir_Type_Object type_object__argument_vector_;
 
 public:
 
@@ -63,7 +64,8 @@ public:
  ACCESSORS__CONST_RGET(Kauvir_Type_Object ,type_object__callable_lisp_code)
 
  ACCESSORS__CONST_RGET(Kauvir_Type_Object ,type_object__kcm_callable_value)
-
+ ACCESSORS__CONST_RGET(Kauvir_Type_Object ,type_object__callable_lisp_deferred_value)
+ ACCESSORS__CONST_RGET(Kauvir_Type_Object ,type_object__argument_vector)
 
 };
 

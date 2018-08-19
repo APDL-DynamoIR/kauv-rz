@@ -63,26 +63,63 @@ const KCM_Type_Object* KCM_Lexical_Scope::get_type_object_from_symbol_name(QStri
  return nullptr;
 }
 
-void KCM_Lexical_Scope::hold_runtime_value(const QPair<KCM_Expression*, QPair<int, int> >& coords,
+void KCM_Lexical_Scope::hold_runtime_value(const QPair< QPair<KCM_Expression*, int>, QPair<int, int> >& coords,
   const KCM_Type_Object* kto, QString value_encoding, QString key)
 {
  // // key has two levels of coords ...
  nested_expression_store_[coords] = {kto, {value_encoding, key} };
  nested_expression_key_index_[key] = coords.first;
+
+ if(coords.first.second > 0)
+   nested_expression_key_index_map_[coords.first.second] = {coords.first.first, coords.second};
 }
+
+quint64 KCM_Lexical_Scope::find_held_value_by_hdcode(int hdcode)
+{
+ QPair<KCM_Expression*, QPair<int, int>> pr = nested_expression_key_index_map_.value(hdcode,
+   {nullptr, {0,0}});
+ if(pr.first)
+ {
+  auto fnd = nested_expression_store_.find({{pr.first, hdcode}, pr.second});
+  if(fnd != nested_expression_store_.end())
+  {
+   QPair<const KCM_Type_Object*, QPair<QString, QString>> v = fnd.value();
+   QString v1 = v.second.first;
+   QString v2 = v.second.second;
+   return keys_for_storing_.value(v1);
+  }
+ }
+ return 0;
+}
+
+void KCM_Lexical_Scope::hold_deferred(const QPair<KCM_Expression*,
+  QPair<int, int> >& coords,
+  const KCM_Type_Object* qto, int hdcode, quint64 clo_value)
+{
+ held_deferred_store_[coords] = {qto, {hdcode, clo_value}};
+}
+
+
 
 KCM_Expression* KCM_Lexical_Scope::get_kcm_expression_from_nested_key(QString key)
 {
- return nested_expression_key_index_.value(key);
+ return nested_expression_key_index_.value(key).first;
 }
 
 
-const KCM_Type_Object* KCM_Lexical_Scope::find_runtime_value(KCM_Expression* kcx, int level, int index, QString& encoded_value)
+const KCM_Type_Object* KCM_Lexical_Scope::find_runtime_value(KCM_Expression* kcx,
+  int level, int index, QString& encoded_value, QPair<int, quint64>& qclo_value, int hdcode)
 {
- if(nested_expression_store_.contains({kcx, {level, index}}))
+ if(nested_expression_store_.contains({ {kcx,hdcode}, {level, index}}))
  {
-  encoded_value = nested_expression_store_.value({kcx, {level, index}}).second.first;
-  return nested_expression_store_.value({kcx, {level, index}}).first;
+  encoded_value = nested_expression_store_.value({{kcx,hdcode}, {level, index}}).second.first;
+  return nested_expression_store_.value({{kcx,hdcode}, {level, index}}).first;
+ }
+ if(held_deferred_store_.contains({kcx, {level, index}}))
+ {
+  qclo_value = held_deferred_store_.value({kcx, {level, index}}).second;
+  encoded_value = "\\cldv";
+  return held_deferred_store_.value({kcx, {level, index}}).first;
  }
  return nullptr;
 }

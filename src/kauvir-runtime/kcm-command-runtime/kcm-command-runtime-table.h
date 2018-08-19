@@ -85,20 +85,30 @@ public:
   return s1_string_returns_.contains(n);
  }
 
+ inline static void strip_hyphens(QString& s)
+ {
+  s.replace('-', '_');
+ }
+
  template<typename FN_type>
  void add_s1_declared_function(QString name, KCM_Channel_Group* kcg, FN_type fn)
  {
+  strip_hyphens(name);
   s1_declared_functions_generic_.insert(name, {kcg, (s1_fng_type)fn});
  }
 
  template<typename FN_type>
  void add_s0_declared_function(QString name, KCM_Channel_Group* kcg, FN_type fn)
  {
+  strip_hyphens(name);
   s0_declared_functions_generic_.insert(name, {kcg, (s0_fng_type)fn});
  }
 
+ s0_fn1_p_type find_argvec_function(QString name);
+
+
  s0_fn1_p_type find_s0_declared_function_1(QString name,
-   KCM_Channel_Group* kcg, const KCM_Type_Object** pkto);
+   KCM_Channel_Group* kcg, const KCM_Type_Object** pkto, int& byte_code);
 
  s1_fng_type find_s1_declared_function_0(QString name,
    KCM_Channel_Group* kcg, const KCM_Type_Object** pkto);

@@ -53,9 +53,10 @@ public:
 
  void find_value(QString symbol_name, KCM_Expression* kcm_expression, quint64*& v,
    const KCM_Type_Object*& kto, const KCM_Type_Object*& ckto,
-   QString& encoded_value, const KCM_Type_Object** skto = nullptr);
+   QString& encoded_value, QPair<int, quint64>& qclo_value, const KCM_Type_Object** skto = nullptr);
 
  quint64 find_held_lisp_list(QString key);
+ quint64 find_held_value_by_hdcode(int hdcode);
 
  KCM_Source_Function* find_source_function_value(QString symbol_name);
 

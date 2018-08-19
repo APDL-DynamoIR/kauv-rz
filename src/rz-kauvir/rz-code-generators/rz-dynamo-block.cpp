@@ -18,6 +18,9 @@
 
 #include "rz-graph-core/code/rz-re-function-def-entry.h"
 
+#include "rz-graph-core/code/rz-re-call-entry.h"
+
+
 #include "rz-graph-core/token/rz-re-token.h"
 
 #include "rz-graph-valuer/scope/rz-lisp-graph-block-info.h"
@@ -42,6 +45,12 @@ RZ_Dynamo_Block::RZ_Dynamo_Block(caon_ptr<RZ_Dynamo_Block> parent_block)
      parent_lambda_position_(-1)
 {
 
+}
+
+int RZ_Dynamo_Block::get_new_hd_code()
+{
+ static int result = 0;
+ return ++result;
 }
 
 void RZ_Dynamo_Block::scan_top_level(RZ_Lisp_Graph_Visitor_Dynamo& visitor_dynamo)
@@ -406,6 +415,12 @@ void RZ_Dynamo_Block::scan_form_from_statement_entry_node(RZ_Lisp_Graph_Visitor_
     new_form->set_parent_lambda_position(lambda_count);
     new_form->set_implicit_added_depth(implicit_added_depth);
     current_form_->add_expression(new_form);
+    caon_ptr<RE_Call_Entry> rce = next_node->re_call_entry();
+    CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+    if(rce->flags.is_deferred)
+    {
+     current_form_->add_expression_wrapper(new_form, "defer'", get_new_hd_code());
+    }
     current_form_ = new_form;
     caon_ptr<RE_Node> en = visitor_dynamo.visitor().entry_from_call_entry(next_node);
     CAON_PTR_DEBUG(RE_Node ,en)
@@ -571,7 +586,6 @@ void RZ_Dynamo_Block::scan_form_from_statement_entry_node(RZ_Lisp_Graph_Visitor_
    {
     QString entry_code;
     CAON_PTR_DEBUG(RE_Node ,next_node)
-
     if(caon_ptr<RE_Function_Def_Entry> fde = next_node->re_function_def_entry())
     {
      CAON_PTR_DEBUG(RE_Function_Def_Entry ,fde)
@@ -603,7 +617,6 @@ void RZ_Dynamo_Block::scan_form_from_statement_entry_node(RZ_Lisp_Graph_Visitor_
       {
        QString signature_code = function_def_info->dynamo_signature_code_string();
        MS_Token note {MS_Token_Kinds::Note_Symbol, ":fdef"};
-       //?
        current_form_->add_prin1_quoted_form(signature_code, note);
       }
      }

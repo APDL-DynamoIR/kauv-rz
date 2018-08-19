@@ -43,7 +43,8 @@ RE_Markup_Position::RE_Markup_Position
    last_do_map_block_statement_entry_node_(nullptr),
    last_statement_entry_node_(nullptr),
    last_do_map_inner_block_first_entry_node_(nullptr),
-   held_equalizer_context_(Equalizer_Contexts::N_A)
+   held_equalizer_context_(Equalizer_Contexts::N_A),
+   current_closed_do_entry_node_(nullptr)
 {
 }
 
@@ -158,13 +159,41 @@ caon_ptr<RE_Node> RE_Markup_Position::insert_entry_node(
  return result;
 }
 
+caon_ptr<RE_Node> RE_Markup_Position::pop_chief()
+{
+ return chiefs_.pop();
+}
+
+void RE_Markup_Position::check_hold_closed_do_entry()
+{
+ if(chiefs_.isEmpty())
+  return;
+ caon_ptr<RE_Node> tcnode = chiefs_.top();
+ if(caon_ptr<RE_Call_Entry> rce = tcnode->re_call_entry())
+ {
+  CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+  current_closed_do_entry_node_ = tcnode;
+  position_state_ = Position_States::Active_Closed_Do_Entry;
+ }
+}
+
+caon_ptr<RE_Call_Entry> RE_Markup_Position::current_closed_do_entry()
+{
+ if(current_closed_do_entry_node_)
+ {
+  return current_closed_do_entry_node_->re_call_entry();
+ }
+}
 
 void RE_Markup_Position::check_pop_chief()
 {
  CAON_PTR_DEBUG(RE_Node ,current_node_)
  caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry();
+
+ CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+
  caon_ptr<RE_Node> self_node = current_node_;
- current_node_ = chiefs_.pop();
+ current_node_ = pop_chief();
  {
   CAON_PTR_DEBUG(RE_Node ,current_node_)
   CAON_DEBUG_NOOP
@@ -392,12 +421,26 @@ void RE_Markup_Position::check_add_implied_call_entry()
 
 void RE_Markup_Position::add_call_entry(bool is_statement_entry, QString prefix)
 {
+ caon_ptr<RE_Node> old_current_node = nullptr;
+ caon_ptr<RE_Node> old_closed_do_entry_node = nullptr;
+ if(current_closed_do_entry_node_)
+ {
+  caon_ptr<RE_Call_Entry> ccde = current_closed_do_entry();
+  CAON_PTR_DEBUG(RE_Node ,current_closed_do_entry_node_);
+  old_current_node = current_node_;
+  current_node_ = current_closed_do_entry_node_;
+  if(ccde)
+   ccde->flags.is_do_closed_with_follow = 1;
+  old_closed_do_entry_node = current_closed_do_entry_node_;
+  current_closed_do_entry_node_ = nullptr;
+ }
+
+
  caon_ptr<RE_Node> retval_n = check_add_retval_nodes();
 
  CAON_PTR_DEBUG(RE_Node ,current_node_)
 
  check_add_implied_call_entry();
-
 
  switch(position_state_)
  {
@@ -408,7 +451,42 @@ void RE_Markup_Position::add_call_entry(bool is_statement_entry, QString prefix)
    retval_n << fr_/rq_.Retval_Follow >> current_node_;
 
   position_state_ = Position_States::Run_Pre_Entry;
+  break;
 
+ case Position_States::Active_Closed_Do_Entry:
+  if(!old_current_node)
+  {
+   qDebug() << "Warning at: " << __LINE__;
+  }
+  last_pre_entry_node_ = current_node_;
+  current_node_ = insert_entry_node(rq_.Run_Cross_Sequence, false, prefix);
+  if(retval_n)
+   retval_n << fr_/rq_.Retval_Follow >> current_node_;
+
+  position_state_ = Position_States::Run_Pre_Entry;
+  if(old_closed_do_entry_node)
+  {
+   CAON_PTR_DEBUG(RE_Node ,old_closed_do_entry_node)
+   if(caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry())
+   {
+    rce->flags.follows_closed_do = true;
+
+    // //  We need to connect the arrows ...
+     //
+    if(caon_ptr<RE_Node> old_do_node = rq_.Run_Call_Entry(old_closed_do_entry_node))
+    {
+     CAON_PTR_DEBUG(RE_Node ,old_do_node)
+     //old_do_node << fr_/rq_.Run_Fundef_Arrow_Sequence >> current_node_;
+     old_do_node->debug_connections();
+     if(caon_ptr<RE_Node> old_arrow_node = rq_.Run_Call_Sequence(old_do_node))
+     {
+      CAON_PTR_DEBUG(RE_Node ,old_arrow_node)
+      old_arrow_node << fr_/rq_.Run_Fundef_Arrow_Sequence >> current_node_;
+      //CAON_DEBUG_NOOP
+     }
+    }
+   }
+  }
   break;
  case Position_States::Active_Run_Token:
   last_pre_entry_node_ = current_node_;
@@ -819,7 +897,7 @@ void RE_Markup_Position::finalize_overall_if_block()
 
   while(chiefs_.top() != current_node_)
   {
-   caon_ptr<RE_Node> n = chiefs_.pop();
+   caon_ptr<RE_Node> n = pop_chief();
    CAON_PTR_DEBUG(RE_Node ,n)
    CAON_DEBUG_NOOP
   }
@@ -952,7 +1030,7 @@ void RE_Markup_Position::add_block_map_leave()
 
     while(chiefs_.top() != current_node_)
     {
-     caon_ptr<RE_Node> n = chiefs_.pop();
+     caon_ptr<RE_Node> n = pop_chief();
      CAON_PTR_DEBUG(RE_Node ,n)
      CAON_DEBUG_NOOP
     }
@@ -1179,6 +1257,13 @@ void RE_Markup_Position::add_token_node(caon_ptr<RE_Node> token_node)
 
  if(token->flags.is_do)
  {
+  if(caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry())
+  {
+   CAON_PTR_DEBUG(RE_Node ,current_node_)
+   CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+   current_node_ << fr_/rq_.Run_Cross_Do >> token_node;
+  }
+
   add_call_entry(false);
   CAON_PTR_DEBUG(RE_Node ,current_node_)
   if(caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry())
@@ -1727,6 +1812,7 @@ void RE_Markup_Position::read_chiefs()
    if(caon_ptr<RE_Token> tok = nn->re_token())
    {
     CAON_PTR_DEBUG(RE_Token ,tok)
+    CAON_DEBUG_NOOP
    }
   }
   else if(caon_ptr<RE_Node> dn = rq_.Run_Data_Entry(n))
@@ -1749,9 +1835,9 @@ void RE_Markup_Position::add_data_leave(caon_ptr<RE_Node> tuple_info_node)
 
  CAON_PTR_DEBUG(RE_Node ,current_node_)
 
- current_node_ = chiefs_.pop();
+ current_node_ = pop_chief();
 
- caon_ptr<RE_Node> pop_node = chiefs_.pop();
+ caon_ptr<RE_Node> pop_node = pop_chief();
  CAON_PTR_DEBUG(RE_Node ,pop_node)
 
  if(caon_ptr<RE_Tuple_Info> rti = tuple_info_node->re_tuple_info())
@@ -1831,12 +1917,12 @@ void RE_Markup_Position::complete_function_declaration(caon_ptr<RE_Node> arrow_n
 {
  add_arrow_token_node(arrow_node);
  add_token_node(proxy_body_node);
- leave_lexical_scope(2);
+ leave_lexical_scope(2, "-");
 
  position_state_ = Position_States::Cross_Run_Chief;
 }
 
-void RE_Markup_Position::leave_lexical_scope(int length)
+void RE_Markup_Position::leave_lexical_scope(int length, QString suffix)
 {
   // // always necessary? ...
   // reset_if_block_pending_follow();
@@ -1906,7 +1992,6 @@ void RE_Markup_Position::leave_lexical_scope(int length)
  // //  It looks like the below is only for length == 1,
  //     because for length == 2 the end statements ends
  //     the enclosing statement also.
-
  if(length == 2)
  {
   // // what about anonymous functions which are not the end
@@ -1914,6 +1999,22 @@ void RE_Markup_Position::leave_lexical_scope(int length)
   if(current_do_map_block_entry_node_)
   {
    // // No close statement in this case ...
+  }
+  else if(suffix == ",")
+  {
+   read_chiefs();
+   check_hold_closed_do_entry();
+   //CAON_PTR_DEBUG(RE_Call_Entry ,current_closed_do_entry_)
+   //close_statement();
+   CAON_PTR_DEBUG(RE_Node ,current_closed_do_entry_node_)
+   {
+    CAON_PTR_DEBUG(RE_Node ,current_node_)
+    CAON_DEBUG_NOOP
+   }
+  }
+  else if(suffix == ".")
+  {
+
   }
   else
   {
@@ -1926,6 +2027,7 @@ void RE_Markup_Position::leave_lexical_scope(int length)
 
   if(caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry())
   {
+   CAON_PTR_DEBUG(RE_Node ,current_node_)
    CAON_PTR_DEBUG(RE_Call_Entry ,rce)
    if(rce->flags.is_do_lambda)
    {
@@ -1940,7 +2042,22 @@ void RE_Markup_Position::leave_lexical_scope(int length)
    }
   }
 
-  position_state_ = Position_States::Cross_Run_Chief;
+  // check if we're ending a do sequence ...
+  if(suffix.isEmpty())
+  {
+   CAON_PTR_DEBUG(RE_Node ,current_node_)
+   if(caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry())
+   {
+    CAON_PTR_DEBUG(RE_Call_Entry ,rce)
+    if(rce->flags.is_do_closed_with_follow)
+    {
+     check_pop_chief();
+    }
+   }
+  }
+
+  if(position_state_ != Position_States::Active_Closed_Do_Entry)
+    position_state_ = Position_States::Cross_Run_Chief;
   return;
  }
 

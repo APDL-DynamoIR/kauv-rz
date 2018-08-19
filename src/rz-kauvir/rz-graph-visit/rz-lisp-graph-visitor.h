@@ -312,6 +312,8 @@ public:
 
  void pop_embed_branch_node();
 
+ void check_cross_do(caon_ptr<RE_Node> n);
+
  void normalize_nested_run_call(caon_ptr<RE_Call_Entry> carried_rce, int depth, tNode& function_node);
 
  caon_ptr<RZ_Lisp_Graph_Core_Function> find_core_function(QString name);

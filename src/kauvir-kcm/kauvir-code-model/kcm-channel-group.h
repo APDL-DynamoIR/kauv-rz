@@ -56,6 +56,7 @@ public:
 
  ACCESSORS(KCM_Channel_Furnisher* ,furnisher)
 
+ int get_lambda_byte_code();
 
  friend bool operator<(const KCM_Channel_Group& lhs, const KCM_Channel_Group& rhs)
  {
@@ -103,6 +104,7 @@ public:
 
  void add_fuxe_carrier(const KCM_Type_Object* type_object);
  void add_fuxe_carrier(QString symbol_name);
+
 
  void add_lambda_carrier_via_scoped_symbol(QString symbol_name, KCM_Runtime_Scope* scope);
 
@@ -171,7 +173,7 @@ public:
  void add_sigma_carrier_via_typed_literal_with_cast(const KCM_Type_Object* kto,
    QString value_name, const KCM_Type_Object* ckto);
 
- void add_sigma_carrier_via_symbol_with_cast(QString value_name, const KCM_Type_Object* type_object,
+ void add_sigma_carrier_via_symbol_with_cast(QString value_name, const KCM_Type_Object* kto,
     const KCM_Type_Object* ckto);
  void add_sigma_carrier_via_literal_with_cast(QString value_name, const KCM_Type_Object* type_object);
 

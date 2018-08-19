@@ -53,10 +53,10 @@ void KCM_Scope_System::enter_scope()
 
 quint64* KCM_Scope_System::find_raw_value_from_current_scope(QString bind_code,
   KCM_Expression* kcm_expression, const KCM_Type_Object*& kto,
-  const KCM_Type_Object*& ckto, QString& encoded_value, const KCM_Type_Object** skto)
+  const KCM_Type_Object*& ckto, QString& encoded_value, QPair<int, quint64>& qclo_value, const KCM_Type_Object** skto)
 {
  return find_raw_value_from_scope(current_scope_, bind_code,
-   kcm_expression, kto, ckto, encoded_value, skto);
+   kcm_expression, kto, ckto, encoded_value, qclo_value, skto);
 }
 
 KCM_Source_Function* KCM_Scope_System::find_source_function_from_current_scope(QString local_name)
@@ -70,17 +70,23 @@ quint64 KCM_Scope_System::find_held_lisp_list_from_current_scope(QString key)
  return current_scope_->find_held_lisp_list(key);
 }
 
+quint64 KCM_Scope_System::find_held_value_by_hdcode(int hdcode)
+{
+ return current_scope_->find_held_value_by_hdcode(hdcode);
+}
+
 quint64* KCM_Scope_System::find_raw_value_from_scope(KCM_Runtime_Scope* scope,
   QString bind_code, KCM_Expression* kcm_expression, const KCM_Type_Object*& kto,
-  const KCM_Type_Object*& ckto, QString& encoded_value, const KCM_Type_Object** skto)
+  const KCM_Type_Object*& ckto, QString& encoded_value, QPair<int, quint64>& qclo_value, const KCM_Type_Object** skto)
 {
  quint64* result;
- scope->find_value(bind_code, kcm_expression, result, kto, ckto, encoded_value, skto);
+ scope->find_value(bind_code, kcm_expression, result, kto, ckto, encoded_value, qclo_value, skto);
  if(!result)
  {
   KCM_Runtime_Scope* parent_scope = scope->parent_scope();
   if(parent_scope)
-    return find_raw_value_from_scope(parent_scope, bind_code, kcm_expression, kto, ckto, encoded_value, skto);
+   return find_raw_value_from_scope(parent_scope, bind_code, kcm_expression, kto, ckto, encoded_value,
+     qclo_value, skto);
   return nullptr;
  }
  return result;

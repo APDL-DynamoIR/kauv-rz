@@ -74,21 +74,32 @@ Kauvir_Code_Model::Kauvir_Code_Model()
  detailed_report_synax_.channel_kind_codes()[KCM_Channel::Kinds::Lambda] = "lambda";
  detailed_report_synax_.channel_kind_codes()[KCM_Channel::Kinds::Sigma] = "sigma";
 
- generic_anon_callable_value_type_object_ = new KCM_Type_Object(&type_system_->type_object__kcm_callable_value());
+ // //  is this affected by 32/64?
+ generic_anon_callable_value_type_object_ =
+   new KCM_Type_Object(&type_system_->type_object__kcm_callable_value(), DEFAULT_PTR_BYTE_CODE);
+ callable_lisp_deferred_value_type_object_ =
+   new KCM_Type_Object(&type_system_->type_object__callable_lisp_deferred_value(), DEFAULT_PTR_BYTE_CODE);
+ argument_vector_type_object_ =
+   new KCM_Type_Object(&type_system_->type_object__argument_vector(), 9);
+
 
  kcm_type_object_map_ = {{
    {&type_system_->type_object__u8(),
-     new KCM_Type_Object(&type_system_->type_object__u8())},
+     new KCM_Type_Object(&type_system_->type_object__u8(), 1)},
    {&type_system_->type_object__u32(),
-     new KCM_Type_Object(&type_system_->type_object__u32())},
+     new KCM_Type_Object(&type_system_->type_object__u32(), 4)},
    {&type_system_->type_object__u64(),
-     new KCM_Type_Object(&type_system_->type_object__u64())},
+     new KCM_Type_Object(&type_system_->type_object__u64(), 8)},
    {&type_system_->type_object__str(),
-     new KCM_Type_Object(&type_system_->type_object__str())},
+     new KCM_Type_Object(&type_system_->type_object__str(), 8)},
    {&type_system_->type_object__opaque_lisp_value(),
-     new KCM_Type_Object(&type_system_->type_object__opaque_lisp_value())},
+     new KCM_Type_Object(&type_system_->type_object__opaque_lisp_value(), 8)},
    {&type_system_->type_object__kcm_callable_value(),
      generic_anon_callable_value_type_object_},
+   {&type_system_->type_object__callable_lisp_deferred_value(),
+     callable_lisp_deferred_value_type_object_},
+   {&type_system_->type_object__argument_vector(),
+     argument_vector_type_object_},
   }};
 
  type_object_string_map_ = {{
@@ -328,12 +339,19 @@ KCM_Runtime_Scope* Kauvir_Code_Model::get_current_runtime_scope()
 void Kauvir_Code_Model::finalize_anon_fdef(quint64 clo, QString symbol_name)
 {
  // //  have to pull up the nested because do is wrapped in an expression ...
- QPair<KCM_Expression*, QPair<int, int> > pr = current_nested_expression_coords_.pop();
+
+ // //  stack or queue?
+ //QPair< QPair<KCM_Expression*, int>, QPair<int, int> > pr = current_nested_expression_coords_.pop();
+ //QPair< QPair<KCM_Expression*, int>, QPair<int, int> > pr = //current_nested_expression_coords_.dequeue();
+
+ // is this always ok?
+ QPair< QPair<KCM_Expression*, int>, QPair<int, int> > pr = current_nested_expression_coords_.takeLast();
+
  if(KCM_Callable_Value* kcv = current_anon_codes_.value(symbol_name))
  {
   //scope_system_->find_raw_value_from_current_scope();
 
-  KCM_Expression* kcx = pr.first;
+  KCM_Expression* kcx = pr.first.first;
 
   int level = pr.second.first;
   int index = pr.second.second;
@@ -624,9 +642,23 @@ void Kauvir_Code_Model::enter_plebod()
  current_proxy_scope_ = new KCM_Proxy_Scope(current_proxy_scope_);
 }
 
+void Kauvir_Code_Model::prepare_nested_defer_expression(KCM_Expression* kcx,
+  int hdcode, int level, int index)
+{
+ current_held_deferred_coords_.push({kcx, {level, index}});
+
+  // //  stack or queue?
+ //current_nested_expression_coords_.push({{kcx, hdcode}, {level, index}});
+ current_nested_expression_coords_.enqueue({{kcx, hdcode}, {level, index}});
+
+}
+
 void Kauvir_Code_Model::prepare_nested_expression(KCM_Expression* kcx, int level, int index)
 {
- current_nested_expression_coords_.push({kcx, {level, index}});
+ // //  stack or queue?
+ //current_nested_expression_coords_.push({{kcx, 0}, {level, index}});
+ current_nested_expression_coords_.enqueue({{kcx, 0}, {level, index}});
+
 }
 
 KCM_Block* Kauvir_Code_Model::create_and_enter_block()
@@ -670,8 +702,17 @@ void Kauvir_Code_Model::hold_runtime_value(QString key, const KCM_Type_Object* k
 {
  // // always pop?
  //current_lexical_scope_->hold_runtime_value(current_nested_expression_coords_.top(), kto, value_encoding);
- current_lexical_scope_->hold_runtime_value(current_nested_expression_coords_.pop(), kto, value_encoding, key);
+ // //  stack or queue?
+ //current_lexical_scope_->hold_runtime_value(current_nested_expression_coords_.pop(), kto, value_encoding, key);
+ current_lexical_scope_->hold_runtime_value(current_nested_expression_coords_.dequeue(), kto, value_encoding, key);
 }
+
+void Kauvir_Code_Model::hold_deferred(int hdcode, quint64 clo)
+{
+ current_lexical_scope_->hold_deferred(current_held_deferred_coords_.pop(),
+   callable_lisp_deferred_value_type_object_, hdcode, clo);
+}
+
 
 void Kauvir_Code_Model::leave_block(KCM_Block* kcb)
 {
@@ -749,8 +790,6 @@ QString Kauvir_Code_Model::get_ouput_type_name(KCM_Report_Syntax& kcrs, const KC
    break;
  default: break;
  }
-
-
 
  QString result = kto->kauvir_type_object()->name();
  if(result.isEmpty())

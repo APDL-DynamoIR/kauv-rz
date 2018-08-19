@@ -9,22 +9,19 @@ PROJECT_NAME = basic-functions
 
 include(../build-group.pri)
 
+include(../../find-ecl-sexp.pri)
 
 
 INCLUDEPATH += $$KAUVIR_SRC_GROUP_DIR \
   $$KAUVIR_SRC_GROUP_DIR/kauvir-type-system
 
-
-
 HEADERS +=  \
   $$SRC_DIR/rz-dynamo-basic-functions.h \
-
 
 SOURCES +=  \
   $$SRC_DIR/rz-dynamo-basic-functions.cpp \
 
-
 CONFIG += no_keywords
 
 
-LIBS += -L$$TARGETSDIR -lkauvir-code-model -lkcm-command-runtime
+LIBS += -L$$TARGETSDIR -lkauvir-code-model -lkcm-command-runtime -lkcm-lisp-bridge

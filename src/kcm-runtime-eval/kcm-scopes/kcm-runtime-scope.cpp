@@ -83,10 +83,19 @@ const KCM_Type_Object* KCM_Runtime_Scope::get_type_object_from_symbol_name(QStri
  return nullptr;
 }
 
+quint64 KCM_Runtime_Scope::find_held_value_by_hdcode(int hdcode)
+{
+ if(associated_lexical_scope_)
+ {
+  return associated_lexical_scope_->find_held_value_by_hdcode(hdcode);
+ }
+ return 0;
+}
+
 void KCM_Runtime_Scope::find_value(QString symbol_name, KCM_Expression* kcm_expression,
   quint64*& v,
   const KCM_Type_Object*& kto, const KCM_Type_Object*& ckto,
-  QString& encoded_value, const KCM_Type_Object** skto)
+  QString& encoded_value, QPair<int, quint64>& qclo_value, const KCM_Type_Object** skto)
 {
  if(associated_lexical_scope_)
  {
@@ -112,7 +121,7 @@ void KCM_Runtime_Scope::find_value(QString symbol_name, KCM_Expression* kcm_expr
   if(associated_lexical_scope_)
   {
    kto = associated_lexical_scope_->
-     find_runtime_value(kcm_expression, level, index, encoded_value);
+     find_runtime_value(kcm_expression, level, index, encoded_value, qclo_value);
 
    // // kto being nullptr means nested_expression_store_ couldn't
     //   find the expression/index pair ...
@@ -139,7 +148,7 @@ void KCM_Runtime_Scope::find_value(QString symbol_name, KCM_Expression* kcm_expr
   if(associated_lexical_scope_)
   {
    kto = associated_lexical_scope_->
-     find_runtime_value(kcm_expression, level, index, encoded_value);
+     find_runtime_value(kcm_expression, level, index, encoded_value, qclo_value);
 
    // // kto being nullptr means nested_expression_store_ couldn't
     //   find the expression/index pair ...

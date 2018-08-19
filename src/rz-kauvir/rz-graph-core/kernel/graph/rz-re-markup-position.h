@@ -57,7 +57,7 @@ private:
   Root, Active_Run_Token, Active_Run_Chief,
   End_Of_Logical_Scope, Data_Entry,
   Run_Cross_Sequence, Run_Pre_Entry, Cross_Run_Chief,
-  Block_Entry, Cross_Block_Entry,
+  Block_Entry, Cross_Block_Entry, Active_Closed_Do_Entry,
 
  };
 
@@ -81,9 +81,15 @@ private:
 
  caon_ptr<RE_Node> type_indicator_node_;
 
+ caon_ptr<RE_Node> current_closed_do_entry_node_;
+ caon_ptr<RE_Call_Entry> current_closed_do_entry();
 
  void check_append_chief(caon_ptr<RE_Node> new_chief);
  void check_pop_chief();
+
+ void check_hold_closed_do_entry();
+
+ caon_ptr<RE_Node> pop_chief();
 
  void check_if_block_non_continue(caon_ptr<RE_Token> token);
  void reset_if_block_pending_follow();
@@ -186,7 +192,7 @@ public:
  void leave_expression();
 
  void close_statement();
- void leave_lexical_scope(int length);
+ void leave_lexical_scope(int length, QString suffix);
 
 
  RE_Tuple_Info::Tuple_Indicators data_chief_indicator();

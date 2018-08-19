@@ -145,8 +145,6 @@ public:
  caon_ptr<RZ_Lisp_Token_Out_Info>
   get_lisp_out(RZ_Type_Variety& tv, QString& result);
 
-// std::function<void(QString&, RZ_Lisp_Node*, RZ_Lisp_Token*)>
-
  void skip_lisp_out();
 
  static QString lara_argument_map(QString text);
@@ -215,11 +213,6 @@ public:
   vh_.set_value(caon_ptr<T>(t));
 #endif
  }
-
-// void set_value(double* d)
-// {
-//  //?vh_.set_value(caon_ptr<T>(t));
-// }
 
  template<typename T>
  void set_direct_value(T t)

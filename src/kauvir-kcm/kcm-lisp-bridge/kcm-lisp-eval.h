@@ -81,7 +81,7 @@ public:
  static QString get_string_rep(cl_object clo);
 
  static void run_source_function(KCM_Command_Runtime_Router& kcrr, quint64 qclo);
-
+ static void eval_lisp_callable_deferred_value(quint64 qclo, quint64& result, QString convention);
 
  void check_flags_replace(QString& eval_text);
 
@@ -98,6 +98,7 @@ public:
 
  static void run_held_lisp_list(quint64 lisp_val, quint64& mem);
 
+ void eval_held_form(quint64 qclo);
 
  void prepare_dynamo_callbacks(void** pass_on);
 

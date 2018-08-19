@@ -18,19 +18,19 @@ USING_KANS(Kauvir)
 
 KCM_Type_Object::KCM_Type_Object(KCM_Channel_Group* channel_group)
   :  kauvir_type_object_(nullptr), channel_group_(channel_group),
-     modifier_(Modifiers::N_A), array_length_(0)
+     modifier_(Modifiers::N_A), array_length_(0), byte_code_(0)
 {
 }
 
-KCM_Type_Object::KCM_Type_Object(const Kauvir_Type_Object* kauvir_type_object)
+KCM_Type_Object::KCM_Type_Object(const Kauvir_Type_Object* kauvir_type_object, int byte_code)
   :  kauvir_type_object_(kauvir_type_object), channel_group_(nullptr),
-     modifier_(Modifiers::N_A), array_length_(0)
+     modifier_(Modifiers::N_A), array_length_(0), byte_code_(byte_code)
 {
 }
 
 KCM_Type_Object::KCM_Type_Object()
  :  kauvir_type_object_(nullptr), channel_group_(nullptr),
-    modifier_(Modifiers::N_A), array_length_(0)
+    modifier_(Modifiers::N_A), array_length_(0), byte_code_(0)
 {
 
 }
@@ -61,6 +61,18 @@ bool KCM_Type_Object::is_lisp_list_like() const
 {
  // too primitive, no doubt
  return kauvir_type_object_->name() == "opl";
+}
+
+bool KCM_Type_Object::is_callable_lisp_deferred_value_like() const
+{
+ // too primitive, no doubt
+ return kauvir_type_object_->name() == "cldv";
+}
+
+bool KCM_Type_Object::is_argvec_like() const
+{
+ // too primitive, no doubt
+ return kauvir_type_object_->name() == "argvec";
 }
 
 KCM_Type_Object* KCM_Type_Object::base_clone() const

@@ -12,6 +12,7 @@
 
 #include "rz-graph-embed/rz-graph-embed-token.h"
 
+
 #include "rzns.h"
 USING_RZNS(GRun)
 
@@ -140,8 +141,6 @@ QString RZ_Graph_Run_Token::lisp_value() const
 
  if(flags.is_via_type_assignment)
  {
-  //QString temp = result;
-   //? make-instance
   result.prepend("(q-create :|");
   result.append("|)");
  }

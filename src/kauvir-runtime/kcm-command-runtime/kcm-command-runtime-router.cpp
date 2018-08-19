@@ -111,12 +111,14 @@ KCM_Command_Runtime_Argument* KCM_Command_Runtime_Router::parse_carrier_to_argum
  }
  else if(kcc.declaration_scope())
  {
-  // // currently declaration_scope is only used
-   // as a signal that kcc is scoped ...
+  // //  currently declaration_scope is only used
+   //    as a signal that kcc is scoped ...
   result = new KCM_Command_Runtime_Argument;
   const KCM_Type_Object* rkto;
 
   quint64 qv =  KCM_Lisp_Bridge::get_value_of_symbol(kcc.symbol(), scopes_, &rkto);
+
+  int x = *(int*) qv;
 
   if(rkto)
   {
@@ -214,23 +216,32 @@ KCM_Channel_Group* KCM_Command_Runtime_Router::get_channel_group()
  }
 }
 
+
 void KCM_Command_Runtime_Router::proceed_s0()
 {
  void* result;
+
+ if(s0_fn1_p_type fn = table_.find_argvec_function(fuxe_name_))
+ {
+  proceed_s0_argvec(fn, &result);
+  goto set_result;
+ }
+
  switch(lambda_arguments_.size())
  {
  case 0:
-  proceed_s0_0();
+  proceed_s0_0(&result);
   break;
  case 1:
   proceed_s0_1(&result);
   break;
  case 2:
-  proceed_s0_2();
+  proceed_s0_2(&result);
   break;
  default:
   break;
  }
+set_result:
  if(result)
  {
   call_result_ = (quint64) result;
@@ -244,7 +255,10 @@ void KCM_Command_Runtime_Router::proceed_s1()
  const KCM_Type_Object* kto = nullptr;
  const KCM_Type_Object* ckto = nullptr;
  QString encoded_value;
- void* raw_value = scopes_->find_raw_value_from_current_scope(code, kcm_expression_, kto, ckto, encoded_value);
+
+ QPair<int, quint64> qclo_value = {0, 0};
+ void* raw_value = scopes_->find_raw_value_from_current_scope(code, kcm_expression_,
+    kto, ckto, encoded_value, qclo_value);
 
  switch(lambda_arguments_.size())
  {
@@ -280,6 +294,7 @@ void KCM_Command_Runtime_Router::proceed_s1_2(void** pResult, void* raw_value)
   Kauvir_Universal_Class* uo = (Kauvir_Universal_Class*) (* (void**)raw_value) ;
   void* la0 = nullptr;
   quint64 mem = 0;
+  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
   QString qs_mem;
   QString* pqs_mem = &qs_mem;
 
@@ -287,13 +302,16 @@ void KCM_Command_Runtime_Router::proceed_s1_2(void** pResult, void* raw_value)
   quint64 mem1 = 0;
   QString qs_mem1;
   QString* pqs_mem1 = &qs_mem1;
+  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value1 = {scopes_, {0, 0}};
 
   FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
 
   int ptr_depth1;
   int ptr_depth2;
-  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem, pqs_mem, la0, ptr_depth1);
-  FN_Codes fnc2 = check_init_raw_value(lambda_arguments_[1], fnc1, mem1, pqs_mem1, la1, ptr_depth2);
+  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem,
+    qclo_value, pqs_mem, la0, ptr_depth1);
+  FN_Codes fnc2 = check_init_raw_value(lambda_arguments_[1], fnc1, mem1,
+    qclo_value1, pqs_mem1, la1, ptr_depth2);
 
   if(result_type_object_)
   {
@@ -327,7 +345,8 @@ void KCM_Command_Runtime_Router::run_callable_value(KCM_Callable_Value* kcv)
 
 
 KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_value(KCM_Command_Runtime_Argument* kcra,
-  FN_Codes fnc, quint64& mem, QString* qs_mem, void*& result, int& ptr_depth)
+  FN_Codes fnc, quint64& mem, QPair<KCM_Scope_System*, QPair<int, quint64>>& qclo_value,
+  QString* qs_mem, void*& result, int& ptr_depth)
 {
  const KCM_Type_Object* kto;
  if(kcra->bind_code().isEmpty())
@@ -342,8 +361,16 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
   }
   else
   {
-   // // assume always a string rep to number?
-   mem = qs->toLongLong();
+   // //  are these value classifications misleading?
+   if(kcra->value_classification() == KCM_Command_Runtime_Argument::Value_Classification::Generic_Ptr)
+   {
+    mem = qs->toLongLong();
+   }
+   else if(kcra->value_classification() == KCM_Command_Runtime_Argument::Value_Classification::QObject_Ptr)
+   {
+    mem = *(quint64*) kcra->raw_value();
+   }
+
    result = &mem;
    ptr_depth = 1;
    return add_ptr_cast_to_fn_code(fnc);
@@ -368,7 +395,8 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
 
   if(proxy_coords_code.isEmpty())
   {
-   quint64* rv = scopes_->find_raw_value_from_current_scope(kcra->bind_code(), kcm_expression_, kto, ckto, encoded_value);
+   quint64* rv = scopes_->find_raw_value_from_current_scope(kcra->bind_code(), kcm_expression_,
+     kto, ckto, encoded_value, qclo_value.second);
 
    if(rv == (quint64*) &encoded_value)
    {
@@ -391,6 +419,11 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
      // // is this OK given the QString** stuff?
      *qs_mem = encoded_value;
      result = qs_mem;
+    }
+    else if(kto->is_callable_lisp_deferred_value_like())
+    {
+     mem = (quint64) &qclo_value;
+     result = (void*) &mem;
     }
     else
     {
@@ -484,12 +517,14 @@ void KCM_Command_Runtime_Router::proceed_s1_1(void** pResult, void* raw_value)
   void* la0 = nullptr;
   quint64 mem = 0;
   QString qs_mem;
+  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
   QString* pqs_mem = &qs_mem;
 
   FN_Codes fnc = result_type_object_? FN_Codes::RET_C:FN_Codes::NOR_C;
 
   int ptr_depth = 0;
-  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem, pqs_mem, la0, ptr_depth);
+  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem,
+    qclo_value, pqs_mem, la0, ptr_depth);
 
   switch(fnc1)
   {
@@ -567,41 +602,187 @@ void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
 }
 
 
-//?
-void KCM_Command_Runtime_Router::proceed_s0_0()
-{
 
+
+void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
+{
+ void* result = nullptr;
+ int byte_code = 0;
+ s0_fn1_p_p_type fn = (s0_fn1_p_p_type) table_.find_s0_declared_function_1(fuxe_name_,
+   nullptr, &result_type_object_, byte_code);
+ bool sr = table_.s0_string_return(fuxe_name_);
+ if(fn)
+ {
+   // raw_value is quint64* standing for void** ...
+  void* la0 = nullptr;
+  quint64 mem0 = 0;
+  QString qs_mem0;
+  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
+  QString* pqs_mem0 = &qs_mem0;
+
+  void* la1 = nullptr;
+  quint64 mem1 = 0;
+  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value1 = {scopes_, {0, 0}};
+  QString qs_mem1;
+  QString* pqs_mem1 = &qs_mem1;
+
+
+
+  FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+
+  int ptr_depth = 0;
+
+  FN_Codes fnc0 = check_init_raw_value(lambda_arguments_[0], fnc, mem0,
+    qclo_value, pqs_mem0, la0, ptr_depth);
+  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[1], fnc, mem1,
+    qclo_value1, pqs_mem1, la1, ptr_depth);
+
+  if(result_type_object_)
+  {
+   if(sr)
+   {
+    s0_fn1_p_p__s_type sfn = (s0_fn1_p_p__s_type) fn;
+    QString str_result = sfn( (void*) *((quint64*) la0),
+                              (void*) *((quint64*) la1) );
+    hold_string_result(str_result);
+   }
+   else
+   {
+    result = fn( (void*) *((quint64*) la0),  (void*) *((quint64*) la1) );
+   }
+  }
+  else
+  {
+   switch(byte_code)
+   {
+   case 944: ((s0_fn1_32_32_type) fn)( (quint32) *((quint64*) la0),  (quint32) *((quint64*) la1) );
+     break;
+   case 984: ((s0_fn1_64_32_type) fn)( (quint64) *((quint64*) la0),  (quint32) *((quint64*) la1) );
+     break;
+   case 948: ((s0_fn1_32_64_type) fn)( (quint32) *((quint64*) la0),  (quint64) *((quint64*) la1) );
+     break;
+   default:
+   case 988: ((s0_fn1_64_64_type) fn)( (quint64) *((quint64*) la0),  (quint64) *((quint64*) la1) );
+     break;
+   }
+  }
+ }
+ if(pResult)
+ {
+  *pResult = result;
+ }
 }
 
-void KCM_Command_Runtime_Router::proceed_s0_2()
-{
 
+void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pResult)
+{
+ void* result = nullptr;
+ bool sr = table_.s0_string_return(fuxe_name_);
+
+ // // populate a vec
+ QVector<quint64> args;
+ int sz = lambda_arguments_.size();
+ args.resize(sz);
+
+ quint64 memvec[sz];
+ QString qs_memvec[sz];
+ QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_valuevec[sz];
+
+ for(int i = 0; i < sz; ++i)
+ {
+  void* lai = nullptr;
+  memvec[i] = 0;
+  qclo_valuevec[i] = {scopes_, {0, 0}};
+
+  QString* pqs_mem = &qs_memvec[i];
+
+  FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+
+  int ptr_depth = 0;
+  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[i], fnc, memvec[i],
+     qclo_valuevec[i], pqs_mem, lai, ptr_depth);
+  args[i] = (quint64) lai;
+ }
+
+
+ if(result_type_object_)
+ {
+  if(sr)
+  {
+   s0_fn1_p__s_type sfn = (s0_fn1_p__s_type) fn;
+   QString str_result = sfn( (void*) &args );
+   hold_string_result(str_result);
+  }
+  else
+  {
+   result = fn( (void*) &args );
+  }
+ }
+ else
+ {
+  ((s0_fn1_64_type) fn)( (quint64) &args );
+ }
+ if(pResult)
+ {
+  *pResult = result;
+ }
+}
+
+void KCM_Command_Runtime_Router::proceed_s0_0(void** pResult)
+{
+ void* result = nullptr;
+ int byte_code = 0;
+ s0_fn1_p_type fn = table_.find_s0_declared_function_1(fuxe_name_,
+   nullptr, &result_type_object_, byte_code);
+ bool sr = table_.s0_string_return(fuxe_name_);
+ if(fn)
+ {
+  if(result_type_object_)
+  {
+   if(sr)
+   {
+    s0_fn1_void__s_type sfn = (s0_fn1_void__s_type) fn;
+    QString str_result = sfn( );
+    hold_string_result(str_result);
+   }
+   else
+   {
+    result = ((s0_fn1_void_type) fn)();
+   }
+  }
+  else
+  {
+   ((s0_fn1_void_type) fn)();
+  }
+ }
+ if(pResult)
+ {
+  *pResult = result;
+ }
 }
 
 void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
 {
  void* result = nullptr;
- s0_fn1_p_type fn = table_.find_s0_declared_function_1(fuxe_name_, nullptr, &result_type_object_);
+ int byte_code = 0;
+ s0_fn1_p_type fn = table_.find_s0_declared_function_1(fuxe_name_,
+   nullptr, &result_type_object_, byte_code);
  bool sr = table_.s0_string_return(fuxe_name_);
  if(fn)
  {
    // raw_value is quint64* standing for void** ...
   void* la0 = nullptr;
   quint64 mem = 0;
+  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
+
   QString qs_mem;
   QString* pqs_mem = &qs_mem;
 
   FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
 
   int ptr_depth = 0;
-  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem, pqs_mem, la0, ptr_depth);
-
-  // for review ...
-  QString** qs = reinterpret_cast<QString**>(la0);
-
-
-  QString xx = "ok";
-  void* arg = (void*) *((quint64*) la0);
+  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem,
+    qclo_value, pqs_mem, la0, ptr_depth);
 
   if(result_type_object_)
   {
@@ -618,7 +799,15 @@ void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
   }
   else
   {
-   fn( (void*) *((quint64*) la0) );
+   switch(byte_code)
+   {
+   case 94: ((s0_fn1_32_type) fn)( (quint32) *((quint64*) la0) );
+     break;
+
+   default:
+   case 98: ((s0_fn1_64_type) fn)( (quint64) *((quint64*) la0) );
+     break;
+   }
   }
  }
  if(pResult)
@@ -658,9 +847,9 @@ void KCM_Command_Runtime_Router::do_invoke_method(QVector<KCM_Command_Runtime_Ar
 
  switch(args.size())
  {
-//?
+
  case 0: Do_Invoke_Method_<0, 0 <= MAX_UC_ARG_COUNT>::run(this, args); break;
-//?
+
  case 1: Do_Invoke_Method_<1, 1 <= MAX_UC_ARG_COUNT>::run(this, args); break;
  case 2: Do_Invoke_Method_<2, 2 <= MAX_UC_ARG_COUNT>::run(this, args); break;
  }
@@ -712,8 +901,6 @@ void KCM_Command_Runtime_Router::init_argument_info_qob(QVector<KCM_Command_Runt
  for(int i = 0; i < args.size(); ++i)
  {
   KCM_Command_Runtime_Argument* arg = args[i];
-  //int i = j + 1;
-  //QString internal_type_string = arg->qob_reflection_type_name();
 
   QString tn = arg->type_name();
   QOB_Argument_Conventions ac;
@@ -744,7 +931,9 @@ void KCM_Command_Runtime_Router::init_argument_info_qob(QVector<KCM_Command_Runt
    const KCM_Type_Object* kto;
    const KCM_Type_Object* ckto;
    QString encoded_value;
-   quint64* rv = scopes_->find_raw_value_from_current_scope(abc, kcm_expression_, kto, ckto, encoded_value);
+   QPair<int, quint64> qclo_value = {0, 0};
+   quint64* rv = scopes_->find_raw_value_from_current_scope(abc, kcm_expression_,
+     kto, ckto, encoded_value, qclo_value);
    store[i] = *rv;
    argument_info_[i + 1].qob_convention = ac;
    argument_info_[i + 1].void_argument = &store[i];
@@ -794,7 +983,9 @@ void KCM_Command_Runtime_Router::init_argument_info_qob(QVector<KCM_Command_Runt
   const KCM_Type_Object* kto;
   const KCM_Type_Object* ckto;
   QString encoded_value;
-  quint64* rv = scopes_->find_raw_value_from_current_scope(bc, kcm_expression_, kto, ckto, encoded_value);
+  QPair<int, quint64> qclo_value = {0, 0};
+  quint64* rv = scopes_->find_raw_value_from_current_scope(bc, kcm_expression_,
+    kto, ckto, encoded_value, qclo_value);
   argument_info_[0].void_argument = (void*) *rv;
  }
 }
@@ -810,17 +1001,7 @@ void KCM_Command_Runtime_Router::Do_Invoke_Method<Arg_Count>
  ::run(KCM_Command_Runtime_Router* this_, QVector<KCM_Command_Runtime_Argument*>& args)
 {
   switch(this_->reflection_convention_)
-  {//?
-//  case Reflection_Conventions::Universal_Class:
-//   Do_Invoke_Method__Cast_Schedule__UC__Cast_<Arg_Count>
-//     ::Type::template run<QObject*, typename Type_List__All_Cast_Needed<Arg_Count>::Type,
-//     typename FN_Type_Arg_Count<Arg_Count>::Type
-//     >
-//      (this_->function_name(),
-//      this_->this_object(), 0, *this_,
-//      this_->argument_info(), args);
-//   break;
-
+  {
   case Reflection_Conventions::Qt_Meta_Object:
    Do_Invoke_Method__Cast_Schedule__QOB__Cast_<Arg_Count>
      ::Type::template run<QObject*, typename Type_List__All_Cast_Needed<Arg_Count>::Type //,

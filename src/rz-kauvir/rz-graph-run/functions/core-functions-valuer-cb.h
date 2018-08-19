@@ -8,10 +8,4 @@
 
 //RZ_LISP_GRAPH_FUNCTION_DECLARE(assume, Assume, 0, Valuer)
 
-
 //?RZ_LISP_GRAPH_FUNCTION_DECLARE(enum, Enum, 0, Valuer_CB)
-
-//?RZ_LISP_GRAPH_FUNCTION_DECLARE(else, Else, 0, Valuer_CB)
-
-//?RZ_LISP_GRAPH_FUNCTION_DECLARE(caserun, Caserun, 0, Valuer_CB)
-

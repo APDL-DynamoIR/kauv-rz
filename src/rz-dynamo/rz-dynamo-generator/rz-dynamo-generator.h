@@ -127,6 +127,9 @@ public:
 
  void write_qpr(QList<MS_Token>& tokens);
 
+ void hold_deferred(int hdcode, quint64 clo, quint64& eval_clo);
+ void finalize_hold_deferred();
+
  void write_enter_plene_block();
  void write_leave_plene_block();
 

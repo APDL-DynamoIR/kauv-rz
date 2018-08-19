@@ -25,8 +25,6 @@
 
 USING_RZNS(GBuild)
 
-//RZNS_(RECore)
-
 RZNS_(RECore)
 
 
@@ -137,7 +135,9 @@ public:
 
  QString get_lisp_out() const;
 
- RE_Code_Representation::Special_Token_Kind special_token_kind()
+ QString special_token_kind_string() const;
+
+ RE_Code_Representation::Special_Token_Kind special_token_kind() const
  {
   return special_token_.kind;
  }

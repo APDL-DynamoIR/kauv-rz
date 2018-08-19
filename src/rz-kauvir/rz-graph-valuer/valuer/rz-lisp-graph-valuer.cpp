@@ -164,6 +164,18 @@ QString RZ_Lisp_Graph_Valuer::get_cpp_type_name(QString name)
  return result;
 }
 
+caon_ptr<RZ_Function_Def_Info> RZ_Lisp_Graph_Valuer::new_function_def_info(caon_ptr<RE_Function_Def_Entry> fdef)
+{
+ return new RZ_Function_Def_Info(*fdef,
+   [this](QString str){ return get_cpp_type_name(str); },
+      [](RZ_Lisp_Graph_Lexical_Scope& ls, QString symbol_name, QString channel_name_code)
+        {
+         ls.add_channel_symbol_from_symbol_name(symbol_name, channel_name_code);
+        }
+ );
+}
+
+
 QString RZ_Lisp_Graph_Valuer::rename_function_name(RZ_Lisp_Token& tok)
 {
  caon_ptr<RZ_Type_Object> rtop = tok.type_object();
@@ -418,14 +430,7 @@ void RZ_Lisp_Graph_Valuer::check_node_type(caon_ptr<tNode>& node)
   caon_ptr<RE_Node> n = rq_.Run_Function_Def_Entry(node);
   if(n)
   {
-   caon_ptr<RZ_Function_Def_Info> fdi = new RZ_Function_Def_Info(*n->re_function_def_entry(),
-    [this](QString str){ return get_cpp_type_name(str); },
-    // // circular
-    [](RZ_Lisp_Graph_Lexical_Scope& ls, QString symbol_name, QString channel_name_code)
-   {
-    ls.add_channel_symbol_from_symbol_name(symbol_name, channel_name_code);
-   }
-     );
+   caon_ptr<RZ_Function_Def_Info> fdi = new_function_def_info(n->re_function_def_entry());
    tok->set_value(fdi);
    check_function_def_map_sequence(node, *fdi);
   }
@@ -455,7 +460,37 @@ void RZ_Lisp_Graph_Valuer::check_node_type(caon_ptr<tNode>& node)
 void RZ_Lisp_Graph_Valuer::check_function_def_map_sequence(caon_ptr<tNode> node,
   RZ_Function_Def_Info& fdi)
 {
- if(caon_ptr<tNode> arrow_node = rq_.Run_Fundef_Map_Key_Sequence(node))
+ CAON_PTR_DEBUG(RE_Node ,node)
+ caon_ptr<tNode> arrow_node = rq_.Run_Fundef_Map_Key_Sequence(node);
+
+ caon_ptr<RZ_Function_Def_Info> reffdi = nullptr;
+
+ if(!arrow_node)
+ {
+//?
+//  caon_ptr<RE_Function_Def_Entry> fde = fdi.function_def_entry();
+//  CAON_PTR_DEBUG(RE_Function_Def_Entry ,fde)
+//  caon_ptr<RE_Node> en = fde->prior_node();
+//  CAON_PTR_DEBUG(RE_Node ,en)
+//    if(caon_ptr<RE_Node> don = rq_.Run_Fundef_Arrow_Sequence(en))
+
+  if(caon_ptr<RE_Node> don = rq_.Run_Fundef_Arrow_Sequence(node))
+  {
+   CAON_PTR_DEBUG(RE_Node ,don)
+   if(caon_ptr<RE_Node> en = rq_.Run_Call_Entry(don))
+   {
+    CAON_PTR_DEBUG(RE_Node ,en)
+    arrow_node = rq_.Run_Call_Sequence(en);
+    reffdi = fdi.ref_fdi();
+    if(!reffdi)
+    {
+     reffdi = &fdi;
+    }
+   }
+  }
+ }
+
+ if(arrow_node)
  {
   CAON_PTR_DEBUG(tNode ,arrow_node)
     // //   Should the token be already initialized?
@@ -474,20 +509,27 @@ void RZ_Lisp_Graph_Valuer::check_function_def_map_sequence(caon_ptr<tNode> node,
    {
     if(caon_ptr<RE_Function_Def_Entry> fdef = fdef_node->re_function_def_entry())
     {
-     caon_ptr<RZ_Function_Def_Info> new_fdi = new RZ_Function_Def_Info(*fdef,
-       [this](QString str){ return get_cpp_type_name(str); },
+//     caon_ptr<RZ_Function_Def_Info> new_fdi = new RZ_Function_Def_Info(*fdef,
+//       [this](QString str){ return get_cpp_type_name(str); },
 
-       [](RZ_Lisp_Graph_Lexical_Scope& ls, QString symbol_name, QString channel_name_code)
-      {
-       ls.add_channel_symbol_from_symbol_name(symbol_name, channel_name_code);
-      }
-       );
+//       [](RZ_Lisp_Graph_Lexical_Scope& ls, QString symbol_name, QString channel_name_code)
+//      {
+//       ls.add_channel_symbol_from_symbol_name(symbol_name, channel_name_code);
+//      }
+//       );
+     caon_ptr<RZ_Function_Def_Info> new_fdi = new_function_def_info(fdef);
      rzlt->set_value(new_fdi);
      fdi.set_map_key_sequence_ref_node(arrow_node);
 
      new_fdi->set_map_key_sequence_order(fdi.map_key_sequence_order() + 1);
 
      new_fdi->flags.has_preceding = true;
+
+     if(reffdi)
+     {
+      new_fdi->set_ref_fdi(reffdi);
+     }
+
      check_function_def_map_sequence(arrow_node, *new_fdi);
     }
    }
@@ -533,6 +575,7 @@ caon_ptr<RZ_Lisp_Graph_Valuer::tNode>
   caon_ptr<tNode>& node)
 {
  caon_ptr<tNode> result = nullptr;
+ CAON_PTR_DEBUG(tNode ,node)
  if(premise)
  {
   switch(premise.case_label)

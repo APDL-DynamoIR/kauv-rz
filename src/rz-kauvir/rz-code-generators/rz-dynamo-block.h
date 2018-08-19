@@ -87,6 +87,8 @@ private:
 
  QVector<caon_ptr<RZ_Code_Statement>> code_statements_;
 
+ static int get_new_hd_code();
+
 public:
 
  RZ_Dynamo_Block(caon_ptr<RZ_Dynamo_Block> parent_block = nullptr);

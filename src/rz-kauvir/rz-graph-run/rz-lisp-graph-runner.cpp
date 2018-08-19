@@ -45,11 +45,11 @@ void RZ_Lisp_Graph_Runner::check_run_info(RZ_Lisp_Graph_Result_Holder& rh,
 
  switch(cf.arity())
  {
-//?
+
  case 0: run_from_node<0>(rh, cf, start_node); break;
-//?
+
  case 1: run_from_node<1>(rh, cf, start_node); break;
-//?
+
  case 2: run_from_node<2>(rh, cf, start_node); break;
  default: break;
  }

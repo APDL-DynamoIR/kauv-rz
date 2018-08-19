@@ -11,10 +11,12 @@ include(../build-group.pri)
 
 INCLUDEPATH += $$SRC_DIR $$SRC_GROUP_DIR $$SRC_ROOT_DIR/kcm-runtime-eval/kcm-scopes
 
-
 CONFIG += no_keywords
 
+
 DEFINES += USE_KANS
+DEFINES += DEFAULT_PTR_BYTE_CODE=QT_POINTER_SIZE
+
 
 HEADERS += \
   $$SRC_DIR/kauvir-code-model.h \
