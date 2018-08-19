@@ -14,14 +14,6 @@ INCLUDEPATH += $$SRC_DIR $$SRC_GROUP_DIR
 
 CONFIG += no_keywords
 
-ECL_DIR = /extension/ecl
-CL_CXX_DIR = /extension/ecl/cl-cxx
-INCLUDEPATH += $$ECL_DIR/install/include
-INCLUDEPATH += $$CL_CXX_DIR/install/include/cl-cxx
-INCLUDEPATH += $$CL_CXX_DIR/install/include
-
-
-message($$SRC_DIR)
 
 DEFINES += USE_KANS
 
