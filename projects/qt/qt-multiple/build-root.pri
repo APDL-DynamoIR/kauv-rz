@@ -63,35 +63,24 @@ CONFIG(debug, debug|release) {
     OBJECTS_DIR = $$TARGETSDIR/PROJECT_OBJECTS/$$PROJECT_NAME/release
 }
 
-#Debug:OBJECTS_DIR = $$TARGETSDIR/$$PROJECT_NAME/release
-#release:OBJECTS_DIR = $$TARGETSDIR/$$PROJECT_NAME/debug
-
-#?CONFIG(debug, debug|release) {
-#?    DESTDIR = $$TARGETSDIR
-#?} else {
-#?    DESTDIR = $$QT_PLUGINS_LIB_DIR
-#?}
 DESTDIR = $$TARGETSDIR
 
-#QMAKE_CXXFLAGS += -std=c++0x
-#QMAKE_CXXFLAGS += -std=gnu++0x -w
 
 INCLUDEPATH += $$SRC_DIR $$SRC_ROOT_DIR $$SRC_GLOBAL_DIR
 
-#?DEFINES += NO_CAON
 
 
 #groups
 
 RELAE_SRC_GROUP_DIR = $$SRC_ROOT_DIR/relae-graph
-KAUVIR_SRC_GROUP_DIR = $$SRC_ROOT_DIR/kauvir-kcm
-RZ_SRC_GROUP_DIR = $$SRC_ROOT_DIR/ka-lacadam
+KAUVIR_KCM_SRC_GROUP_DIR = $$SRC_ROOT_DIR/kauvir-kcm
+RZ_KAUVIR_SRC_GROUP_DIR = $$SRC_ROOT_DIR/rz-kauvir
+KAUVIR_RUNTIME_SRC_GROUP_DIR = $$SRC_ROOT_DIR/kauvir-runtime
+KCM_RUNTIME_EVAL_SRC_GROUP_DIR = $$SRC_ROOT_DIR/kcm-runtime-eval
+RZ_DYNAMO_SRC_GROUP_DIR = $$SRC_ROOT_DIR/rz-dynamo
+
 
 
 DEFINES += RZ_DIR="\\\"$$ROOT_DIR/data/scripts/rz\\\""
-
-#KA_ASK_SRC_GROUP_DIR = $$SRC_ROOT_DIR/ka-ask
-#KA_MODEL_SRC_GROUP_DIR = $$SRC_ROOT_DIR/ka-model
-
 
 

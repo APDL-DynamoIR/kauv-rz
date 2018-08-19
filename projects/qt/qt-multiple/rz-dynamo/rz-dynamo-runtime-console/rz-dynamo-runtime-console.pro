@@ -13,7 +13,7 @@ include(../build-group.pri)
 TEMPLATE = app
 
 INCLUDEPATH += $$SRC_DIR $$SRC_GROUP_DIR
-INCLUDEPATH += $$KAUVIR_SRC_GROUP_DIR $$KAUVIR_SRC_GROUP_DIR/kcm-lisp-bridge
+INCLUDEPATH += $$KAUVIR_KCM_SRC_GROUP_DIR $$KAUVIR_KCM_SRC_GROUP_DIR/kcm-lisp-bridge
 
 
 CONFIG += no_keywords

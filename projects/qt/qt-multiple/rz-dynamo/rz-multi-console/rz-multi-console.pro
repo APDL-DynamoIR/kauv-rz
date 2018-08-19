@@ -11,7 +11,7 @@ include(../build-group.pri)
 TEMPLATE = app
 
 INCLUDEPATH += $$SRC_DIR $$SRC_GROUP_DIR
-INCLUDEPATH += $$KAUVIR_SRC_GROUP_DIR $$KAUVIR_SRC_GROUP_DIR/kcm-lisp-bridge
+INCLUDEPATH += $$KAUVIR_KCM_SRC_GROUP_DIR $$KAUVIR_KCM_SRC_GROUP_DIR/kcm-lisp-bridge
 
 include(../../find-ecl-sexp.pri)
 
@@ -21,11 +21,10 @@ INCLUDEPATH += $$SEXP_DIR/pingus/
 DEFINES += CAON_DEBUG
 DEFINES += RELAE_LABEL_NODES
 
-RZ_SRC_GROUP_DIR = $$SRC_ROOT_DIR/rz-kauvir
 
-INCLUDEPATH += $$RZ_SRC_GROUP_DIR \
-  $$RZ_SRC_GROUP_DIR/rz-graph-core  $$RZ_SRC_GROUP_DIR/rz-graph-token  \
-  $$RELAE_SRC_GROUP_DIR  $$KAUVIR_SRC_GROUP_DIR
+INCLUDEPATH += $$RZ_KAUVIR_SRC_GROUP_DIR \
+  $$RZ_KAUVIR_SRC_GROUP_DIR/rz-graph-core  $$RZ_KAUVIR_SRC_GROUP_DIR/rz-graph-token  \
+  $$RELAE_SRC_GROUP_DIR  $$KAUVIR_KCM_SRC_GROUP_DIR
 
 
 CONFIG += no_keywords
