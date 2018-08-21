@@ -12,101 +12,133 @@
 
 USING_KANS(KCM)
 
-KCM_Channel_Group::KCM_Channel_Group()
-  :  furnisher_(nullptr)
+KCM_Channel_Group::KCM_Channel_Group(QPair<QSet<QString*>*,
+  QMap<KCM_Channel::Kinds, QString*>*>& channel_names)
+  :  furnisher_(nullptr), channel_names_(channel_names)
 {
- set_kinds();
 }
 
 KCM_Channel_Group::KCM_Channel_Group(const KCM_Channel_Group& rhs)
-  :  furnisher_(rhs.furnisher())
+  :  furnisher_(rhs.furnisher()), channels_(rhs.channels_),
+  channel_names_(rhs.channel_names_)
 {
- lambda_ = rhs.lambda();
- result_ = rhs.result();
- sigma_ = rhs.sigma();
-
- fuxe_ = rhs.fuxe();
 }
 
 
 void KCM_Channel_Group::set_kinds()
 {
- fuxe_.set_kind(KCM_Channel::Kinds::Fuxe);
- lambda_.set_kind(KCM_Channel::Kinds::Lambda);
- sigma_.set_kind(KCM_Channel::Kinds::Sigma);
- array_.set_kind(KCM_Channel::Kinds::Array);
- capture_.set_kind(KCM_Channel::Kinds::Capture);
- gamma_.set_kind(KCM_Channel::Kinds::Gamma);
- result_.set_kind(KCM_Channel::Kinds::Result);
-
- preempt_.set_kind(KCM_Channel::Kinds::Preempt_Any);
-
+ QMapIterator<KCM_Channel::Kinds, QString*> it(channel_names_map());
+ while(it.hasNext())
+ {
+  it.next();
+  KCM_Channel::Kinds k = it.key();
+  QString* qs = it.value();
+  auto cit = channels_.find(qs);
+  if(cit != channels_.end())
+  {
+   cit.value().set_kind(k);
+  }
+ }
 }
 
 void KCM_Channel_Group::clear_all_but_sigma()
 {
- fuxe_ = KCM_Channel();
- lambda_ = KCM_Channel();
- capture_ = KCM_Channel();
- array_ = KCM_Channel();
- gamma_ = KCM_Channel();
- result_ = KCM_Channel();
- preempt_ = KCM_Channel();
- set_kinds();
+ QList<QString*> keys = channels_.keys();
+ for(QString* qs : keys)
+ {
+  if(*qs != "sigma")
+  {
+   channels_.remove(qs);
+  }
+ }
 }
 
 void KCM_Channel_Group::clear_all()
 {
- fuxe_ = KCM_Channel();
- lambda_ = KCM_Channel();
- sigma_ = KCM_Channel();
- array_ = KCM_Channel();
- capture_ = KCM_Channel();
- gamma_ = KCM_Channel();
- result_ = KCM_Channel();
- preempt_ = KCM_Channel();
- set_kinds();
+ channels_.clear();
 }
+
+QString* KCM_Channel_Group::get_channel_name_pointer(QString name, KCM_Channel::Kinds k)
+{
+ if(k != KCM_Channel::Kinds::N_A)
+ {
+  QString* result = channel_names_map().value(k);
+  if(result)
+    return result;
+ }
+ for(QString* qs : channel_names_set())
+ {
+  if(*qs == name)
+  {
+   if(k != KCM_Channel::Kinds::N_A)
+     channel_names_map()[k] = qs;
+   return qs;
+  }
+ }
+ QString* result = new QString(name);
+ channel_names_set().insert(result);
+ if(k != KCM_Channel::Kinds::N_A)
+   channel_names_map()[k] = result;
+ return result;
+}
+
+
+KCM_Channel& KCM_Channel_Group::fuxe()
+{
+ QString* qs = get_channel_name_pointer("fuxe", KCM_Channel::Kinds::Fuxe);
+ return channels_[qs];
+}
+
+
+KCM_Channel& KCM_Channel_Group::lambda()
+{
+ QString* qs = get_channel_name_pointer("lambda", KCM_Channel::Kinds::Lambda);
+ return channels_[qs];
+}
+
+KCM_Channel& KCM_Channel_Group::result()
+{
+ QString* qs = get_channel_name_pointer("result", KCM_Channel::Kinds::Result);
+ return channels_[qs];
+}
+
+KCM_Channel& KCM_Channel_Group::sigma()
+{
+ QString* qs = get_channel_name_pointer("sigma", KCM_Channel::Kinds::Sigma);
+ return channels_[qs];
+}
+
+
 
 void KCM_Channel_Group::add_fuxe_carrier(const KCM_Type_Object* type_object)
 {
- fuxe_.add_carrier({type_object, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, QString());
+ fuxe().add_carrier({type_object, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, QString());
 }
 
 void KCM_Channel_Group::add_fuxe_carrier(QString symbol_name)
 {
- fuxe_.add_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, symbol_name);
+ fuxe().add_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, symbol_name);
 }
 
 
 void KCM_Channel_Group::add_result_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name)
 {
- result_.add_carrier(tos, ep, symbol_name);
+ result().add_carrier(tos, ep, symbol_name);
 }
 
-void KCM_Channel_Group::add_preempt_carrier(kcm_type_object_pair_type tos,
-  KCM_Carrier::Effect_Protocols ep, QString symbol_name)
-{
- preempt_.add_carrier(tos, ep, symbol_name);
-}
 
 void KCM_Channel_Group::add_lambda_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name, KCM_Runtime_Scope* scope)
 {
- lambda_.add_carrier(tos, ep, symbol_name, scope);
+ lambda().add_carrier(tos, ep, symbol_name, scope);
 }
 
-void KCM_Channel_Group::add_array_carrier(kcm_type_object_pair_type tos,
-  KCM_Carrier::Effect_Protocols ep, QString symbol_name)
-{
- array_.add_carrier(tos, ep, symbol_name);
-}
 
 void KCM_Channel_Group::add_sigma_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name)
 {
- sigma_.add_carrier(tos, ep, symbol_name);
+ sigma().add_carrier(tos, ep, symbol_name);
 }
 
 void KCM_Channel_Group::add_sigma_carrier_via_symbol_with_cast(QString value_name,
@@ -115,22 +147,10 @@ void KCM_Channel_Group::add_sigma_carrier_via_symbol_with_cast(QString value_nam
  add_sigma_carrier({kto, ckto}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
 }
 
-void KCM_Channel_Group::add_capture_carrier(kcm_type_object_pair_type tos,
-  KCM_Carrier::Effect_Protocols ep, QString symbol_name)
-{
- capture_.add_carrier(tos, ep, symbol_name);
-}
-
-void KCM_Channel_Group::add_gamma_carrier(kcm_type_object_pair_type tos,
-  KCM_Carrier::Effect_Protocols ep, QString symbol_name)
-{
- gamma_.add_carrier(tos, ep, symbol_name);
-}
-
 int KCM_Channel_Group::get_lambda_byte_code()
 {
  int result = 9;
- for(const KCM_Carrier& c : lambda_.carriers())
+ for(const KCM_Carrier& c : lambda().carriers())
  {
   result *= 10;
   result += c.type_object()->byte_code();
@@ -149,19 +169,9 @@ void KCM_Channel_Group::add_lambda_carrier_via_symbol_with_cast(QString value_na
  add_lambda_carrier({nullptr, type_object}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
 }
 
-void KCM_Channel_Group::add_array_carrier_via_symbol_with_cast(QString value_name, const KCM_Type_Object* type_object)
-{
- add_array_carrier({nullptr, type_object}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
-}
-
 void KCM_Channel_Group::add_lambda_carrier_via_literal_with_cast(QString value_name, const KCM_Type_Object* type_object)
 {
  add_lambda_carrier({nullptr, type_object}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
-}
-
-void KCM_Channel_Group::add_array_carrier_via_literal_with_cast(QString value_name, const KCM_Type_Object* type_object)
-{
- add_array_carrier({nullptr, type_object}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
 }
 
 void KCM_Channel_Group::add_lambda_carrier_via_bind_symbol(const KCM_Type_Object* kto, QString symbol_name)
@@ -193,12 +203,6 @@ void KCM_Channel_Group::add_lambda_carrier_via_scoped_symbol(QString symbol_name
 void KCM_Channel_Group::add_sigma_carrier_via_symbol(QString value_name)
 {
  add_sigma_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
-}
-
-
-void KCM_Channel_Group::add_array_carrier_via_symbol(QString value_name)
-{
- add_array_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Unrestricted, value_name);
 }
 
 void KCM_Channel_Group::add_lambda_carrier_via_typed_opaque_value(const KCM_Type_Object* kto, QString value_encoding)
@@ -239,19 +243,9 @@ void KCM_Channel_Group::add_sigma_carrier_via_literal(QString value_name)
  add_sigma_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
 }
 
-void KCM_Channel_Group::add_array_carrier_via_literal(QString value_name)
-{
- add_array_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
-}
-
 void KCM_Channel_Group::add_lambda_carrier(kcm_type_object_pair_type tos, QString value_name)
 {
  add_lambda_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
-}
-
-void KCM_Channel_Group::add_array_carrier(kcm_type_object_pair_type tos, QString value_name)
-{
- add_array_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
 }
 
 void KCM_Channel_Group::add_sigma_carrier(kcm_type_object_pair_type tos, QString value_name)
@@ -259,59 +253,57 @@ void KCM_Channel_Group::add_sigma_carrier(kcm_type_object_pair_type tos, QString
  add_sigma_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
 }
 
-void KCM_Channel_Group::add_capture_carrier(kcm_type_object_pair_type tos, QString value_name)
-{
- add_capture_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
-}
-
-void KCM_Channel_Group::add_gamma_carrier(kcm_type_object_pair_type tos, QString value_name)
-{
- add_gamma_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
-}
 
 void KCM_Channel_Group::add_result_carrier(kcm_type_object_pair_type tos, QString value_name)
 {
  add_result_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
 }
 
-void KCM_Channel_Group::add_preempt_carrier(kcm_type_object_pair_type tos, QString value_name)
+void KCM_Channel_Group::check_report(KCM_Channel::Kinds k, QTextStream& qts, Kauvir_Code_Model& kcm,
+  KCM_Report_Syntax& kcrs, KCM_Channel::Code_Environments cenv)
 {
- add_preempt_carrier(tos, KCM_Carrier::Effect_Protocols::Const_Literal, value_name);
+ QString* qs = channel_names_map().value(k);
+ if(qs)
+ {
+  auto it = channels_.find(qs);
+  if(it != channels_.end())
+  {
+   it->report(qts, kcm, kcrs, cenv);
+  }
+ }
+}
+
+
+void KCM_Channel_Group::report(QVector<KCM_Channel::Kinds> ks, QTextStream& qts, Kauvir_Code_Model& kcm,
+  KCM_Report_Syntax& kcrs, KCM_Channel::Code_Environments cenv)
+{
+ set_kinds();
+ for(KCM_Channel::Kinds k : ks)
+ {
+  check_report(k, qts, kcm, kcrs, cenv);
+ }
 }
 
 void KCM_Channel_Group::report(QTextStream& qts, Kauvir_Code_Model& kcm,
   KCM_Report_Syntax& kcrs, KCM_Channel::Code_Environments cenv)
 {
- fuxe_.report(qts, kcm, kcrs, cenv);
- if(array_.carriers().isEmpty())
- {
-  lambda_.report(qts, kcm, kcrs, cenv);
- }
- else
- {
-  array_.report(qts, kcm, kcrs, cenv);
- }
- sigma_.report(qts, kcm, kcrs, cenv);
- capture_.report(qts, kcm, kcrs, cenv);
- gamma_.report(qts, kcm, kcrs, cenv);
- result_.report(qts, kcm, kcrs, cenv);
- preempt_.report(qts, kcm, kcrs, cenv);
-
+ report({KCM_Channel::Kinds::Fuxe, KCM_Channel::Kinds::Lambda,
+   KCM_Channel::Kinds::Sigma, KCM_Channel::Kinds::Result}, qts, kcm, kcrs, cenv);
 }
 
 
 
 KCM_Channel_Group* KCM_Channel_Group::branch_copy()
 {
- KCM_Channel_Group* result = new KCM_Channel_Group;
- result->fuxe_.copy_from(fuxe_);
- result->lambda_.copy_from(lambda_);
- result->sigma_.copy_from(sigma_);
- result->preempt_.copy_from(preempt_);
- result->array_.copy_from(array_);
- result->result_.copy_from(result_);
- // any others?
+ KCM_Channel_Group* result = new KCM_Channel_Group(channel_names_);
 
+ for(QString* qs : channel_names_set())
+ {
+  if(channels_.contains(qs))
+  {
+   result->channels_[qs].copy_from(channels_[qs]);
+  }
+ }
  return result;
 }
 

@@ -220,7 +220,7 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
 
  KCM_Command_Runtime_Table& table = *kcm.table();
 
- KCM_Channel_Group g1;
+ KCM_Channel_Group g1(kcm.channel_names());
  {
   g1.add_lambda_carrier(
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},

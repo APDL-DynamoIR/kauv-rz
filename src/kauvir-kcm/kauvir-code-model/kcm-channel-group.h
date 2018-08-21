@@ -16,6 +16,7 @@
 
 #include <QVector>
 #include <QTextStream>
+#include <QSet>
 
 KANS_(KCM)
 
@@ -28,19 +29,28 @@ class KCM_Channel_Group
  KCM_Channel_Furnisher* furnisher_;
 
 protected:
- KCM_Channel fuxe_;
 
- KCM_Channel lambda_;
- KCM_Channel sigma_;
+ QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*>& channel_names_;
 
- KCM_Channel array_;
+ QMap<QString*, KCM_Channel> channels_;
 
- KCM_Channel capture_;
- KCM_Channel gamma_;
+ QString* get_channel_name_pointer(QString name, KCM_Channel::Kinds k = KCM_Channel::Kinds::N_A);
 
- KCM_Channel result_;
+ QSet<QString*>& channel_names_set()
+ {
+  return *channel_names_.first;
+ }
 
- KCM_Channel preempt_;
+ QMap<KCM_Channel::Kinds, QString*>& channel_names_map()
+ {
+  return *channel_names_.second;
+ }
+
+ const QMap<KCM_Channel::Kinds, QString*>& channel_names_map() const
+ {
+  return *channel_names_.second;
+ }
+
 
 private:
 
@@ -50,7 +60,7 @@ private:
 
 public:
 
- KCM_Channel_Group();
+ KCM_Channel_Group(QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*>& channel_names);
 
  KCM_Channel_Group(const KCM_Channel_Group& rhs);
 
@@ -58,49 +68,39 @@ public:
 
  int get_lambda_byte_code();
 
+ KCM_Channel& fuxe();
+ KCM_Channel& lambda();
+ KCM_Channel& result();
+ KCM_Channel& sigma();
+
  friend bool operator<(const KCM_Channel_Group& lhs, const KCM_Channel_Group& rhs)
  {
-  if(lhs.sigma() < rhs.sigma())
+  if(lhs.channels_.size() == rhs.channels_.size())
+  {
+   QMapIterator<QString*, KCM_Channel> lit(lhs.channels_);
+   QMapIterator<QString*, KCM_Channel> rit(rhs.channels_);
+   while(lit.hasNext())
+   {
+    lit.next();
+    rit.next();
+    if(*lit.key() == *rit.key())
+    {
+     if(lit.value() < rit.value())
+       return true;
+     if(rit.value() < lit.value())
+       return true;
+    }
+    else if(*lit.key() < *rit.key())
+      return true;
+    else return false;
+   }
+  }
+  else if(lhs.channels_.size() < rhs.channels_.size())
+  {
    return true;
-  if(lhs.lambda() < rhs.lambda())
-   return true;
-  if(lhs.array() < rhs.array())
-   return true;
-  if(lhs.capture() < rhs.capture())
-   return true;
-  if(lhs.gamma() < rhs.gamma())
-   return true;
-  if(lhs.result() < rhs.result())
-   return true;
-  if(lhs.fuxe() < rhs.fuxe())
-   return true;
+  }
   return false;
  }
-
- ACCESSORS__RGET(KCM_Channel ,fuxe)
-
- ACCESSORS__RGET(KCM_Channel ,lambda)
- ACCESSORS__RGET(KCM_Channel ,sigma)
-
- ACCESSORS__RGET(KCM_Channel ,array)
-
- ACCESSORS__RGET(KCM_Channel ,capture)
- ACCESSORS__RGET(KCM_Channel ,gamma)
-
- ACCESSORS__RGET(KCM_Channel ,result)
-
- ACCESSORS__CONST_RGET(KCM_Channel ,fuxe)
-
- ACCESSORS__CONST_RGET(KCM_Channel ,lambda)
- ACCESSORS__CONST_RGET(KCM_Channel ,sigma)
-
- ACCESSORS__CONST_RGET(KCM_Channel ,array)
-
- ACCESSORS__CONST_RGET(KCM_Channel ,capture)
- ACCESSORS__CONST_RGET(KCM_Channel ,gamma)
-
- ACCESSORS__CONST_RGET(KCM_Channel ,result)
-
 
  void add_fuxe_carrier(const KCM_Type_Object* type_object);
  void add_fuxe_carrier(QString symbol_name);
@@ -112,10 +112,6 @@ public:
    KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
    QString symbol_name = QString(), KCM_Runtime_Scope* scope = nullptr);
 
- void add_array_carrier(kcm_type_object_pair_type tos,
-   KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
-   QString symbol_name = QString());
-
  void add_sigma_carrier(kcm_type_object_pair_type tos,
    KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
                         QString symbol_name = QString());
@@ -124,26 +120,13 @@ public:
    KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
                           QString symbol_name = QString());
 
- void add_gamma_carrier(kcm_type_object_pair_type tos,
-   KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
-                        QString symbol_name = QString());
-
  void add_result_carrier(kcm_type_object_pair_type tos,
    KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
    QString symbol_name = QString());
 
- void add_preempt_carrier(kcm_type_object_pair_type tos,
-   KCM_Carrier::Effect_Protocols ep = KCM_Carrier::Effect_Protocols::Unrestricted,
-   QString symbol_name = QString());
-
-
  void add_lambda_carrier(kcm_type_object_pair_type tos, QString value_name);
  void add_sigma_carrier(kcm_type_object_pair_type tos, QString value_name);
- void add_array_carrier(kcm_type_object_pair_type tos, QString value_name);
- void add_capture_carrier(kcm_type_object_pair_type tos, QString value_name);
- void add_gamma_carrier(kcm_type_object_pair_type tos, QString value_name);
  void add_result_carrier(kcm_type_object_pair_type tos, QString value_name);
- void add_preempt_carrier(kcm_type_object_pair_type tos, QString value_name);
 
  void add_lambda_carrier_via_bind_symbol(const KCM_Type_Object* kto, QString symbol_name);
 
@@ -164,8 +147,6 @@ public:
  void add_lambda_carrier_via_symbol_with_cast(QString value_name, const KCM_Type_Object* type_object);
  void add_lambda_carrier_via_literal_with_cast(QString value_name, const KCM_Type_Object* type_object);
 
-
-
  void add_sigma_carrier_via_symbol(QString value_name);
  void add_sigma_carrier_via_literal(QString value_name);
 
@@ -177,20 +158,19 @@ public:
     const KCM_Type_Object* ckto);
  void add_sigma_carrier_via_literal_with_cast(QString value_name, const KCM_Type_Object* type_object);
 
-
-
- void add_array_carrier_via_symbol(QString value_name);
- void add_array_carrier_via_literal(QString value_name);
- void add_array_carrier_via_symbol_with_cast(QString value_name, const KCM_Type_Object* type_object);
- void add_array_carrier_via_literal_with_cast(QString value_name, const KCM_Type_Object* type_object);
-
  void clear_all();
 
  void clear_all_but_sigma();
 
  KCM_Channel_Group* branch_copy();
 
+ void report(QVector<KCM_Channel::Kinds> ks, QTextStream& qts, Kauvir_Code_Model& kcm,
+   KCM_Report_Syntax& kcrs, KCM_Channel::Code_Environments cenv);
+
  void report(QTextStream& qts, Kauvir_Code_Model& kcm,
+   KCM_Report_Syntax& kcrs, KCM_Channel::Code_Environments cenv);
+
+ void check_report(KCM_Channel::Kinds k, QTextStream& qts, Kauvir_Code_Model& kcm,
    KCM_Report_Syntax& kcrs, KCM_Channel::Code_Environments cenv);
 
 

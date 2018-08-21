@@ -1,14 +1,14 @@
 
+//           Copyright Nathaniel Christen 2018.
+//  Distributed under the Boost Software License, Version 1.0.
+//     (See accompanying file LICENSE_1_0.txt or copy at
+//           http://www.boost.org/LICENSE_1_0.txt)
+
 #include "kcm-direct-eval.h"
 
 #include "kauvir-code-model/kauvir-code-model.h"
 #include "kcm-lisp-bridge/kcm-lisp-bridge.h"
 #include "kauvir-runtime/kcm-command-package/kcm-command-package.h"
-
-//           Copyright Nathaniel Christen 2018.
-//  Distributed under the Boost Software License, Version 1.0.
-//     (See accompanying file LICENSE_1_0.txt or copy at
-//           http://www.boost.org/LICENSE_1_0.txt)
 
 #include "kauvir-code-model/kcm-source-function.h"
 #include "kcm-runtime-eval/kcm-scopes/kcm-scope-system.h"
@@ -33,9 +33,9 @@ KCM_Command_Package* make_kcm_command_package_from_channel_group(const KCM_Chann
  return new KCM_Command_Package(kcg);
 }
 
-KCM_Command_Package* make_kcm_command_package(const KCM_Type_Object* kto, QString val, QObject* qob)
+KCM_Command_Package* make_kcm_command_package(QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*>& channel_names, const KCM_Type_Object* kto, QString val, QObject* qob)
 {
- return new KCM_Command_Package(kto, val, qob);
+ return new KCM_Command_Package(channel_names, kto, val, qob);
 }
 
 void kcm_direct_eval(Kauvir_Code_Model* kcm, KCM_Command_Package* cpkg, KCM_Lisp_Bridge& bridge)

@@ -19,6 +19,7 @@
 
 #include <QVector>
 #include <QMap>
+#include <QSet>
 
 #include <QTextStream>
 #include <QQueue>
@@ -74,7 +75,8 @@ class Kauvir_Code_Model
 
  make_kcm_command_package_from_channel_group_fn_type make_kcm_command_package_from_channel_group_fn_;
 
- typedef std::function<KCM_Command_Package*(const KCM_Type_Object* kto,
+ typedef std::function<KCM_Command_Package*(QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*>& channel_names,
+   const KCM_Type_Object* kto,
    QString val, QObject* qob)> make_kcm_command_package_fn_type;
 
  make_kcm_command_package_fn_type make_kcm_command_package_fn_;
@@ -123,6 +125,14 @@ class Kauvir_Code_Model
 
  QStack<QPair<KCM_Expression*, QPair<int, int>>> current_held_deferred_coords_;
 
+ QSet<QString*> channel_names_set_;
+ QMap<KCM_Channel::Kinds, QString*> channel_names_map_;
+
+ QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*> channel_names_;
+
+
+ typedef QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*> channel_names_type;
+
 public:
 
  Kauvir_Code_Model();
@@ -141,6 +151,8 @@ public:
  ACCESSORS(make_kcm_command_package_fn_type ,make_kcm_command_package_fn)
 
  ACCESSORS__RGET(KCM_Report_Syntax ,detailed_report_synax)
+
+ ACCESSORS__RGET(channel_names_type, channel_names)
 
  void init_scope_system();
  void prepare_nested_expression(KCM_Expression* kcx, int level, int index);

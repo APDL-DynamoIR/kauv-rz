@@ -145,9 +145,6 @@ public:
 
  Q_INVOKABLE void kcg_add_lambda_carrier_via_literal(KCM_Channel_Group* kcg, QString text);
 
- Q_INVOKABLE void kcg_add_array_carrier_via_symbol_with_cast(KCM_Channel_Group* kcg,
-   QString symbol_name, KCM_Type_Object* ckto);
-
  Q_INVOKABLE quint64 get_value_of_symbol(QString symbol_name);
 
  static quint64 get_value_of_symbol(QString symbol_name,

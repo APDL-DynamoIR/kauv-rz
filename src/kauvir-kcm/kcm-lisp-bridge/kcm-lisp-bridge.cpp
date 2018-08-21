@@ -43,7 +43,7 @@ KCM_Lisp_Bridge::KCM_Lisp_Bridge(const KCM_Lisp_Bridge& rhs)
 
 KCM_Channel_Group* KCM_Lisp_Bridge::new_KCM_Channel_Group()
 {
- return new KCM_Channel_Group();
+ return new KCM_Channel_Group(kcm_.channel_names());
 }
 
 
@@ -432,13 +432,6 @@ void KCM_Lisp_Bridge::kcg_add_lambda_carrier_via_literal(KCM_Channel_Group* kcg,
 {
  kcg->add_lambda_carrier_via_literal(text);
 }
-
-void KCM_Lisp_Bridge::kcg_add_array_carrier_via_symbol_with_cast(KCM_Channel_Group* kcg,
-  QString symbol_name, KCM_Type_Object* ckto)
-{
- kcg->add_array_carrier_via_symbol_with_cast(symbol_name, ckto);
-}
-
 
 const KCM_Type_Object* KCM_Lisp_Bridge::kcm_type_object__u64()
 {

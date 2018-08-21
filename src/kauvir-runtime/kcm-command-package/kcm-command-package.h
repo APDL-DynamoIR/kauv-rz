@@ -33,11 +33,12 @@ class KCM_Command_Package : public KCM_Channel_Group
 
 public:
 
- KCM_Command_Package();
+ KCM_Command_Package(QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*>& channel_names);
 
  KCM_Command_Package(const KCM_Channel_Group& kcg);
 
- KCM_Command_Package(const KCM_Type_Object* kto, QString val, QObject* bind_qob);
+ KCM_Command_Package(QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*>& channel_names,
+   const KCM_Type_Object* kto, QString val, QObject* bind_qob);
 
  ACCESSORS(KCM_Overloadable_Symbol* ,output_symbol)
 
@@ -53,6 +54,10 @@ public:
  }
 
  QString output_symbol_name();
+
+
+ QString report_channel(KCM_Channel::Kinds k, QString prefix, QString suffix,
+   Kauvir_Code_Model& kcm, QString sep, QString last_sep, QString on_empty) const;
 
  QString report_sigma(Kauvir_Code_Model& kcm, QString sep, QString last_sep, QString on_empty) const;
  QString report_fuxe(Kauvir_Code_Model& kcm, QString sep, QString last_sep, QString on_empty) const;

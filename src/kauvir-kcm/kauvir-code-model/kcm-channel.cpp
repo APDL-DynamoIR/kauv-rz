@@ -19,6 +19,29 @@ KCM_Channel::KCM_Channel()
 
 }
 
+KCM_Channel::Kinds KCM_Channel::get_channel_kind_by_string(QString key)
+{
+ static QMap<QString, Kinds> static_map{{
+  {"Fuxe", Kinds::Fuxe},
+  {"Lambda", Kinds::Lambda},
+  {"Sigma", Kinds::Sigma},
+  {"Array", Kinds::Array},
+  {"Capture", Kinds::Capture},
+  {"Gamma", Kinds::Gamma},
+  {"Result", Kinds::Result},
+  {"Error", Kinds::Error},
+  {"Preempt_Any", Kinds::Preempt_Any},
+  {"Preempt_Return", Kinds::Preempt_Return},
+  {"Preempt_Continue", Kinds::Preempt_Continue},
+  {"Preempt_Break", Kinds::Preempt_Break},
+  {"CTOR_Mem", Kinds::CTOR_Mem},
+  {"CTOR_Ret", Kinds::CTOR_Ret},
+ }};
+
+ return static_map.value(key, Kinds::N_A);
+}
+
+
 QString KCM_Channel::kind_to_string(KCM_Report_Syntax& kcrs)
 {
  return kcrs.get_channel_kind_code(kind_);

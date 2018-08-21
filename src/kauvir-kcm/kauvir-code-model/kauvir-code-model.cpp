@@ -55,6 +55,8 @@ Kauvir_Code_Model::Kauvir_Code_Model()
     make_kcm_command_package_from_channel_group_fn_(nullptr),
     make_kcm_command_package_fn_(nullptr)
 {
+ channel_names_ = {&channel_names_set_, &channel_names_map_};
+
  type_string_reps_[&type_system_->type_object__auto_expr()] = "auto_expr";
  type_string_reps_[&type_system_->type_object__str()] = "str";
  type_string_reps_[&type_system_->type_object__u8()] = "u8";
@@ -291,7 +293,6 @@ KCM_Command_Package* Kauvir_Code_Model::statement_to_command_package(KCM_Stateme
 
  if(kce)
  {
-  //.result = new KCM_Command_Package(*kce->channel_group());
   if(make_kcm_command_package_from_channel_group_fn_)
   {
    result = make_kcm_command_package_from_channel_group_fn_(*kce->channel_group());
@@ -300,10 +301,9 @@ KCM_Command_Package* Kauvir_Code_Model::statement_to_command_package(KCM_Stateme
  }
  else
  {
-  //.result = new KCM_Command_Package(kcs->bind_kto(), kcs->bind_val());
   if(make_kcm_command_package_fn_)
   {
-   result = make_kcm_command_package_fn_(kcs->bind_kto(), kcs->bind_val(), kcs->bind_qob());
+   result = make_kcm_command_package_fn_(channel_names_, kcs->bind_kto(), kcs->bind_val(), kcs->bind_qob());
    result->set_kcm_expression(kce);
   }
  }

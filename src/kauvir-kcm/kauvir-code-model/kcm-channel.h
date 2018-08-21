@@ -32,7 +32,8 @@ public:
 
  enum class Kinds {
   N_A, Fuxe, Lambda, Sigma, Array, Capture, Gamma, Result, Error,
-  Preempt_Any, Preempt_Return, Preempt_Continue, Preempt_Break
+  Preempt_Any, Preempt_Return, Preempt_Continue, Preempt_Break,
+  CTOR_Mem, CTOR_Ret
  };
 
  enum class Code_Environments {
@@ -75,6 +76,9 @@ public:
    KCM_Report_Syntax& kcrs, Code_Environments cenv);
 
  QString kind_to_string(KCM_Report_Syntax& kcrs);
+
+ static Kinds get_channel_kind_by_string(QString key);
+
 
 
 };
