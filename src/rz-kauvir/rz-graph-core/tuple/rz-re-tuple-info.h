@@ -39,7 +39,8 @@ public:
    Indicates_Plex, Indicates_Final, Indicates_String,
    Indicates_Multi, Indicates_Functional,
    Indicates_Text_Map, Indicates_Text_Vector,
-   Indicates_Pattern, Indicates_Assignment, Indicates_Unquote
+   Indicates_Pattern, Indicates_Assignment, Indicates_Unquote,
+   Indicates_CTOR_Ret, Indicates_CTOR_Mem
  };
 
  static Tuple_Formations get_tuple_formation(QString s)
@@ -57,6 +58,8 @@ public:
     { "-", Tuple_Formations::Indicates_Pattern },
     { "--", Tuple_Formations::Indicates_Plex },
     { "=", Tuple_Formations::Indicates_Assignment },
+    { "@.", Tuple_Formations::Indicates_CTOR_Mem },
+    { "@..", Tuple_Formations::Indicates_CTOR_Ret },
   }};
 
   return static_map.value(s, Tuple_Formations::N_A);
@@ -107,8 +110,6 @@ public:
  RE_Tuple_Info(Tuple_Formations tf, Tuple_Indicators ti, int data_id);
 
  QString lisp_out(bool with_prefix = false) const;
-
- QString haskell_out(bool with_prefix = false) const;
 
  QString lisp_out_with_id(bool with_prefix = false) const;
 

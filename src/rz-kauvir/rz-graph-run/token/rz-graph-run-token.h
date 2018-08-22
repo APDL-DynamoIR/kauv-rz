@@ -40,9 +40,7 @@ RZNS_(GEmbed)
 
 class RZ_Graph_Embed_Token;
 class RZ_Graph_Cpp_Token;
-class RZ_Graph_Haskell_Token;
-class RZ_Graph_Cheerp_Token;
-class RZ_Graph_Clasp_Token;
+
 
 _RZNS(GEmbed)
 USING_RZNS(GEmbed)

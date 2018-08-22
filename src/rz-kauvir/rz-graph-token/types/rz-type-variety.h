@@ -27,19 +27,19 @@ class RZ_Type_Variety
  QMap<int, caon_ptr<RZ_Type_Object>> type_objects_;
 
  QMap<QString, QString> type_object_cpp_names_;
- QMap<QString, QString> type_object_haskell_names_;
+ QMap<QString, QString> type_object_embed_names_;
 
 public:
 
  caon_ptr<RZ_Type_Object> add_type_object(int key,
-  QString type_name, QString cpp_name, QString haskell_name, QString rz_name);
+  QString type_name, QString cpp_name, QString embed_name, QString rz_name);
  caon_ptr<RZ_Type_Object> get_type_object(int key);
 
  void check_type_objects();
 
  QString get_cpp_type_name(QString name);
- QString get_haskell_type_name(QString name);
- void check_haskell_type_name(QString& sv);
+ QString get_embed_type_name(QString name);
+ void check_embed_type_name(QString& sv);
 
 };
 

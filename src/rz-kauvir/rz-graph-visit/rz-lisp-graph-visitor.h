@@ -41,8 +41,6 @@ class RE_Graph;
 class RE_Node;
 class RE_Call_Entry;
 class RZ_Cpp_Project;
-class RZ_Haskell_Project;
-class RZ_Clasp_Project;
 class RZ_SRE_Token;
 
 _RZNS(RECore)
@@ -74,10 +72,7 @@ RZNS_(GEmbed)
 class RZ_Graph_Run_Embedder;
 class RZ_Graph_Embed_Token;
 class RZ_Graph_Cpp_Token;
-class RZ_Graph_Haskell_Token;
 class RZ_Graph_Embed_Run_Valuer;
-class RZ_Graph_Cheerp_Token;
-class RZ_Graph_Clasp_Token;
 
 _RZNS(GEmbed)
 
@@ -240,9 +235,6 @@ public:
  caon_ptr<RZ_Lisp_Graph_Block_Info> get_block_info_from_function_node(caon_ptr<RE_Node> node);
 
  void take_project(caon_ptr<RZ_Cpp_Project> project);
- void take_project(caon_ptr<RZ_Haskell_Project> project);
-
- void take_project(caon_ptr<RZ_Clasp_Project> project);
 
  QString get_mapkey_string(caon_ptr<RE_Node> node);
 

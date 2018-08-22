@@ -11,9 +11,9 @@
 
 Not_Set
 
-#define RZ_RUN_TYPE_NS(ns_name, enum_name, name, cpp_name, haskell_name, fam) \
- RZ_RUN_TYPE(enum_name, name, cpp_name, haskell_name, fam)
-#define RZ_RUN_TYPE(enum_name, name, cpp_name, haskell_name, fam) ,enum_name
+#define RZ_RUN_TYPE_NS(ns_name, enum_name, name, cpp_name, embed_name, fam) \
+ RZ_RUN_TYPE(enum_name, name, cpp_name, embed_name, fam)
+#define RZ_RUN_TYPE(enum_name, name, cpp_name, embed_name, fam) ,enum_name
 #include "type-codes.h"
 #undef RZ_RUN_TYPE
 #undef RZ_RUN_TYPE_NS

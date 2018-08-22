@@ -131,12 +131,12 @@ void RZ_Lisp_Graph_Valuer::init_callback_code_map()
 
 void RZ_Lisp_Graph_Valuer::init_type_objects()
 {
-#define RZ_RUN_TYPE_NS(ns_name, enum_name, name, cpp_name, haskell_name, fam) \
- RZ_RUN_TYPE(enum_name, name, cpp_name, haskell_name, fam)
+#define RZ_RUN_TYPE_NS(ns_name, enum_name, name, cpp_name, embed_name, fam) \
+ RZ_RUN_TYPE(enum_name, name, cpp_name, embed_name, fam)
 
-#define RZ_RUN_TYPE(enum_name, name, cpp_name, haskell_name, fam) \
+#define RZ_RUN_TYPE(enum_name, name, cpp_name, embed_name, fam) \
  add_type_object(dominion_get_type_code<RE_Dominion, cpp_name>(), \
-  type_variety_.add_type_object(RZ_Run_Types::enum_name, #enum_name, #cpp_name, #haskell_name, #name));
+  type_variety_.add_type_object(RZ_Run_Types::enum_name, #enum_name, #cpp_name, #embed_name, #name));
 #include "rz-graph-token/types/type-codes.h"
 #undef RZ_RUN_TYPE
 #undef RZ_RUN_TYPE_NS
@@ -832,7 +832,7 @@ QString RZ_Lisp_Graph_Valuer::form_type_expression(caon_ptr<RE_Node> entry_node)
   {
    QString sv = token->string_value();
    // //  Obviously, at some point this has to be more general
-   type_variety_.check_haskell_type_name(sv);
+   type_variety_.check_embed_type_name(sv);
    result += sv + ' ';
   }
   caon_ptr<RE_Node> nested_entry_node = rq_.Run_Call_Entry(node);

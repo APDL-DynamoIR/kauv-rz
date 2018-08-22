@@ -72,61 +72,6 @@ QString RE_Tuple_Info::base_token_representation() const
  }
 }
 
-QString RE_Tuple_Info::haskell_out(bool with_prefix) const
-{
- QString result;
-
- if(with_prefix)
- {
-  switch(formation_)
-  {
-  case Tuple_Formations::Indicates_Declarations:
-   result = "Decl_"; break;
-  case Tuple_Formations::Indicates_Input:
-   result = "Input_"; break;
-  case Tuple_Formations::Indicates_Final:
-   result = "Final_"; break;
-  case Tuple_Formations::Indicates_String:
-   result = "String_"; break;
-  case Tuple_Formations::Indicates_Multi:
-   result = "Multi_"; break;
-  case Tuple_Formations::Indicates_Functional:
-   result = "Functional_"; break;
-  case Tuple_Formations::Indicates_Text_Map:
-   result = "Text_Map_"; break;
-  case Tuple_Formations::Indicates_Text_Vector:
-   result = "Text_Vector_"; break;
-  case Tuple_Formations::Indicates_Pattern:
-   result = "Pattern_"; break;
-  case Tuple_Formations::Indicates_Assignment:
-   result = "Assignment_"; break;
-  default:
-   result = "RZ_";
-   break;
-  }
- }
-
- switch(indicator_)
- {
- case Tuple_Indicators::Enter_Array:
-  result += "Haskell_Array"; break;
- case Tuple_Indicators::Enter_Vector:
-  result += "Haskell_Vector"; break;
- case Tuple_Indicators::Enter_Map:
-  result += "Haskell_Map"; break;
- case Tuple_Indicators::Enter_Set:
-  result += "Haskell_Set"; break;
- default: break;
- }
-
- if(is_empty())
-  result.prepend("empty_");
- else
-  result.prepend("build_");
-
- return result;
-
-}
 
 void RE_Tuple_Info::mark_as_empty()
 {

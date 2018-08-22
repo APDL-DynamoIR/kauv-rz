@@ -23,7 +23,7 @@
 #include "rzns.h"
 
 
-#define RZ_RUN_TYPE_NS(ns_name, enum_name, name, cpp_name, haskell_name, fam) \
+#define RZ_RUN_TYPE_NS(ns_name, enum_name, name, cpp_name, embed_name, fam) \
  RZNS_(ns_name) \
  class cpp_name; \
  _RZNS(ns_name)

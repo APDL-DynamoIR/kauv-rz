@@ -43,7 +43,6 @@ class RE_Graph;
 class RE_Node;
 class RE_Call_Entry;
 class RZ_Cpp_Project;
-class RZ_Haskell_Project;
 class RZ_Clasp_Project;
 class RZ_SRE_Token;
 
@@ -74,10 +73,7 @@ RZNS_(GEmbed)
 class RZ_Graph_Run_Embedder;
 class RZ_Graph_Embed_Token;
 class RZ_Graph_Cpp_Token;
-class RZ_Graph_Haskell_Token;
 class RZ_Graph_Embed_Run_Valuer;
-class RZ_Graph_Cheerp_Token;
-class RZ_Graph_Clasp_Token;
 
 _RZNS(GEmbed)
 

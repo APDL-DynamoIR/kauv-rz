@@ -97,33 +97,9 @@ void RZ_Lisp_Graph_Visitor::prepare_rz_path_handlers_output(QString handlers)
  }
 }
 
-
-void RZ_Lisp_Graph_Visitor::take_project(caon_ptr<RZ_Cpp_Project> project)
-{
- check_lisp_graph_runner();
- if(valuer_->embedder())
-  valuer_->embedder()->set_cpp_project(project);
-}
-
-void RZ_Lisp_Graph_Visitor::take_project(caon_ptr<RZ_Clasp_Project> project)
-{
- check_lisp_graph_runner();
- if(valuer_->embedder())
-  valuer_->embedder()->set_clasp_project(project);
-}
-
-
 void RZ_Lisp_Graph_Visitor::add_initial_output_text(QString text)
 {
 
-}
-
-
-void RZ_Lisp_Graph_Visitor::take_project(caon_ptr<RZ_Haskell_Project> project)
-{
- check_lisp_graph_runner();
- if(valuer_->embedder())
-  valuer_->embedder()->set_haskell_project(project);
 }
 
 

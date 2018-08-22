@@ -26,9 +26,7 @@ RZNS_(RECore)
 
 class RE_Node;
 class RZ_Cpp_Project;
-class RZ_Haskell_Project;
-class RZ_Cheerp_Project;
-class RZ_Clasp_Project;
+
 
 _RZNS(RECore)
 
@@ -58,8 +56,6 @@ RZNS_(GEmbed)
 
 class RZ_Graph_Embed_Package;
 class RZ_Graph_Cpp_Token;
-class RZ_Graph_Haskell_Token;
-
 
 class RZ_Graph_Run_Embedder
 {
@@ -76,16 +72,13 @@ class RZ_Graph_Run_Embedder
  caon_ptr<RZ_Graph_Embed_Package> rz_cpp_embed_package_;
 
  caon_ptr<RZ_Cpp_Project> cpp_project_;
- caon_ptr<RZ_Haskell_Project> haskell_project_;
- caon_ptr<RZ_Cheerp_Project> cheerp_project_;
- caon_ptr<RZ_Clasp_Project> clasp_project_;
+
 
 public:
 
  ACCESSORS(caon_ptr<RZ_Lisp_Graph_Valuer> ,valuer)
  ACCESSORS(caon_ptr<RZ_Cpp_Project> ,cpp_project)
- ACCESSORS(caon_ptr<RZ_Haskell_Project> ,haskell_project)
- ACCESSORS(caon_ptr<RZ_Clasp_Project> ,clasp_project)
+
 
  RZ_Graph_Run_Embedder(caon_ptr<RZ_Lisp_Graph_Valuer> valuer);
  void init_noop_node();
