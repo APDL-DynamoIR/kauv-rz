@@ -7,6 +7,6 @@ kenv \= (envv "KCM_Env*");
 
 fnd -> init kenv;
 
-,test-fn ::: .(int)  $-> extern;
+,test-fn ::: .()  $-> extern;
 
 fnd -> read  "test-fn";

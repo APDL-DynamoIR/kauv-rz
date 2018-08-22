@@ -83,62 +83,91 @@ QString* KCM_Channel_Group::get_channel_name_pointer(QString name, KCM_Channel::
 }
 
 
-KCM_Channel& KCM_Channel_Group::fuxe()
+KCM_Channel& KCM_Channel_Group::fuxe_ch()
 {
  QString* qs = get_channel_name_pointer("fuxe", KCM_Channel::Kinds::Fuxe);
  return channels_[qs];
 }
 
 
-KCM_Channel& KCM_Channel_Group::lambda()
+KCM_Channel& KCM_Channel_Group::lambda_ch()
 {
  QString* qs = get_channel_name_pointer("lambda", KCM_Channel::Kinds::Lambda);
  return channels_[qs];
 }
 
-KCM_Channel& KCM_Channel_Group::result()
+KCM_Channel& KCM_Channel_Group::result_ch()
 {
  QString* qs = get_channel_name_pointer("result", KCM_Channel::Kinds::Result);
  return channels_[qs];
 }
 
-KCM_Channel& KCM_Channel_Group::sigma()
+KCM_Channel& KCM_Channel_Group::sigma_ch()
 {
  QString* qs = get_channel_name_pointer("sigma", KCM_Channel::Kinds::Sigma);
  return channels_[qs];
 }
 
+KCM_Channel& KCM_Channel_Group::error_ch()
+{
+ QString* qs = get_channel_name_pointer("error", KCM_Channel::Kinds::Error);
+ return channels_[qs];
+}
 
+KCM_Channel& KCM_Channel_Group::capture_ch()
+{
+ QString* qs = get_channel_name_pointer("capture", KCM_Channel::Kinds::Capture);
+ return channels_[qs];
+}
 
 void KCM_Channel_Group::add_fuxe_carrier(const KCM_Type_Object* type_object)
 {
- fuxe().add_carrier({type_object, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, QString());
+ fuxe_ch().add_carrier({type_object, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, QString());
 }
 
 void KCM_Channel_Group::add_fuxe_carrier(QString symbol_name)
 {
- fuxe().add_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, symbol_name);
+ fuxe_ch().add_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Run_Chief, symbol_name);
 }
 
+void KCM_Channel_Group::add_empty_lambda_channel()
+{
+ lambda_ch();
+}
+
+void KCM_Channel_Group::add_empty_result_channel()
+{
+ result_ch();
+}
+
+void KCM_Channel_Group::add_empty_error_channel()
+{
+ error_ch();
+}
+
+void KCM_Channel_Group::add_empty_capture_channel()
+{
+ capture_ch();
+}
 
 void KCM_Channel_Group::add_result_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name)
 {
- result().add_carrier(tos, ep, symbol_name);
+ result_ch().add_carrier(tos, ep, symbol_name);
 }
 
 
 void KCM_Channel_Group::add_lambda_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name, KCM_Runtime_Scope* scope)
 {
- lambda().add_carrier(tos, ep, symbol_name, scope);
+ lambda_ch().add_carrier(tos, ep, symbol_name, scope);
 }
 
 
 void KCM_Channel_Group::add_sigma_carrier(kcm_type_object_pair_type tos,
   KCM_Carrier::Effect_Protocols ep, QString symbol_name)
 {
- sigma().add_carrier(tos, ep, symbol_name);
+ sigma_ch().add_carrier(tos, ep, symbol_name);
 }
 
 void KCM_Channel_Group::add_sigma_carrier_via_symbol_with_cast(QString value_name,
@@ -150,7 +179,7 @@ void KCM_Channel_Group::add_sigma_carrier_via_symbol_with_cast(QString value_nam
 int KCM_Channel_Group::get_lambda_byte_code()
 {
  int result = 9;
- for(const KCM_Carrier& c : lambda().carriers())
+ for(const KCM_Carrier& c : lambda_ch().carriers())
  {
   result *= 10;
   result += c.type_object()->byte_code();

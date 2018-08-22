@@ -57,14 +57,22 @@ void KCM_Channel::report(QTextStream& qts,
  }
  if(carriers_.isEmpty())
  {
+  QString pre;
+  QString post;
+  if(kcrs.flags.identify_channel_names)
+  {
+   pre = QString("[%1").arg(kind_to_string(kcrs));
+   post = " ]";
+  }
+
   if(kcrs.flags.write_empty_lambda_channel && kind_ == Kinds::Lambda)
   {
-   qts << " () ";
+   qts << pre << " <<void>>" << post;
   }
-  if( (cenv == Code_Environments::Statement) &&
+  else if( (cenv == Code_Environments::Statement) &&
    kcrs.flags.write_empty_result_channel && kind_ == Kinds::Result)
   {
-   qts << " () ";
+   qts << pre << " <<void>>" << post;
   }
   return;
  }

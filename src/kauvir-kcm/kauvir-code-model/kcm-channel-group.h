@@ -68,10 +68,13 @@ public:
 
  int get_lambda_byte_code();
 
- KCM_Channel& fuxe();
- KCM_Channel& lambda();
- KCM_Channel& result();
- KCM_Channel& sigma();
+ KCM_Channel& fuxe_ch();
+ KCM_Channel& lambda_ch();
+ KCM_Channel& result_ch();
+ KCM_Channel& sigma_ch();
+ KCM_Channel& error_ch();
+ KCM_Channel& capture_ch();
+
 
  friend bool operator<(const KCM_Channel_Group& lhs, const KCM_Channel_Group& rhs)
  {
@@ -105,6 +108,10 @@ public:
  void add_fuxe_carrier(const KCM_Type_Object* type_object);
  void add_fuxe_carrier(QString symbol_name);
 
+ void add_empty_lambda_channel();
+ void add_empty_result_channel();
+ void add_empty_error_channel();
+ void add_empty_capture_channel();
 
  void add_lambda_carrier_via_scoped_symbol(QString symbol_name, KCM_Runtime_Scope* scope);
 

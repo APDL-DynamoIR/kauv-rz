@@ -63,7 +63,7 @@ s1_fng_type KCM_Command_Runtime_Table::find_s1_declared_function_0(QString name,
   if(pkto)
   {
    KCM_Channel_Group* k_ = pr.first;
-   KCM_Channel& result = k_->result();
+   KCM_Channel& result = k_->result_ch();
    if(!result.carriers().isEmpty())
    {
     KCM_Carrier r1;
@@ -105,7 +105,7 @@ s0_fn1_p_type KCM_Command_Runtime_Table::find_s0_declared_function_1(QString nam
   byte_code = k_->get_lambda_byte_code();
   if(pkto)
   {
-   KCM_Channel& result = k_->result();
+   KCM_Channel& result = k_->result_ch();
    if(!result.carriers().isEmpty())
    {
     KCM_Carrier r1;

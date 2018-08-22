@@ -313,16 +313,21 @@ QString RZ_Function_Def_Info::dynamo_signature_code_for_symbol(QString carrier_k
 
 QString RZ_Function_Def_Info::dynamo_signature_code_for_symbol(QString carrier_kind, QString symbol_name, QString type_name)
 {
-
  QString result =
    QString("\n(ka::kc :|kcg_add_%1_carrier_via_symbol_and_type_name| kcg \"%2\" \"%3\")").arg(carrier_kind).arg(symbol_name).arg(type_name);
  return result;
 }
 
+QString RZ_Function_Def_Info::dynamo_signature_code_for_empty_channel(QString carrier_kind)
+{
+ QString result =
+   QString("\n(ka::kc :|kcg_add_empty_%1_channel| kcg)").arg(carrier_kind);
+ return result;
+}
 
 QString RZ_Function_Def_Info::dynamo_signature_code_string_by_channel_type(Channel_Types ct)
 {
- caon_ptr<RE_Node> sequence_node;
+ caon_ptr<RE_Node> sequence_node = nullptr;
 
  QString channel_name_code;
 
@@ -364,7 +369,7 @@ QString RZ_Function_Def_Info::dynamo_signature_code_string_by_channel_type(Chann
    CAON_PTR_DEBUG(RZ_Lisp_Token ,rzlt)
    if(rzlt->flags.is_empty_tuple_indicator)
    {
-    return QString();
+    return dynamo_signature_code_for_empty_channel(channel_name_code);
    }
    QString rt = rzlt->raw_text();
    if(rt == "<-")

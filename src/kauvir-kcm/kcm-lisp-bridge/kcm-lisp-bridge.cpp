@@ -340,6 +340,27 @@ void KCM_Lisp_Bridge::kcg_add_lambda_carrier_via_type_name(KCM_Channel_Group* kc
  kcg->add_lambda_carrier({kto, nullptr});
 }
 
+
+void KCM_Lisp_Bridge::kcg_add_empty_lambda_channel(KCM_Channel_Group* kcg)
+{
+ kcg->add_empty_lambda_channel();
+}
+
+void KCM_Lisp_Bridge::kcg_add_empty_return_channel(KCM_Channel_Group* kcg)
+{
+ kcg->add_empty_result_channel();
+}
+
+void KCM_Lisp_Bridge::kcg_add_empty_error_channel(KCM_Channel_Group* kcg)
+{
+ kcg->add_empty_error_channel();
+}
+
+void KCM_Lisp_Bridge::kcg_add_empty_context_channel(KCM_Channel_Group* kcg)
+{
+ kcg->add_empty_capture_channel();
+}
+
 void KCM_Lisp_Bridge::kcg_add_lambda_carrier_via_bind_symbol(KCM_Channel_Group* kcg, QString symbol_name)
 {
  const KCM_Type_Object* kto = kcm_.retrieve_type_binding(symbol_name);

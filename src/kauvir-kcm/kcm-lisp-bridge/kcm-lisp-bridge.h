@@ -114,6 +114,12 @@ public:
 
  Q_INVOKABLE void kcg_add_lambda_carrier_via_type_name(KCM_Channel_Group* kcg, QString type_name);
 
+ Q_INVOKABLE void kcg_add_empty_lambda_channel(KCM_Channel_Group* kcg);
+ Q_INVOKABLE void kcg_add_empty_return_channel(KCM_Channel_Group* kcg);
+ Q_INVOKABLE void kcg_add_empty_error_channel(KCM_Channel_Group* kcg);
+ Q_INVOKABLE void kcg_add_empty_context_channel(KCM_Channel_Group* kcg);
+
+
  Q_INVOKABLE void kcg_add_lambda_carrier_via_symbol_and_type_name(KCM_Channel_Group* kcg,
    QString symbol_name, QString type_name);
 

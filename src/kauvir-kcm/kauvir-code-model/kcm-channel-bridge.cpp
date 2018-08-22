@@ -46,7 +46,7 @@ KCM_Carrier* KCM_Channel_Bridge::get_carrier_by_proxy_coords_code(QString pxyc)
 
  switch(c0.toLatin1())
  {
- case 'L': return channel_group_->lambda().get_carrier_at_position(index);
+ case 'L': return channel_group_->lambda_ch().get_carrier_at_position(index);
  default: break;
  }
 

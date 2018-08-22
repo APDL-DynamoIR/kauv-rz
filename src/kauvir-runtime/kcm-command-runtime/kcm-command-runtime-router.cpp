@@ -149,7 +149,7 @@ void KCM_Command_Runtime_Router::parse_command_package(KCM_Command_Package* cpkg
 {
  kcm_expression_ = cpkg->kcm_expression();
 
- KCM_Channel& sigma = cpkg->sigma();
+ KCM_Channel& sigma = cpkg->sigma_ch();
  if(!sigma.carriers().isEmpty())
  {
   KCM_Carrier s1;
@@ -166,13 +166,13 @@ void KCM_Command_Runtime_Router::parse_command_package(KCM_Command_Package* cpkg
   }
   sigma_argument_ = s1a;
  }
- KCM_Channel& fuxe = cpkg->fuxe();
+ KCM_Channel& fuxe = cpkg->fuxe_ch();
  if(fuxe.carriers().isEmpty())
  {
   // no function name!
   return;
  }
- KCM_Channel& result = cpkg->result();
+ KCM_Channel& result = cpkg->result_ch();
  if(!result.carriers().isEmpty())
  {
   KCM_Carrier r1;
@@ -185,7 +185,7 @@ void KCM_Command_Runtime_Router::parse_command_package(KCM_Command_Package* cpkg
  fuxe_name_ = kcc.symbol();
 
 
- KCM_Channel& lambda = cpkg->lambda();
+ KCM_Channel& lambda = cpkg->lambda_ch();
 
  int size = lambda.carriers().size();
  for(int i = 0; i < size; ++i)

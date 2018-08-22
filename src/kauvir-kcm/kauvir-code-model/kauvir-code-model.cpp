@@ -71,6 +71,7 @@ Kauvir_Code_Model::Kauvir_Code_Model()
  detailed_report_synax_.flags.identify_channel_names = true;
  detailed_report_synax_.flags.identify_types = true;
  detailed_report_synax_.flags.surround_type_expressions = true;
+ detailed_report_synax_.flags.write_empty_lambda_channel = true;
 
  detailed_report_synax_.channel_kind_codes()[KCM_Channel::Kinds::Fuxe] = "fuxe";
  detailed_report_synax_.channel_kind_codes()[KCM_Channel::Kinds::Lambda] = "lambda";

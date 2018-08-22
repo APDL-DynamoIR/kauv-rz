@@ -138,6 +138,8 @@ public:
  QString dynamo_signature_code_for_symbol(QString carrier_kind, QString symbol_name);
  QString dynamo_signature_code_for_symbol(QString carrier_kind, QString symbol_name, QString type_name);
 
+ QString dynamo_signature_code_for_empty_channel(QString carrier_kind);
+
  QString dynamo_signature_code_string();
  QString dynamo_signature_code_string_by_channel_type(Channel_Types ct);
 
