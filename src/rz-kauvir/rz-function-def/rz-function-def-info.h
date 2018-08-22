@@ -70,7 +70,7 @@ public:
  _flags
 
  enum class Channel_Types {
-  N_A, Lambda, Sigma, Error, Return, Context
+  N_A, Lambda, Sigma, Error, Return, Context, CTOR_Mem, CTOR_Ret, Monad
  };
 
 private:
@@ -85,12 +85,7 @@ private:
  type_name_callback_type type_name_callback_;
  ls_callback_type ls_callback_;
 
- caon_ptr<tNode> lambda_channel_entry_node_;
- caon_ptr<tNode> return_channel_entry_node_;
- caon_ptr<tNode> sigma_channel_entry_node_;
- caon_ptr<tNode> error_channel_entry_node_;
- caon_ptr<tNode> monad_channel_entry_node_;
- caon_ptr<tNode> context_channel_entry_node_;
+ QMap<Channel_Types, caon_ptr<tNode>> entry_nodes_map_;
 
  caon_ptr<tNode> map_key_sequence_ref_node_;
 
@@ -101,8 +96,6 @@ private:
  const RE_Query& rq_;
 
  QStack<caon_ptr<RE_Node>> entry_nodes_;
-
- // debug ...
 
  int map_key_sequence_order_;
  caon_ptr<RZ_Function_Def_Info> ref_fdi_;
@@ -124,7 +117,7 @@ public:
  QString lambda_channel_string(const RZ_Function_Def_Syntax& syntax);
  QString sigma_channel_string(const RZ_Function_Def_Syntax& syntax);
  QString return_channel_string(int& token_count);
-
+ QString channel_string(Channel_Types ct, const RZ_Function_Def_Syntax& syntax);
 
  QString kauvir_entry_code_string(RZ_Lisp_Graph_Lexical_Scope& ls);
 

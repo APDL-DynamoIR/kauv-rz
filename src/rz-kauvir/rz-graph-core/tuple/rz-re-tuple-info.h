@@ -31,7 +31,8 @@ public:
  typedef RE_Node tNode;
 
  enum class Function_Def_Channels {
-  N_A, Lambda_Channel, Sigma_Channel, Return_Channel, Error_Channel, Context_Channel
+  N_A, Lambda_Channel, Sigma_Channel, Return_Channel, Error_Channel,
+  Context_Channel, CTOR_Mem_Channel, CTOR_Ret_Channel,
  };
 
  enum class Tuple_Formations {
@@ -125,6 +126,8 @@ public:
     return Function_Def_Channels::Lambda_Channel;
    else if(formation_ == Tuple_Formations::Indicates_Final)
     return Function_Def_Channels::Return_Channel;
+   else if(formation_ == Tuple_Formations::Indicates_CTOR_Ret)
+    return Function_Def_Channels::CTOR_Ret_Channel;
   }
   else if(indicator_ == Tuple_Indicators::Enter_Vector)
   {
@@ -132,6 +135,8 @@ public:
     return Function_Def_Channels::Sigma_Channel;
    else if(formation_ == Tuple_Formations::Indicates_Final)
     return Function_Def_Channels::Error_Channel;
+   else if(formation_ == Tuple_Formations::Indicates_CTOR_Mem)
+    return Function_Def_Channels::CTOR_Mem_Channel;
    else if(formation_ == Tuple_Formations::Indicates_Pattern)
     return Function_Def_Channels::Context_Channel;
   }

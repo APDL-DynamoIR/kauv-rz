@@ -34,12 +34,6 @@ RZ_Function_Def_Info::RZ_Function_Def_Info(RE_Function_Def_Entry& function_def_e
   , type_name_callback_type type_name_callback, ls_callback_type ls_callback)
  : Flags(0), function_def_entry_(&function_def_entry), type_name_callback_(type_name_callback),
    ls_callback_(ls_callback), rq_(RE_Query::instance()),
-   lambda_channel_entry_node_(nullptr),
-   return_channel_entry_node_(nullptr),
-   sigma_channel_entry_node_(nullptr),
-   error_channel_entry_node_(nullptr),
-   monad_channel_entry_node_(nullptr),
-   context_channel_entry_node_(nullptr),
    map_key_sequence_ref_node_(nullptr),
    map_key_sequence_order_(0), ref_fdi_(nullptr)
 {
@@ -88,16 +82,24 @@ caon_ptr<RZ_Function_Def_Info::tNode> RZ_Function_Def_Info::function_def_entry_n
  return function_def_entry_->node();
 }
 
-
+QString RZ_Function_Def_Info::channel_string(Channel_Types ct, const RZ_Function_Def_Syntax& syntax)
+{
+ auto it = entry_nodes_map_.find(ct);
+ if(it != entry_nodes_map_.end())
+ {
+  return channel_string(syntax, it.value());
+ }
+ return QString();
+}
 
 QString RZ_Function_Def_Info::lambda_channel_string(const RZ_Function_Def_Syntax& syntax)
 {
- return channel_string(syntax, lambda_channel_entry_node_);
+ return channel_string(Channel_Types::Lambda, syntax);
 }
 
 QString RZ_Function_Def_Info::sigma_channel_string(const RZ_Function_Def_Syntax& syntax)
 {
- return channel_string(syntax, sigma_channel_entry_node_);
+ return channel_string(Channel_Types::Sigma, syntax);
 }
 
 QString RZ_Function_Def_Info::channel_string(const RZ_Function_Def_Syntax& syntax, caon_ptr<RE_Node> sequence_node)
@@ -327,19 +329,23 @@ QString RZ_Function_Def_Info::dynamo_signature_code_string_by_channel_type(Chann
  switch(ct)
  {
  case Channel_Types::Lambda:
-  sequence_node = lambda_channel_entry_node_;
   channel_name_code = "lambda";
-  break;
+  goto ok_sequence_node;
+
 
  case Channel_Types::Sigma:
-  sequence_node = sigma_channel_entry_node_;
   channel_name_code = "sigma";
-  break;
+  goto ok_sequence_node;
+
 
  case Channel_Types::Return:
-  sequence_node = return_channel_entry_node_;
   channel_name_code = "return";
+  goto ok_sequence_node;
+
+ default:
   break;
+
+ ok_sequence_node: sequence_node = entry_nodes_map_.value(ct); break;
 
  }
  QString result;
@@ -400,14 +406,16 @@ QString RZ_Function_Def_Info::kauvir_entry_code_string_by_channel_type(Channel_T
  switch(ct)
  {
  case Channel_Types::Lambda:
-  sequence_node = lambda_channel_entry_node_;
   channel_name_code = "L";
-  break;
+  goto ok_sequence_node;
 
  case Channel_Types::Sigma:
-  sequence_node = sigma_channel_entry_node_;
   channel_name_code = "S";
-  break;
+  goto ok_sequence_node;
+
+ default: break;
+
+ ok_sequence_node: sequence_node = entry_nodes_map_.value(ct); break;
 
  }
  QString result;
@@ -499,11 +507,11 @@ caon_ptr<RZ_Lisp_Token> RZ_Function_Def_Info::channel_sequence(caon_ptr<tNode>& 
 
 QString RZ_Function_Def_Info::context_channel_string()
 {
- if(context_channel_entry_node_)
+ if(caon_ptr<tNode> context_channel_entry_node = entry_nodes_map_.value(Channel_Types::Context))
  {
   QString result = "[[";
-  CAON_PTR_DEBUG(RE_Node ,context_channel_entry_node_)
-  if(caon_ptr<RE_Token> retok = context_channel_entry_node_->re_token())
+  CAON_PTR_DEBUG(RE_Node ,context_channel_entry_node)
+  if(caon_ptr<RE_Token> retok = context_channel_entry_node->re_token())
   {
    CAON_PTR_DEBUG(RE_Token ,retok)
    caon_ptr<RZ_Lisp_Token> rzlt = RZ_Lisp_Token::check_init_lisp_token(*retok);
@@ -520,7 +528,7 @@ QString RZ_Function_Def_Info::return_channel_string(int& token_count)
 {
  QString result;
  token_count = 0;
- caon_ptr<tNode> sequence_node = return_channel_entry_node_;
+ caon_ptr<tNode> sequence_node = entry_nodes_map_.value(Channel_Types::Context);
  int depth_change = 0;
  while(sequence_node)
  {
@@ -581,21 +589,27 @@ void RZ_Function_Def_Info::init_channels(tNode& fdef_node)
     {
     case RE_Tuple_Info::Function_Def_Channels::Lambda_Channel:
      if(flags.monad)
-      monad_channel_entry_node_ = rq_.Run_Data_Entry(tuple_info_node);
+       entry_nodes_map_[Channel_Types::Monad] = rq_.Run_Data_Entry(tuple_info_node);
      else
-      lambda_channel_entry_node_ = rq_.Run_Data_Entry(tuple_info_node);
+       entry_nodes_map_[Channel_Types::Lambda] = rq_.Run_Data_Entry(tuple_info_node);
      break;
     case RE_Tuple_Info::Function_Def_Channels::Context_Channel:
-     context_channel_entry_node_ = rq_.Run_Data_Entry(tuple_info_node);
+     entry_nodes_map_[Channel_Types::Context] = rq_.Run_Data_Entry(tuple_info_node);
      break;
     case RE_Tuple_Info::Function_Def_Channels::Sigma_Channel:
-     sigma_channel_entry_node_ = rq_.Run_Data_Entry(tuple_info_node);
+      entry_nodes_map_[Channel_Types::Sigma] = rq_.Run_Data_Entry(tuple_info_node);
      break;
     case RE_Tuple_Info::Function_Def_Channels::Return_Channel:
-     return_channel_entry_node_ = rq_.Run_Data_Entry(tuple_info_node);
+      entry_nodes_map_[Channel_Types::Return] = rq_.Run_Data_Entry(tuple_info_node);
      break;
     case RE_Tuple_Info::Function_Def_Channels::Error_Channel:
-     error_channel_entry_node_ = rq_.Run_Data_Entry(tuple_info_node);
+      entry_nodes_map_[Channel_Types::Error] = rq_.Run_Data_Entry(tuple_info_node);
+     break;
+    case RE_Tuple_Info::Function_Def_Channels::CTOR_Ret_Channel:
+      entry_nodes_map_[Channel_Types::CTOR_Ret] = rq_.Run_Data_Entry(tuple_info_node);
+     break;
+    case RE_Tuple_Info::Function_Def_Channels::CTOR_Mem_Channel:
+      entry_nodes_map_[Channel_Types::CTOR_Mem] = rq_.Run_Data_Entry(tuple_info_node);
      break;
     }
    }
