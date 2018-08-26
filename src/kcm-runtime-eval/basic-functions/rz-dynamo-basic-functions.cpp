@@ -136,6 +136,17 @@ void test_arg_vec_dfr_call(quint64 args_ptr)
  }
 }
 
+void test_arg_vec_str(quint64 args_ptr)
+{
+ QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
+
+ for(quint64 qui: args)
+ {
+  QString** qs = (QString**) qui;
+  qDebug() << **qs;
+ }
+}
+
 void test_if_then_else(quint64 args_ptr)
 {
  QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
@@ -266,6 +277,16 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
   g1.clear_all();
  }
 
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-arg-vec-str", g1);
+  table.add_s0_declared_function("test-arg-vec-str", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_arg_vec_str));
+  g1.clear_all();
+ }
 
  {
   KCM_Channel_Group* kcg = table.add_s0_declared_function("test-void", g1);

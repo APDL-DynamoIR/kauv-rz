@@ -687,20 +687,19 @@ void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pRes
  quint64 memvec[sz];
  QString qs_memvec[sz];
  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_valuevec[sz];
+ QString* pqs_memvec[sz];
 
  for(int i = 0; i < sz; ++i)
  {
   void* lai = nullptr;
   memvec[i] = 0;
   qclo_valuevec[i] = {scopes_, {0, 0}};
-
-  QString* pqs_mem = &qs_memvec[i];
-
+  pqs_memvec[i] = &qs_memvec[i];
   FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
-
   int ptr_depth = 0;
+
   FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[i], fnc, memvec[i],
-     qclo_valuevec[i], pqs_mem, lai, ptr_depth);
+     qclo_valuevec[i], pqs_memvec[i], lai, ptr_depth);
   args[i] = (quint64) lai;
  }
 
