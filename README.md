@@ -35,14 +35,25 @@ fnd -> read  "test-fn";
 ```
 
 Other examples of sample code are in the "samp" folder.  Multiple 
-samples can be executed in sequence with the projeect called rz-multi-console.
+samples can be executed in sequence with the project called rz-multi-console.
 
-Note: the "udpipe" project includes code from the UDPip project, 
+*udpipe*
+Note: the "udpipe" project includes code from the UDPipe project, 
 with its own copyright and license.  This code is copied here for convenience.  
+
 Please note the provenance of code in this project folder if reusing.  
+
 This distribution has only a minimal working example of a script interfacing 
 with UDPipe code; please inquir about more complex examples. 
 
+*ecl*
+This code requires ECL (Embeddable Common Lisp) and a C++ ECL wrapper called 
+cl-cxx.  Fortunately, both of these are easy to find and build.
+
+You may need to edit the find-ecl-sexpr.pri file to point to 
+the correct folder(s) where ECL includes and libs are located.
+
+*comments*
 This code set will be expanded in conjunction with other 
 data sets published in the same volume as the 
 "Hypergraphs" chapter.  Future versions of this repo 

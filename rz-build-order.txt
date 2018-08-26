@@ -30,5 +30,11 @@
 /rz-dynamo              rz-graph-dynamo-runtime-console
 /rz-dynamo              rz-multi-console
 
+-- if trying the UDPipe environment --
+
+/qring                  qring
+/DygRed                 udpipe
+/DygRed                 dygred-sentence
+/DygRed                 dygred-console
 
 

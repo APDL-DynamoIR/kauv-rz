@@ -65,12 +65,12 @@ public:
  KCM_Channel_Group* add_s0_declared_function(QString name, const KCM_Channel_Group& channels);
 
 
- note_s0_string_return(QString n)
+ void note_s0_string_return(QString n)
  {
   s0_string_returns_.insert(n);
  }
 
- note_s1_string_return(QString n)
+ void note_s1_string_return(QString n)
  {
   s1_string_returns_.insert(n);
  }
