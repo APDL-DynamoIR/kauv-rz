@@ -346,7 +346,7 @@ void KCM_Command_Runtime_Router::run_callable_value(KCM_Callable_Value* kcv)
 
 KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_value(KCM_Command_Runtime_Argument* kcra,
   FN_Codes fnc, quint64& mem, QPair<KCM_Scope_System*, QPair<int, quint64>>& qclo_value,
-  QString* qs_mem, void*& result, int& ptr_depth)
+  QString* const& qs_mem, void*& result, int& ptr_depth)
 {
  const KCM_Type_Object* kto;
  if(kcra->bind_code().isEmpty())
@@ -355,7 +355,7 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
   if(kcra->type_name() == "str")
   {
    *qs_mem = *qs;
-   result = &qs_mem;
+   result = const_cast<void*>( (const void*) &qs_mem);
    ptr_depth = 2;
    return add_string_cast_to_fn_code(fnc);
   }

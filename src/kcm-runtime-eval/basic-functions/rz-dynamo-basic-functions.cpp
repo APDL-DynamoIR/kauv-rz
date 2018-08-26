@@ -188,6 +188,13 @@ void prs(QString str)
  qDebug() << str;
 }
 
+void test_prss(QString str1, QString str2)
+{
+ qDebug() << str1;
+ qDebug() << str2;
+}
+
+
 void prn(int num)
 {
  qDebug() << num;
@@ -229,6 +236,21 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
   KCM_Channel_Group* kcg = table.add_s0_declared_function("prs", g1);
   table.add_s0_declared_function("prs", kcg, reinterpret_cast<s0_fn1_p_type>
                               (&prs));
+  g1.clear_all();
+ }
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+     QString()
+    );
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test_prss", g1);
+  table.add_s0_declared_function("test_prss", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_prss));
   g1.clear_all();
  }
 

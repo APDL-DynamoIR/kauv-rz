@@ -93,8 +93,10 @@ Kauvir_Code_Model::Kauvir_Code_Model()
      new KCM_Type_Object(&type_system_->type_object__u32(), 4)},
    {&type_system_->type_object__u64(),
      new KCM_Type_Object(&type_system_->type_object__u64(), 8)},
+
    {&type_system_->type_object__str(),
-     new KCM_Type_Object(&type_system_->type_object__str(), 8)},
+     new KCM_Type_Object(&type_system_->type_object__str(), DEFAULT_PTR_BYTE_CODE)},
+
    {&type_system_->type_object__opaque_lisp_value(),
      new KCM_Type_Object(&type_system_->type_object__opaque_lisp_value(), 8)},
    {&type_system_->type_object__kcm_callable_value(),
