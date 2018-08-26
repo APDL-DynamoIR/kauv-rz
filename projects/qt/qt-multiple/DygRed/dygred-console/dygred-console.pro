@@ -1,0 +1,85 @@
+
+#           Copyright Nathaniel Christen 2018.
+#  Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy at
+#           http://www.boost.org/LICENSE_1_0.txt)
+
+PROJECT_NAME = dygred-console
+
+include(../build-group.pri)
+
+TEMPLATE = app
+
+
+INCLUDEPATH += $$SRC_GROUP_DIR/udpipe $$SRC_GROUP_DIR/
+
+
+INCLUDEPATH += $$SRC_DIR $$SRC_GROUP_DIR
+INCLUDEPATH += $$KAUVIR_KCM_SRC_GROUP_DIR $$KAUVIR_KCM_SRC_GROUP_DIR/kcm-lisp-bridge
+
+include(../../find-ecl-sexp.pri)
+
+INCLUDEPATH += $$SEXP_DIR
+INCLUDEPATH += $$SEXP_DIR/pingus/
+
+DEFINES += CAON_DEBUG
+DEFINES += RELAE_LABEL_NODES
+
+
+INCLUDEPATH += $$RZ_KAUVIR_SRC_GROUP_DIR \
+  $$RZ_KAUVIR_SRC_GROUP_DIR/rz-graph-core  $$RZ_KAUVIR_SRC_GROUP_DIR/rz-graph-token  \
+  $$RELAE_SRC_GROUP_DIR  $$KAUVIR_KCM_SRC_GROUP_DIR
+
+
+CONFIG += no_keywords
+
+DEFINES += USE_KANS
+DEFINES += USE_RZNS
+
+DEFINES += UDPIPE_DATA_ROOT="\\\"$$ROOT_DIR/data/udpipe\\\""
+
+HEADERS += \
+  $$SRC_DIR/rz-dygred-functions.h \
+
+
+
+SOURCES += \
+  $$SRC_DIR/main.cpp \
+  $$SRC_DIR/rz-dygred-functions.cpp \
+
+
+
+LIBS += -L$$TARGETSDIR -lkcm-lisp-bridge  \
+  -lkauvir-code-model -lkauvir-type-system -lrz-dynamo-generator
+
+LIBS += -L$$TARGETSDIR -lkcm-command-package -lkcm-command-runtime \
+   -lkcm-direct-eval -lfn-doc
+
+# R/Z ...
+
+LIBS += -L$$TARGETSDIR  \
+   -lrz-graph-core \
+   -lrz-graph-token \
+   -lrz-graph-code \
+   -lrz-graph-visit \
+   -lrz-code-generators \
+   -lrz-graph-build \
+   -lrz-graph-valuer \
+   -lrz-graph-embed \
+   -lrz-graph-embed-run \
+   -lrz-graph-run \
+   -lrz-graph-sre \
+   -lrz-function-def \
+   -lrz-code-elements \
+   -lkcm-scopes \
+   -lbasic-functions \
+   -lkcm-env \
+
+
+LIBS += -L$$ECL_DIR -lecl
+LIBS += -L$$CL_CXX_DIR/install/lib64 -lcl_cxx
+
+LIBS += -L$$TARGETSDIR -lsexpr
+
+
+LIBS += -L$$TARGETSDIR -ludpipe -ldygred-sentence -lqring

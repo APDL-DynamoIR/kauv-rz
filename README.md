@@ -34,6 +34,15 @@ fnd -> read  "test-fn";
 
 ```
 
+Other examples of sample code are in the "samp" folder.  Multiple 
+samples can be executed in sequence with the projeect called rz-multi-console.
+
+Note: the "udpipe" project includes code from the UDPip project, 
+with its own copyright and license.  This code is copied here for convenience.  
+Please note the provenance of code in this project folder if reusing.  
+This distribution has only a minimal working example of a script interfacing 
+with UDPipe code; please inquir about more complex examples. 
+
 This code set will be expanded in conjunction with other 
 data sets published in the same volume as the 
 "Hypergraphs" chapter.  Future versions of this repo 
