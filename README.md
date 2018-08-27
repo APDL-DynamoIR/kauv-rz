@@ -5,11 +5,11 @@ This code set accompanies a paper called
 _Hypergraph Type Theory for Specifications-Conformant Code and
 Generalized Lambda Calculus_.
 
-Be sure to clone the repo to a folder called "cpp" 
+Be sure to clone the repo to a folder called "`cpp`" 
 (do not let git choose the folder name automaticallly).
 
 To build the code, open the projects in Qt Creator and 
-build them in the order listed in "rz-build-order.txt".
+build them in the order listed in "`rz-build-order.txt`".
 
 Create a folder sibling to "`cpp`" called "`data`", and inside 
 that a folder called "`scripts`", and inside that a folder called 
@@ -35,7 +35,8 @@ fnd -> read  "test-fn";
 ```
 
 Other examples of sample code are in the "`samp`" folder.  Multiple 
-samples can be executed in sequence with the project/executable called "`rz-multi-console`".  
+samples can be executed in sequence with the project/executable called "`rz-multi-console`".
+
 So for example, after confirming that "`t1.rz`" runs properly, copy all scripts in the 
 "`samp`" folder, plus "`m1.txt`", to "`../data/scripts/rz`" (relative to the "`cpp`" 
 folder where the repo has been cloned); "`m1.txt`" is a list of scripts to run (e.g. for 
@@ -45,7 +46,8 @@ Testing multiple scripts can also be achieved by including them all in one scrip
 "`<#...>`" notation, e.g. script "`t24.txt`" in "`samp`" has the two lines 
 "`<#t23>`" and "`<#t25>`".
 
-*UDPIPE*
+---
+**UDPIPE**
 
 Note: the "`udpipe`" project includes code from UDPipe, a Natural Language Processing framework. 
 This code has its own copyright and license, but is copied here for convenience.  
@@ -62,8 +64,8 @@ be a one-line script like
 which just tests that the detokenizer worked properly, since it outputs CoNLL-U code 
 that should be nearly identical to the input.
 
-
-*ECL*
+---
+**ECL**
 
 This code requires ECL (Embeddable Common Lisp) and a C++ ECL wrapper called 
 cl-cxx.  Fortunately, both of these are easy to find and build: check 
@@ -72,7 +74,8 @@ https://common-lisp.net/project/ecl/ and https://github.com/juanjosegarciaripoll
 You may need to edit the "`find-ecl-sexpr.pri`" file to point to 
 the correct folder(s) where ECL includes and libs are located.
 
-*COMMENTS*
+---
+**COMMENTS**
 
 This code set will be expanded in conjunction with other 
 data sets published in the same volume as the 
