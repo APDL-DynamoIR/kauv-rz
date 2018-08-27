@@ -18,14 +18,11 @@ INCLUDEPATH += $$SRC_DIR $$SRC_GROUP_DIR $$SRC_GROUP_DIR/rz-graph-token \
  $$RELAE_SRC_GROUP_DIR
 
 
-
-
-#  $$RZ_CORE_SRC_GROUP_DIR $$RZ_CORE_SRC_GROUP_DIR/rz-parser
 DEFINES += RELAE_LABEL_NODES
 DEFINES += CAON_DEBUG
 
 
-LIBS += -L$$TARGETSDIR -lrz-graph-token -lrz-graph-core \ # -lrz-graph-qt
+LIBS += -L$$TARGETSDIR -lrz-graph-token -lrz-graph-core
 
 
 HEADERS += \

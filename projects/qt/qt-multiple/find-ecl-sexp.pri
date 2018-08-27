@@ -9,8 +9,6 @@ CL_CXX_DIR = $$ECL_ROOT_DIR/cl-cxx-master
 SEXP_DIR = $$SRC_ROOT_DIR/external/sexpr
 
 
-#ECL_DIR = /extension/ecl
-#CL_CXX_DIR = /extension/ecl/cl-cxx
 INCLUDEPATH += $$ECL_DIR/install/include
 INCLUDEPATH += $$CL_CXX_DIR/install/include/cl-cxx
 INCLUDEPATH += $$CL_CXX_DIR/install/include
@@ -21,6 +19,7 @@ INCLUDEPATH += $$CL_CXX_DIR/include
 
 DEFINES += IN_QT
 
+## for future reference ...
 #ecl.h line 69-71
 # ifdef IN_QT
   #... typedef uintptr_t pthread_t;
