@@ -1460,6 +1460,41 @@ void KCM_Lisp_Eval::prepare_callbacks()
 
  define_callback(
   [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
+  {
+   KCM_Lisp_Runtime* runtime = reinterpret_cast<KCM_Lisp_Runtime*>( ((void**) pass_on)[0]);
+   KCM_Lisp_Eval* reval = reinterpret_cast<KCM_Lisp_Eval*>( ((void**) pass_on)[1]);
+
+   int size = arglist->frame.size;
+
+   bool result = false;
+   if(size > 0)
+   {
+    cl_object arg = cl_cxx_backend::nth_arg(arglist, 1);
+    cl_type clt = ecl_t_of(arg);
+    switch(clt)
+    {
+    case t_fixnum:
+    case t_bignum:
+    case t_ratio:
+    case t_singlefloat:
+    case t_doublefloat:
+     result = !ecl_zerop(arg); break;
+    default:
+     result = ecl_to_bool(arg); break;
+    }
+   }
+   if(result)
+   {
+    return ECL_NIL;
+   }
+   else
+   {
+    return ECL_T;
+   }
+  }, "KA", "to_bool_not", pass_on);
+
+ define_callback(
+  [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
  {
   KCM_Lisp_Runtime* runtime = reinterpret_cast<KCM_Lisp_Runtime*>( ((void**) pass_on)[0]);
   KCM_Lisp_Eval* reval = reinterpret_cast<KCM_Lisp_Eval*>( ((void**) pass_on)[1]);

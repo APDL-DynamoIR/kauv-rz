@@ -147,6 +147,7 @@ QString RZ_Lisp_Graph_Visitor_Dynamo::function_name_from_token_text(QString text
    {"=?", "equal"},
    {"&if", "&if-t-e"},
    {"??", "ka::to_bool"},
+   {"!!", "ka::to_bool_not"},
   }};
 
  return static_map.value(text, text);
