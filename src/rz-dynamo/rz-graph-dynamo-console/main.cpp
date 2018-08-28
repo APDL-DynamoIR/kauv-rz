@@ -158,8 +158,8 @@ int main(int argc, char* argv[])
 
  kle.eval_script_file(RZ_DIR "/t1.rz.lisp");
 
- qDebug() << "Saving DynamoIR to: " RZ_DIR "/t1.rz.qry.cl";
- QFile qf(RZ_DIR "/t1.rz.qry.cl");
+ qDebug() << "Saving DynamoIR to: " RZ_DIR "/t1.rz.dyn.cl";
+ QFile qf(RZ_DIR "/t1.rz.dyn.cl");
 
 
  if(qf.open(QIODevice::WriteOnly))
