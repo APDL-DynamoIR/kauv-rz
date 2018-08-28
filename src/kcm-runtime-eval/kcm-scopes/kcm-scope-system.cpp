@@ -30,6 +30,10 @@ quint64 KCM_Scope_System::find_temporary_bridge_value(QString code, const KCM_Ty
  {
   QPair<quint64, const KCM_Type_Object*> pr = temporary_bridge_values_.value(code);
   kto = pr.second;
+  
+  // always erase?
+  temporary_bridge_values_.remove(code);
+  
   return pr.first;
  }
  return 0;

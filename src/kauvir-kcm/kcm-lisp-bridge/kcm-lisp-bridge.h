@@ -152,6 +152,7 @@ public:
  Q_INVOKABLE void kcg_add_lambda_carrier_via_literal(KCM_Channel_Group* kcg, QString text);
 
  Q_INVOKABLE quint64 get_value_of_symbol(QString symbol_name);
+ Q_INVOKABLE quint64 get_interpreted_value_of_symbol(QString symbol_name, QString& mode);
 
  static quint64 get_value_of_symbol(QString symbol_name,
    KCM_Scope_System* scopes, const KCM_Type_Object** rkto = nullptr);

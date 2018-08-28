@@ -265,6 +265,8 @@ int main(int argc, char* argv[])
     continue;
   if(fn.startsWith(';'))
     continue;
+  if(fn.startsWith('#'))
+    continue;
   QRegularExpressionMatch rxm;
   if(fn.indexOf(QRegularExpression("\\(\\s*(\\d+)\\s*-\\s*(\\d+)\\s*\\)"), 0, &rxm))
   {

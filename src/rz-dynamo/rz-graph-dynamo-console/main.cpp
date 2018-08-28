@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 
  kle.eval_script_file(RZ_DIR "/t1.rz.lisp");
 
- qDebug() << "Saving DynamoIR to: " RZ_DIR "/t1.rz";
+ qDebug() << "Saving DynamoIR to: " RZ_DIR "/t1.rz.qry.cl";
  QFile qf(RZ_DIR "/t1.rz.qry.cl");
 
 

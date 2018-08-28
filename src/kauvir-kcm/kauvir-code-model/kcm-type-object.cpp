@@ -75,6 +75,16 @@ bool KCM_Type_Object::is_argvec_like() const
  return kauvir_type_object_->name() == "argvec";
 }
 
+bool KCM_Type_Object::is_number_like() const
+{
+ // too primitive, no doubt
+ return kauvir_type_object_->name() == "u32"
+   ||   kauvir_type_object_->name() == "u64"
+   ||   kauvir_type_object_->name() == "u8"
+   ||   kauvir_type_object_->name() == "int"
+   ;
+}
+
 KCM_Type_Object* KCM_Type_Object::base_clone() const
 {
  KCM_Type_Object* result = new KCM_Type_Object;

@@ -1293,6 +1293,32 @@ BASIC_DEFINE_CALLBACK(symbol-init-via-type, symbol_init_via_type)
    return ECL_NIL;
   }, "KA", "VOF", pass_on);
 
+
+ define_callback(
+  [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
+  {
+   KCM_Lisp_Runtime* runtime = reinterpret_cast<KCM_Lisp_Runtime*>( ((void**) pass_on)[0]);
+   KCM_Lisp_Eval* reval = reinterpret_cast<KCM_Lisp_Eval*>( ((void**) pass_on)[1]);
+   cl_object result_size = cl_cxx_backend::nth_arg(arglist, 0);
+
+   int size = arglist->frame.size;
+
+   if(size > 0)
+   {
+    QString symbol_name = cl_arglist_to_qstring(arglist, 1);
+     // // quint64 result = runtime->bridge().get_value_of_symbol(symbol_name);
+    QString mode;
+    quint64 result = runtime->bridge().get_interpreted_value_of_symbol(symbol_name, mode);
+    if(mode == "fixnum")
+    {
+     return ecl_make_fixnum(result);
+    }
+    return (cl_object) result;
+   }
+   return ECL_NIL;
+  }, "KA", "IVOF", pass_on);
+
+
  define_callback(
   [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
   {
@@ -1397,6 +1423,40 @@ void KCM_Lisp_Eval::prepare_callbacks()
 
   }, "KA", "QDEBUG", pass_on);
 
+ define_callback(
+  [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
+  {
+   KCM_Lisp_Runtime* runtime = reinterpret_cast<KCM_Lisp_Runtime*>( ((void**) pass_on)[0]);
+   KCM_Lisp_Eval* reval = reinterpret_cast<KCM_Lisp_Eval*>( ((void**) pass_on)[1]);
+
+   int size = arglist->frame.size;
+
+   bool result = false;
+   if(size > 0)
+   {
+    cl_object arg = cl_cxx_backend::nth_arg(arglist, 1);
+    cl_type clt = ecl_t_of(arg);
+    switch(clt)
+    {
+    case t_fixnum:
+    case t_bignum:
+    case t_ratio:
+    case t_singlefloat:
+    case t_doublefloat:
+     result = !ecl_zerop(arg); break;
+    default:
+     result = ecl_to_bool(arg); break;
+    }
+   }
+   if(result)
+   {
+    return ECL_T;
+   }
+   else
+   {
+    return ECL_NIL;
+   }
+  }, "KA", "to_bool", pass_on);
 
  define_callback(
   [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object

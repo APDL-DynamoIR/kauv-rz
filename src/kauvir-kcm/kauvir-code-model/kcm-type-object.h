@@ -75,6 +75,8 @@ public:
  bool is_lisp_list_like() const;
  bool is_callable_lisp_deferred_value_like() const;
  bool is_argvec_like() const;
+ bool is_number_like() const;
+
 
  void report(QTextStream& qts, Kauvir_Code_Model& kcm, KCM_Report_Syntax& kcrs) const;
 

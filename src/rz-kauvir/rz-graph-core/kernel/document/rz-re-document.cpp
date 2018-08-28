@@ -151,38 +151,48 @@ void RE_Document::set_grammar(RE_Grammar* grammar)
 
 void RE_Document::preprocess_raw_text()
 {
- // //  currently the only modification is for do blocks sharing signature ...
- QRegularExpression rx("do(([^{;>]*\\s+)[@\\w]*->\\s+)\\{([^}]+)\\}");
+ // // for \else ...
+ raw_text_.replace("\\else", "\\t \\do");
 
+ // // for \do ...
+ raw_text_.replace("\\do", "do .() -> ");
 
- int pos = 0;
- while(true)
+ // // for \t ...
+ raw_text_.replace("\\t", "\\(values t)");
+
+ // // for do blocks sharing signature ...
  {
-  QRegularExpressionMatch rxm = rx.match(raw_text_, pos);
-  if(rxm.hasMatch())
+  QRegularExpression rx("do(([^{;>]*\\s+)[@\\w]*->\\s+)\\{([^}]+)\\}");
+
+  int pos = 0;
+  while(true)
   {
-   QString c1 = rxm.captured(1);
-
-   QString c1a = rxm.captured(2);
-
-   if(c1a.trimmed().isEmpty())
+   QRegularExpressionMatch rxm = rx.match(raw_text_, pos);
+   if(rxm.hasMatch())
    {
-    c1.prepend(" .() ");
-   }
+    QString c1 = rxm.captured(1);
 
-   QString c2 = rxm.captured(3);
-   int pos1 = rxm.capturedStart(3);
-   int pos2 = rxm.capturedEnd(3);
-   QString replace = insert_block_map_signatures(c2, c1);
-   raw_text_.replace(pos1, pos2 - pos1, replace);
-   pos += replace.length();
-   raw_text_.replace(rxm.capturedStart(1), rxm.capturedLength(1), " \n");
-   pos -= rxm.capturedLength(1);
-   pos += 2;
-  }
-  else
-  {
-   break;
+    QString c1a = rxm.captured(2);
+
+    if(c1a.trimmed().isEmpty())
+    {
+     c1.prepend(" .() ");
+    }
+
+    QString c2 = rxm.captured(3);
+    int pos1 = rxm.capturedStart(3);
+    int pos2 = rxm.capturedEnd(3);
+    QString replace = insert_block_map_signatures(c2, c1);
+    raw_text_.replace(pos1, pos2 - pos1, replace);
+    pos += replace.length();
+    raw_text_.replace(rxm.capturedStart(1), rxm.capturedLength(1), " \n");
+    pos -= rxm.capturedLength(1);
+    pos += 2;
+   }
+   else
+   {
+    break;
+   }
   }
  }
 

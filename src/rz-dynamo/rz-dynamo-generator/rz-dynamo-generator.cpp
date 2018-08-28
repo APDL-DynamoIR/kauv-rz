@@ -717,7 +717,7 @@ void RZ_Dynamo_Generator::add_acc_token(QString& acc, const MS_Token& mst, QStri
   break;
 
  case MS_Token_Kinds::Scoped_Symbol:
-  acc.append(QString(" (ka::vof \"%1\") ").arg(mst.raw_text));
+  acc.append(QString(" (ka::ivof \"%1\") ").arg(mst.raw_text));
   break;
 
 

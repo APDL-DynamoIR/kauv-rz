@@ -115,7 +115,9 @@ class Kauvir_Code_Model
 
  // //  stack or queue?
  // // QStack<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>> current_nested_expression_coords_;
- QQueue<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>> current_nested_expression_coords_;
+ QMap<int, QQueue<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>>> current_nested_expression_coords_;
+
+
 
  QMap<QString, KCM_Callable_Value*> current_anon_codes_;
 
@@ -129,6 +131,12 @@ class Kauvir_Code_Model
  QMap<KCM_Channel::Kinds, QString*> channel_names_map_;
 
  QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*> channel_names_;
+
+ QStack<int> runtime_scope_ids_;
+
+ int runtime_scope_id_count_;
+
+ int get_current_runtime_scope_id();
 
 
  typedef QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*> channel_names_type;
@@ -169,6 +177,8 @@ public:
 
 
  const KCM_Type_Object* get_kcm_type_by_kauvir_type_object(const Kauvir_Type_Object*);
+ const KCM_Type_Object* get_or_add_kcm_type(QString type_name);
+
  const KCM_Type_Object* get_kcm_type_by_type_name(QString type_name);
 
  KCM_Type_Object* create_type_object(QString name);

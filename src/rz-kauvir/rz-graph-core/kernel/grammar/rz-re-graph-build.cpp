@@ -195,6 +195,12 @@ void RE_Graph_Build::add_semis(QString raw_text, QString suffix,
   length = 6;
  }
 
+ if(flags.added_lr_mode)
+ {
+  flags.added_lr_mode = false;
+  markup_position_.leave_expression();
+ }
+
  switch(length)
  {
  case 1:
@@ -679,6 +685,30 @@ void RE_Graph_Build::add_run_token(QString prefix, QString raw_text,
  else if(token->special_token() == RE_Code_Representation::Special_Tokens::Return_Value_Blank_Or_Identity)
  {
   markup_position_.hold_retval_node(node);
+ }
+ else if(raw_text.startsWith('@') && raw_text != "@" && raw_text != "@@")
+ {
+  if(markup_position_.awaiting_statement_call_entry())
+  {
+   raw_text = raw_text.mid(1);
+   token->set_raw_text(raw_text);
+   caon_ptr<RE_Token> ntoken = new RE_Token("&lr", QString(), QString());
+
+   CAON_PTR_DEBUG(RE_Token ,ntoken)
+
+   caon_ptr<RE_Node> nnode = make_new_node(ntoken);
+   markup_position_.add_token_node(nnode);
+
+   markup_position_.add_call_entry(false, "\\");
+   markup_position_.add_token_node(node);
+
+   flags.added_lr_mode = true;
+
+  }
+  else
+  {
+   markup_position_.add_token_node(node);
+  }
  }
  else
  {

@@ -57,6 +57,7 @@ class RE_Graph_Build
   bool pending_convert_to_type_symbol:1;
 //?  bool pending_symbol_modify_to_method:1;
 //?  bool arrow_pending_symbol_modify_to_method:1;
+  bool added_lr_mode:1;
  _flags
 
  RE_Document* document_;

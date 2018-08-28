@@ -1174,6 +1174,29 @@ void RE_Markup_Position::hold_retval_node(caon_ptr<RE_Node> token_node)
  held_retval_node_ = token_node;
 }
 
+bool RE_Markup_Position::awaiting_statement_call_entry()
+{
+ switch(position_state_)
+ {
+ case Position_States::Root:
+ case Position_States::Block_Entry:
+ case Position_States::Cross_Block_Entry:
+   return true;
+ case Position_States::Cross_Run_Chief:
+   {
+    bool is_statement_entry = true;
+    if(current_node_)
+    {
+     if(caon_ptr<RE_Call_Entry> rce = current_node_->re_call_entry())
+       is_statement_entry = rce->flags.is_statement_entry;
+    }
+    return is_statement_entry;
+   }
+ default:
+   return false;
+ }
+}
+
 void RE_Markup_Position::add_token_node(caon_ptr<RE_Node> token_node)
 {
  if(flags.awaiting_function_def_note)

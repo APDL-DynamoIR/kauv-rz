@@ -153,6 +153,8 @@ public:
  void add_block_map_entry();
  void add_block_map_leave();
 
+ bool awaiting_statement_call_entry();
+
  void add_token_node(caon_ptr<RE_Node> token_node);
  void add_residual_node(caon_ptr<RE_Node> node);
 
