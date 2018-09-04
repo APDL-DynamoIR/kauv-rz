@@ -51,6 +51,7 @@ public:
  Q_INVOKABLE void read(QString fn);
  Q_INVOKABLE void init(KCM_Env* kenv);
 
+ QString test_summary();
 
 };
 

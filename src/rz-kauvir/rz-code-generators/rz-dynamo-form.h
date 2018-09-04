@@ -76,6 +76,8 @@ class RZ_Dynamo_Form
 
  int hdcode_;
 
+ QString s1_assignment_check_;
+
  void mark_unsurrounded_nested();
  void add_string_token(QString tok);
 
@@ -84,10 +86,6 @@ public:
  RZ_Dynamo_Form(caon_ptr<RZ_Dynamo_Form> parent = nullptr);
 
  RZ_Dynamo_Form(caon_ptr<RZ_Dynamo_Block> block);
-
- void write(QTextStream& qts);
- void write_unmediated(QTextStream& qts);
- void write_as_statement(QTextStream& qts);
 
  ACCESSORS__RGET(inner_elements_type ,inner_elements)
  ACCESSORS(caon_ptr<RZ_Dynamo_Form> ,parent)
@@ -98,8 +96,17 @@ public:
  ACCESSORS(int ,nesting_level)
  ACCESSORS(caon_ptr<RZ_Code_Statement> ,code_statement)
  ACCESSORS(caon_ptr<RZ_Expression_Review> ,expression_review)
+ ACCESSORS(QString ,s1_assignment_check)
+
+ bool s1_assignment_preempts_s0();
+
+ void write(QTextStream& qts);
+ void write_unmediated(QTextStream& qts);
+ void write_as_statement(QTextStream& qts);
 
  void add_expression_wrapper(caon_ptr<RZ_Dynamo_Form> form, QString text, int hdcode);
+
+ QString get_s1_assignment_check();
 
  void init_type_declaration(QString cmd);
  void init_expression();
@@ -115,6 +122,9 @@ public:
  void mark_deferred(int hdcode);
  void mark_as_assignment_expression();
  void mark_as_fn_no_block();
+ void mark_as_s1_assignment_preempts_s0();
+ void mark_as_parent_s1_assignment_preempts_s0();
+
 
  QString get_assignment_target();
 

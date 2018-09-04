@@ -196,6 +196,16 @@ void if_t_e(quint64 args_ptr)
  test_if_then_else(args_ptr);
 }
 
+int fndoc_test_summary(Fn_Doc* fnd)
+{
+ QString summ = fnd->test_summary();
+ if(summ.startsWith('?'))
+ {
+  return 1;
+ }
+ return 0;
+}
+
 void* envv(void* kind)
 {
  if(kind)
@@ -339,6 +349,25 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
                               (&fndoc_read));
   g1.clear_all();
  }
+
+
+ {
+  g1.add_sigma_carrier(
+    {kcm.get_kcm_type_by_type_name( "Fn_Doc*" ), nullptr},
+     QString()
+    );
+
+  g1.add_result_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
+     QString()
+    );
+
+  KCM_Channel_Group* kcg = table.add_s10_declared_function("test-summary", g1);
+  table.add_s10_declared_function("test-summary", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&fndoc_test_summary));
+  g1.clear_all();
+ }
+
 
  {
   g1.add_lambda_carrier(

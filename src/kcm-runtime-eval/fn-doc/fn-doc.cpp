@@ -45,6 +45,15 @@ void Fn_Doc::init(KCM_Env* kenv)
  qDebug() << "init...";
 }
 
+
+QString Fn_Doc::test_summary()
+{
+ if(kenv_)
+   return "Fn_Doc: Initialized.";
+ return "?Fn_Doc: Not Initialized.";
+}
+
+
 void Fn_Doc::read(QString fn)
 {
  qDebug() << "fn: " << fn;

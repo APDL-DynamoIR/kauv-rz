@@ -54,7 +54,18 @@ void RZ_Dynamo_Expression::write_as_statement(QTextStream& qts)
   }
   else
   {
-   qts << "\n ;;- tb_\n(kb::write-s0-expression ";
+   QString s1 = form_.get_s1_assignment_check();
+
+   if(s1 == "/->")
+   {
+    qts << "\n ;;- tb_\n(kb::write-s1-assignment-expression ";
+    form_.mark_as_s1_assignment_preempts_s0();
+   }
+   else
+   {
+    qts << "\n ;;- tb_\n(kb::write-s0-expression ";
+   }
+
    qts << askt.encode();
    qts << ' ';
    write(qts);

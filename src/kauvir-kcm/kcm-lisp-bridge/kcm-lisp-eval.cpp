@@ -504,6 +504,28 @@ void KCM_Lisp_Eval::prepare_dynamo_callbacks(void** pass_on)
   }, "KB", "HOLD-DEFERRED", pass_on);
 
 
+ define_callback(
+  [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object
+  {
+   KCM_Lisp_Runtime* runtime = reinterpret_cast<KCM_Lisp_Runtime*>( ((void**) pass_on)[0]);
+   KCM_Lisp_Eval* reval = reinterpret_cast<KCM_Lisp_Eval*>( ((void**) pass_on)[1]);
+
+   RZ_Dynamo_Generator* rdg = runtime->rdg();
+
+   int size = arglist->frame.size;
+   if(size > 0)
+   {
+    QList<MS_Token> tokens;
+    cl_arglist_to_ms_tokens(size, 0, arglist, tokens);
+    if(rdg)
+    {
+     rdg->write_s1_assignment_expression(tokens);
+    }
+   }
+   return ECL_NIL;
+  }, "KB", "WRITE-S1-ASSIGNMENT-EXPRESSION", pass_on);
+
+
 
  define_callback(
   [](void* pass_on, cl_cxx_backend::cl_arglist arglist) -> cl_object

@@ -182,6 +182,39 @@ void RZ_Dynamo_Generator::write_s0_expression(QList<MS_Token>& tokens)
  (*qts_) << "\n(setq kcx (ka::kc :|kcm_dissolve_to_nested_expression| kcg))";
 }
 
+
+void RZ_Dynamo_Generator::write_s1_assignment_expression(QList<MS_Token>& tokens)
+{
+ MS_Token askind = tokens.takeAt(0);
+ MS_Token sigma_check_symbol = tokens.takeAt(0);
+
+ // // right order?
+ MS_Token t1 = tokens.takeAt(0);
+ MS_Token t2 = tokens.takeAt(0);
+
+ MS_Token tfuxe;
+ MS_Token tsigma;
+ if(t1.kind == MS_Token_Kinds::Scoped_Symbol)
+ {
+  tfuxe = t2;
+  tsigma = t1;
+ }
+ else
+ {
+  tfuxe = t1;
+  tsigma = t2;
+ }
+
+ QString sigma = tsigma.raw_text;
+ QString fuxe = tfuxe.raw_text.replace('-', '_');;
+
+ (*qts_) << "\n(ka::kc :|kcm_kcg_add_fuxe_carrier| kcg kto  \"" << fuxe << "\")";
+ (*qts_) << "\n(ka::kc :|kcg_add_sigma_carrier_via_symbol| kcg \"" << sigma << "\")";
+ write_lambdas(tokens);
+ (*qts_) << "\n(setq kcx (ka::kc :|kcm_dissolve_to_nested_expression| kcg))";
+}
+
+
 void RZ_Dynamo_Generator::write_s1_expression(QList<MS_Token>& tokens)
 {
  // // right order?

@@ -22,6 +22,8 @@ enum class MS_Token_Kinds
  Paren_Entry, Paren_Leave,
  Note_Symbol, Proxy_Value_Symbol,
  Skipped_Flag_Symbol,  Assignment_Kind,
+ //Scoped_Symbol_Interp, 
+ Preempted_Instruction_Symbol,
 };
 
 struct MS_Token
@@ -200,6 +202,7 @@ struct MS_Token
  {
   switch(kind)
   {
+  case MS_Token_Kinds::Preempted_Instruction_Symbol:
   case MS_Token_Kinds::String_Literal:
    return QString("\"%1\"").arg(raw_text);
 

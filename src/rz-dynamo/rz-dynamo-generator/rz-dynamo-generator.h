@@ -150,6 +150,7 @@ public:
 
  void write_s0_expression(QList<MS_Token>& tokens);
  void write_s1_expression(QList<MS_Token>& tokens);
+ void write_s1_assignment_expression(QList<MS_Token>& tokens);
 
  void write_function_type_binding_statement(QString sn, QList<MS_Token>& tokens);
 

@@ -220,6 +220,14 @@ void RZ_Dynamo_Block::scan_form_from_statement_entry_node(RZ_Lisp_Graph_Visitor_
     {
      current_form_->init_expression();
      fn = visitor_dynamo.function_name_from_token_text(tok->raw_text());
+     if(tok->raw_text() == "/->")
+     {
+      if(caon_ptr<RZ_Dynamo_Form> parent = current_form_->parent())
+      {
+       parent->set_s1_assignment_check("/->");
+       current_form_->mark_as_parent_s1_assignment_preempts_s0();
+      }
+     }
     }
     current_form_->check_init_annotation(fn);
     if(fn.startsWith("kb::"))

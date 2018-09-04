@@ -187,6 +187,18 @@ void RZ_Dynamo_Form::mark_as_fn_no_block()
  CAON_PTR_DEBUG(RZ_Dynamo_Form_Annotation ,annotation_)
 }
 
+void RZ_Dynamo_Form::mark_as_s1_assignment_preempts_s0()
+{
+ check_init_annotation();
+ annotation_->flags.s1_assignment_preempts_s0 = true;
+}
+
+void RZ_Dynamo_Form::mark_as_parent_s1_assignment_preempts_s0()
+{
+ check_init_annotation();
+ annotation_->flags.parent_s1_assignment_preempts_s0 = true;
+}
+
 void RZ_Dynamo_Form::mark_as_assignment_expression()
 {
  check_init_annotation();
@@ -201,6 +213,12 @@ void RZ_Dynamo_Form::check_init_annotation()
   annotation_ = new RZ_Dynamo_Form_Annotation();
  }
 }
+
+bool RZ_Dynamo_Form::s1_assignment_preempts_s0()
+{
+ return ANNOTATION_FLAG(s1_assignment_preempts_s0);
+}
+
 
 void RZ_Dynamo_Form::check_init_annotation(QString fn)
 {
@@ -286,6 +304,11 @@ void RZ_Dynamo_Form::write_statement_leave(QTextStream& qts)
  }
 }
 
+QString RZ_Dynamo_Form::get_s1_assignment_check()
+{
+ QString result = s1_assignment_check_;
+ return result;
+}
 
 void RZ_Dynamo_Form::check_write_first_nested_is_assignment_leave(QTextStream& qts)
 {
@@ -394,8 +417,17 @@ void RZ_Dynamo_Form::write_unmediated(QTextStream& qts)
  int nf_count = 0;
  int count = 0;
 
+ int skip = -1;
+ int pseudo_first = -1;
+
  for(QPair<caon_ptr<RZ_Dynamo_Form>, MS_Token> element : inner_elements_)
  {
+  if(count == skip)
+  {
+   ++count;
+   continue;
+  }
+
   if(element.first)
   {
    caon_ptr<RZ_Dynamo_Form> ef = element.first;
@@ -403,8 +435,38 @@ void RZ_Dynamo_Form::write_unmediated(QTextStream& qts)
 
    QString note = element.second.raw_text;
 
+#ifdef HIDE
+   // //  would this only apply to tokens?
+   if( (count == pseudo_first) && (assignment_token_.has_text() ) )
+   {
+    if(ANNOTATION_FLAG(first_nested_is_assignment))
+    {
+     // // should I set this here or elsewhere?
+     element.first->mark_as_assignment_expression();
+    }
+    element.first->write(qts);
+    ++count;
+    continue;
+   }
+#endif // HIDE
    if( (count == 0) && (assignment_token_.has_text() ) )
    {
+#ifdef HIDE
+   // //  again, would this only apply to tokens?
+
+    CAON_PTR_DEBUG(RZ_Dynamo_Form_Annotation ,annotation_)
+    if(parent_ && parent_->s1_assignment_preempts_s0())
+    {
+     skip = 1;
+    }
+    else if(ANNOTATION_FLAG(first_inner_element_is_s1_assignment_preempts_s0))
+    {
+     pseudo_first = 1;
+     ++count;
+     continue;
+    }
+#endif // HIDE
+
     if(ANNOTATION_FLAG(first_nested_is_assignment))
     {
      // // should I set this here or elsewhere?
@@ -432,6 +494,21 @@ void RZ_Dynamo_Form::write_unmediated(QTextStream& qts)
   }
   else
   {
+   CAON_PTR_DEBUG(RZ_Dynamo_Form_Annotation ,annotation_)
+   if(count == 0)
+   {
+    if(parent_ && parent_->s1_assignment_preempts_s0())
+    {
+     skip = 1;
+    }
+    else if(ANNOTATION_FLAG(first_inner_element_is_s1_assignment_preempts_s0))
+    {
+     pseudo_first = 1;
+     ++count;
+     continue;
+    }
+   }
+
    QString rt = element.second.raw_text;
    MS_Token_Kinds mstk = element.second.kind;
 
@@ -691,6 +768,15 @@ void RZ_Dynamo_Form::add_instruction_token(MS_Token mt)
 {
  check_init_annotation();
  annotation_->flags.has_instruction_token = true;
+
+ if(annotation_->flags.parent_s1_assignment_preempts_s0)
+ {
+  QString ch = parent_->s1_assignment_check();
+  MS_Token mt1 = {MS_Token_Kinds::Preempted_Instruction_Symbol, ch};
+  inner_elements_.push_back({nullptr, mt1});
+  annotation_->flags.first_inner_element_is_s1_assignment_preempts_s0 = true;
+ }
+
  inner_elements_.push_back({nullptr, mt});
 }
 
