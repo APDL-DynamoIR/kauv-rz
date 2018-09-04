@@ -77,10 +77,11 @@ public:
  bool is_argvec_like() const;
  bool is_number_like() const;
 
-
  void report(QTextStream& qts, Kauvir_Code_Model& kcm, KCM_Report_Syntax& kcrs) const;
 
  QString token_report(Kauvir_Code_Model& kcm) const;
+
+ QString get_name_string() const;
 
  KCM_Type_Object* base_clone() const;
 };

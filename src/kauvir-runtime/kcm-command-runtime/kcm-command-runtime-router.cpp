@@ -149,6 +149,8 @@ void KCM_Command_Runtime_Router::parse_command_package(KCM_Command_Package* cpkg
 {
  kcm_expression_ = cpkg->kcm_expression();
 
+ cpkg_output_symbol_name_ = cpkg->output_symbol_name();
+
  KCM_Channel& sigma = cpkg->sigma_ch();
  if(!sigma.carriers().isEmpty())
  {
@@ -354,6 +356,18 @@ void KCM_Command_Runtime_Router::run_callable_value(KCM_Callable_Value* kcv)
  KCM_Lisp_Eval::run_source_function(*this, (quint64) kcv->as_pVoid() );
 }
 
+QString KCM_Command_Runtime_Router::output_type_string()
+{
+ if(cpkg_output_symbol_name_.isEmpty())
+ {
+  return QString();
+ }
+ if(const KCM_Type_Object* kto = scopes_->get_type_object_from_symbol_name(cpkg_output_symbol_name_))
+ {
+  return kto->get_name_string();
+ }
+ return QString();
+}
 
 KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_value(KCM_Command_Runtime_Argument* kcra,
   FN_Codes fnc, quint64& mem, QPair<KCM_Scope_System*, QPair<int, quint64>>& qclo_value,
@@ -388,6 +402,21 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
    result = &mem;
    ptr_depth = 1;
    return add_ptr_cast_to_fn_code(fnc);
+  }
+ }
+ else if(kcra->bind_code() == "_$")
+ {
+  QString rs = output_type_string();
+  if(rs.isEmpty() && !result_type_object_)
+  {
+   mem = (quint64) 0;
+   result = &mem;
+  }
+  else
+  {
+   *qs_mem = rs;
+   mem = (quint64) qs_mem;
+   result = &mem;
   }
  }
  else if(quint64 temp = scopes_->find_temporary_bridge_value(kcra->bind_code(), kto))
@@ -495,8 +524,8 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
     result = &mem;
    }
   }
-
  }
+ return FN_Codes::N_A;
 }
 
 KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::add_string_cast_to_fn_code(FN_Codes fnc)

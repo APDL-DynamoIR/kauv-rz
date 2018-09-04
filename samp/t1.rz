@@ -3,7 +3,7 @@
 fnd \== default; 
 
 ,kenv ::: KCM_Env*;
-kenv \= (envv "KCM_Env*");
+kenv \= (envv _$);
 
 fnd -> init kenv;
 

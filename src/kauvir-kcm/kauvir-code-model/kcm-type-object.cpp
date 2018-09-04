@@ -51,6 +51,11 @@ KCM_Type_Object::Modifiers KCM_Type_Object::get_modifier_by_string(QString str)
  return static_map.value(str, Modifiers::N_A);
 }
 
+QString KCM_Type_Object::get_name_string() const
+{
+ return kauvir_type_object_->name();
+}
+
 bool KCM_Type_Object::is_string_like() const
 {
  // too primitive, no doubt

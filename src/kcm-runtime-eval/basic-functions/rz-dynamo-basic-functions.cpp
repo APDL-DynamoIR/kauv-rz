@@ -198,7 +198,16 @@ void if_t_e(quint64 args_ptr)
 
 void* envv(void* kind)
 {
- return insert_envv(kind, nullptr);
+ if(kind)
+ {
+  qDebug() << "Kind: " << *(QString*)kind;
+  return insert_envv(kind, nullptr);
+ }
+ else
+ {
+  qDebug() << "In envv: Return kind could not be determined.";
+  return nullptr;
+ }
 }
 
 void* insert_envv(void* kind, void* test)

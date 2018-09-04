@@ -27,16 +27,8 @@ KANS_(Dynamo)
 
 void init_basic_functions_kci(Kauvir_Code_Model& kcm);
 
-void* envv(void* kind);
 void* insert_envv(void* kind, void* test);
 
-void prs(QString str);
-void prn(int num);
-int let_num(int num);
-QString let_str(QString str);
-
-
-void prfn(int num);
 
 _KANS(Dynamo)
 

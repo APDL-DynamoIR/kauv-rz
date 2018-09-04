@@ -224,6 +224,8 @@ class KCM_Command_Runtime_Router
 
  quint64 string_result_code_;
 
+ QString cpkg_output_symbol_name_;
+
  QOB_Argument_Conventions qob_argument_convention_from_type_name(QString tn);
 
  enum class FN_Codes
@@ -242,8 +244,9 @@ class KCM_Command_Runtime_Router
   RET_PP, RET_RP, RET_SP,
   RET_PR, RET_RR, RET_SR,
   RET_PS, RET_RS, RET_SS,
-
  };
+
+ QString output_type_string();
 
 public:
 
