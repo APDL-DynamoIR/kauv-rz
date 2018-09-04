@@ -115,7 +115,7 @@ class Kauvir_Code_Model
 
  // //  stack or queue?
  // // QStack<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>> current_nested_expression_coords_;
- QMap<int, QQueue<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>>> current_nested_expression_coords_;
+ QMap<QPair<int, int>, QQueue<QPair<QPair<KCM_Expression*, int>, QPair<int, int>>>> current_nested_expression_coords_;
 
 
 
@@ -132,11 +132,11 @@ class Kauvir_Code_Model
 
  QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*> channel_names_;
 
- QStack<int> runtime_scope_ids_;
+ QStack<QPair<int, int>> runtime_scope_ids_;
 
  int runtime_scope_id_count_;
 
- int get_current_runtime_scope_id();
+ QPair<int, int> get_current_runtime_scope_id();
 
 
  typedef QPair<QSet<QString*>*, QMap<KCM_Channel::Kinds, QString*>*> channel_names_type;

@@ -9,3 +9,5 @@ x \= test-find "abcdef" "de";
  &prs "Not Found";
 ;;
 
+@format t "review, x = ~a~%" x;
+&prs "done.";

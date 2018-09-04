@@ -55,6 +55,8 @@ Kauvir_Code_Model::Kauvir_Code_Model()
     make_kcm_command_package_from_channel_group_fn_(nullptr),
     make_kcm_command_package_fn_(nullptr), runtime_scope_id_count_(0)
 {
+ runtime_scope_ids_.push({0,0});
+
  channel_names_ = {&channel_names_set_, &channel_names_map_};
 
  type_string_reps_[&type_system_->type_object__auto_expr()] = "auto_expr";
@@ -437,12 +439,13 @@ KCM_Statement* Kauvir_Code_Model::promote_type_binding_to_statement(QString symb
 
 void Kauvir_Code_Model::enter_runtime_scope(KCM_Lisp_Bridge& bridge)
 {
- runtime_scope_ids_.push(++runtime_scope_id_count_);
+ runtime_scope_ids_.push({++runtime_scope_id_count_,0});
 }
 
 void Kauvir_Code_Model::leave_runtime_scope(KCM_Lisp_Bridge& bridge)
 {
  runtime_scope_ids_.pop();
+ ++runtime_scope_ids_.top().second;
 }
 
 void Kauvir_Code_Model::prepare_proxy_symbol(QString symbol_name, const KCM_Type_Object* kto)
@@ -668,12 +671,8 @@ void Kauvir_Code_Model::prepare_nested_defer_expression(KCM_Expression* kcx,
 
 }
 
-int Kauvir_Code_Model::get_current_runtime_scope_id()
+QPair<int, int> Kauvir_Code_Model::get_current_runtime_scope_id()
 {
- if(runtime_scope_ids_.isEmpty())
- {
-  return 0;
- }
  return runtime_scope_ids_.top();
 }
 
