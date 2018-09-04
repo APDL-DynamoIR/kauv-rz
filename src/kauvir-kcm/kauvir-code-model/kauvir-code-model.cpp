@@ -124,11 +124,26 @@ Kauvir_Code_Model::Kauvir_Code_Model()
 
 }
 
-KCM_Type_Object* Kauvir_Code_Model::create_and_register_type_object(QString name)
+
+KCM_Type_Object* Kauvir_Code_Model::create_and_register_type_object(QString name, int bc)
 {
  KCM_Type_Object* result = create_type_object(name);
+ result->set_byte_code(bc);
  type_object_string_map_.insert(name, result);
  return result;
+}
+
+
+KCM_Type_Object* Kauvir_Code_Model::create_and_register_type_object(QString name)
+{
+ if(name.endsWith('*'))
+ {
+  return create_and_register_type_object(name, DEFAULT_PTR_BYTE_CODE);
+ }
+ else
+ {
+  return create_and_register_type_object(name, 8);
+ }
 }
 
 

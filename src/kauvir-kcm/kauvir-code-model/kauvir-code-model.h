@@ -183,6 +183,7 @@ public:
 
  KCM_Type_Object* create_type_object(QString name);
  KCM_Type_Object* create_and_register_type_object(QString name);
+ KCM_Type_Object* create_and_register_type_object(QString name, int bc);
 
  QString make_kcm_code();
  void kcg_add_fuxe_carrier(KCM_Channel_Group* kcg, const KCM_Type_Object* kto, QString symbol_name);

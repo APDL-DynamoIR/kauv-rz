@@ -15,6 +15,8 @@
 
 #include "kauvir-code-model/kcm-callable-value.h"
 
+#include "fn-doc/fn-doc.h"
+
 #include "kauvir-runtime/kcm-command-runtime/kcm-command-runtime-table.h"
 
 #include "kauvir-runtime/kcm-command-runtime/kcm-command-runtime-router.h"
@@ -248,6 +250,15 @@ QString let_str(QString str)
  return str;
 }
 
+
+void fndoc_read(Fn_Doc* fnd, QString fn)
+{
+ qDebug() << "Reading " << fn << " ...";
+ fnd->read(fn);
+}
+
+
+
 void init_basic_functions_kci(Kauvir_Code_Model& kcm)
 {
  Kauvir_Type_System* type_system = kcm.type_system();
@@ -303,6 +314,22 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
   g1.clear_all();
  }
 
+ {
+  g1.add_sigma_carrier(
+    {kcm.get_kcm_type_by_type_name( "Fn_Doc*" ), nullptr},
+     QString()
+    );
+
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+     QString()
+    );
+
+  KCM_Channel_Group* kcg = table.add_s10_declared_function("read", g1);
+  table.add_s10_declared_function("read", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&fndoc_read));
+  g1.clear_all();
+ }
 
  {
   g1.add_lambda_carrier(

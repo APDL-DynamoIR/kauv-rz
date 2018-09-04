@@ -187,6 +187,23 @@ int KCM_Channel_Group::get_lambda_byte_code()
  return result;
 }
 
+
+int KCM_Channel_Group::get_sigma_lambda_byte_code()
+{
+ int result = 9;
+ for(const KCM_Carrier& c : sigma_ch().carriers())
+ {
+  result *= 10;
+  result += c.type_object()->byte_code();
+ }
+ for(const KCM_Carrier& c : lambda_ch().carriers())
+ {
+  result *= 10;
+  result += c.type_object()->byte_code();
+ }
+ return result;
+}
+
 void KCM_Channel_Group::add_lambda_carrier_from_result_channel(int level, int index)
 {
  add_lambda_carrier({nullptr, nullptr}, KCM_Carrier::Effect_Protocols::Unrestricted,

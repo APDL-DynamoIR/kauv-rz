@@ -67,6 +67,7 @@ public:
  ACCESSORS(KCM_Channel_Furnisher* ,furnisher)
 
  int get_lambda_byte_code();
+ int get_sigma_lambda_byte_code();
 
  KCM_Channel& fuxe_ch();
  KCM_Channel& lambda_ch();

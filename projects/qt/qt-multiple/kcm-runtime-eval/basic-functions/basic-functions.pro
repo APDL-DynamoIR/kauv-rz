@@ -12,7 +12,7 @@ include(../build-group.pri)
 include(../../find-ecl-sexp.pri)
 
 
-INCLUDEPATH += $$KAUVIR_KCM_SRC_GROUP_DIR \
+INCLUDEPATH += $$KAUVIR_KCM_SRC_GROUP_DIR $$SRC_GROUP_DIR \
   $$KAUVIR_KCM_SRC_GROUP_DIR/kauvir-type-system
 
 HEADERS +=  \
@@ -24,4 +24,5 @@ SOURCES +=  \
 CONFIG += no_keywords
 
 
-LIBS += -L$$TARGETSDIR -lkauvir-code-model -lkcm-command-runtime -lkcm-lisp-bridge
+LIBS += -L$$TARGETSDIR -lkauvir-code-model -lkcm-command-runtime \
+   -lkcm-lisp-bridge -lfn-doc

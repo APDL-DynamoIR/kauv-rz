@@ -118,7 +118,7 @@ KCM_Command_Runtime_Argument* KCM_Command_Runtime_Router::parse_carrier_to_argum
 
   quint64 qv =  KCM_Lisp_Bridge::get_value_of_symbol(kcc.symbol(), scopes_, &rkto);
 
-  int x = *(int*) qv;
+  //?int x = *(int*) qv;
 
   if(rkto)
   {
@@ -223,7 +223,8 @@ void KCM_Command_Runtime_Router::proceed_s0()
 
  if(s0_fn1_p_type fn = table_.find_argvec_function(fuxe_name_))
  {
-  proceed_s0_argvec(fn, &result);
+  int default_argvec_bytecode = 99;
+  proceed_s0_argvec(fn, &result, default_argvec_bytecode);
   goto set_result;
  }
 
@@ -251,36 +252,46 @@ set_result:
 void KCM_Command_Runtime_Router::proceed_s1()
 {
  void* result = nullptr;
- QString code = sigma_argument_->bind_code();
- const KCM_Type_Object* kto = nullptr;
- const KCM_Type_Object* ckto = nullptr;
- QString encoded_value;
 
- QPair<int, quint64> qclo_value = {0, 0};
- void* raw_value = scopes_->find_raw_value_from_current_scope(code, kcm_expression_,
-    kto, ckto, encoded_value, qclo_value);
+ int sl_byte_code;
 
- switch(lambda_arguments_.size())
+ if(s0_fn1_p_p_type fn = table_.find_s10_argvec_function(fuxe_name_, sl_byte_code))
  {
- case 0:
-  proceed_s1_0(&result, raw_value);
-  break;
- case 1:
-  proceed_s1_1(&result, raw_value);
-  break;
- case 2:
-  proceed_s1_2(&result, raw_value);
-  break;
- default:
-  break;
+  proceed_s0_argvec( (s0_fn1_p_type) fn, &result, sl_byte_code, 1);
+  goto set_result;
  }
+
+ {
+
+  QString code = sigma_argument_->bind_code();
+  const KCM_Type_Object* kto = nullptr;
+  const KCM_Type_Object* ckto = nullptr;
+  QString encoded_value;
+
+  QPair<int, quint64> qclo_value = {0, 0};
+  void* raw_value = scopes_->find_raw_value_from_current_scope(code, kcm_expression_,
+                                                               kto, ckto, encoded_value, qclo_value);
+
+  switch(lambda_arguments_.size())
+  {
+  case 0:
+   proceed_s1_0(&result, raw_value);
+   break;
+  case 1:
+   proceed_s1_1(&result, raw_value);
+   break;
+  case 2:
+   proceed_s1_2(&result, raw_value);
+   break;
+  default:
+   break;
+  }
+ }
+
+set_result:
  if(result)
  {
   call_result_ = (quint64) result;
- }
- else
- {
-
  }
 }
 
@@ -356,6 +367,9 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
   {
    *qs_mem = *qs;
    result = const_cast<void*>( (const void*) &qs_mem);
+
+   //?void* v0 = &qs_mem;
+
    ptr_depth = 2;
    return add_string_cast_to_fn_code(fnc);
   }
@@ -436,6 +450,14 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
    {
     // what about str? ...
     mem = *rv;
+
+    if(mem == 0)
+    {
+     QString exc = QString("Unrecognized Symbol: %1 -- Exception Will Be Thrown").arg(kcra->bind_code());
+     qDebug() << "\n\n" << exc << "\n";
+     throw exc;
+    }
+
     result = &mem;
    }
    else
@@ -509,6 +531,21 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::add_ptr_cast_to
 void KCM_Command_Runtime_Router::proceed_s1_1(void** pResult, void* raw_value)
 {
  void* result = nullptr;
+
+ int byte_code;
+ s0_fn1_p_p_type fn0 = table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
+ if(fn0)
+ {
+  bool sr = table_.s10_string_return(fuxe_name_);
+  proceed_s0_2(&result, fn0, byte_code, sr, true);
+  if(pResult)
+  {
+   *pResult = result;
+  }
+  return;
+ }
+
+
  s1_fng_type fn = table_.find_s1_declared_function_0(fuxe_name_, nullptr, &result_type_object_);
  if(fn)
  {
@@ -576,6 +613,20 @@ void KCM_Command_Runtime_Router::proceed_s1_1(void** pResult, void* raw_value)
 void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
 {
  void* result = nullptr;
+
+ int byte_code;
+ s0_fn1_p_type fn0 = (s0_fn1_p_type) table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
+ if(fn0)
+ {
+  bool sr = table_.s10_string_return(fuxe_name_);
+  proceed_s0_1(&result, fn0, byte_code, sr, true);
+  if(pResult)
+  {
+   *pResult = result;
+  }
+  return;
+ }
+
  s1_fng_type fn = table_.find_s1_declared_function_0(fuxe_name_, nullptr, &result_type_object_);
  if(fn)
  {
@@ -606,65 +657,97 @@ void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
 
 void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
 {
- void* result = nullptr;
  int byte_code = 0;
  s0_fn1_p_p_type fn = (s0_fn1_p_p_type) table_.find_s0_declared_function_1(fuxe_name_,
    nullptr, &result_type_object_, byte_code);
  bool sr = table_.s0_string_return(fuxe_name_);
  if(fn)
  {
-   // raw_value is quint64* standing for void** ...
-  void* la0 = nullptr;
-  quint64 mem0 = 0;
-  QString qs_mem0;
-  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
-  QString* pqs_mem0 = &qs_mem0;
-
-  void* la1 = nullptr;
-  quint64 mem1 = 0;
-  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value1 = {scopes_, {0, 0}};
-  QString qs_mem1;
-  QString* pqs_mem1 = &qs_mem1;
+  proceed_s0_2(pResult, fn, byte_code, sr, false);
+ }
+ else if(pResult)
+ {
+  *pResult = nullptr;
+ }
+}
 
 
+void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult, s0_fn1_p_p_type fn, int byte_code, bool sr, bool s10)
+{
+ void* result = nullptr;
+ // raw_value is quint64* standing for void** ...
 
-  FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+ void* la0 = nullptr;
 
-  int ptr_depth = 0;
 
+ FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+
+
+
+ quint64 mem0 = 0;
+ QString qs_mem0;
+ QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
+ QString* pqs_mem0 = &qs_mem0;
+
+ int offset = 0;
+
+ int ptr_depth0 = 0;
+
+ if(s10)
+ {
+  ++offset;
+  FN_Codes fnc0 = check_init_raw_value(sigma_argument_, fnc, mem0,
+    qclo_value, pqs_mem0, la0, ptr_depth0);
+ }
+ else
+ {
   FN_Codes fnc0 = check_init_raw_value(lambda_arguments_[0], fnc, mem0,
-    qclo_value, pqs_mem0, la0, ptr_depth);
-  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[1], fnc, mem1,
-    qclo_value1, pqs_mem1, la1, ptr_depth);
+    qclo_value, pqs_mem0, la0, ptr_depth0);
+ }
 
-  if(result_type_object_)
+ int ptr_depth1 = 0;
+
+ void* la1 = nullptr;
+ quint64 mem1 = 0;
+ QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value1 = {scopes_, {0, 0}};
+ QString qs_mem1;
+ QString* pqs_mem1 = &qs_mem1;
+
+ //void* v0 = &pqs_mem0;
+
+ FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[1 - offset], fnc, mem1,
+   qclo_value1, pqs_mem1, la1, ptr_depth1);
+
+ void* v1 = &pqs_mem1;
+
+
+ if(result_type_object_)
+ {
+  if(sr)
   {
-   if(sr)
-   {
-    s0_fn1_p_p__s_type sfn = (s0_fn1_p_p__s_type) fn;
-    QString str_result = sfn( (void*) *((quint64*) la0),
-                              (void*) *((quint64*) la1) );
-    hold_string_result(str_result);
-   }
-   else
-   {
-    result = fn( (void*) *((quint64*) la0),  (void*) *((quint64*) la1) );
-   }
+   s0_fn1_p_p__s_type sfn = (s0_fn1_p_p__s_type) fn;
+   QString str_result = sfn( (void*) *((quint64*) la0),
+                             (void*) *((quint64*) la1) );
+   hold_string_result(str_result);
   }
   else
   {
-   switch(byte_code)
-   {
-   case 944: ((s0_fn1_32_32_type) fn)( (quint32) *((quint64*) la0),  (quint32) *((quint64*) la1) );
-     break;
-   case 984: ((s0_fn1_64_32_type) fn)( (quint64) *((quint64*) la0),  (quint32) *((quint64*) la1) );
-     break;
-   case 948: ((s0_fn1_32_64_type) fn)( (quint32) *((quint64*) la0),  (quint64) *((quint64*) la1) );
-     break;
-   default:
-   case 988: ((s0_fn1_64_64_type) fn)( (quint64) *((quint64*) la0),  (quint64) *((quint64*) la1) );
-     break;
-   }
+   result = fn( (void*) *((quint64*) la0),  (void*) *((quint64*) la1) );
+  }
+ }
+ else
+ {
+  switch(byte_code)
+  {
+  case 944: ((s0_fn1_32_32_type) fn)( (quint32) *((quint64*) la0),  (quint32) *((quint64*) la1) );
+   break;
+  case 984: ((s0_fn1_64_32_type) fn)( (quint64) *((quint64*) la0),  (quint32) *((quint64*) la1) );
+   break;
+  case 948: ((s0_fn1_32_64_type) fn)( (quint32) *((quint64*) la0),  (quint64) *((quint64*) la1) );
+   break;
+  default:
+  case 988: ((s0_fn1_64_64_type) fn)( (quint64) *((quint64*) la0),  (quint64) *((quint64*) la1) );
+   break;
   }
  }
  if(pResult)
@@ -674,33 +757,58 @@ void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
 }
 
 
-void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pResult)
+
+void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pResult, int sl_byte_code, int s10_size)
 {
  void* result = nullptr;
  bool sr = table_.s0_string_return(fuxe_name_);
 
  // // populate a vec
  QVector<quint64> args;
+ quint64 s10_arg;
+
  int sz = lambda_arguments_.size();
  args.resize(sz);
 
- quint64 memvec[sz];
- QString qs_memvec[sz];
- QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_valuevec[sz];
- QString* pqs_memvec[sz];
+ int ssz = sz + s10_size;
 
- for(int i = 0; i < sz; ++i)
+ quint64 memvec[ssz];
+ QString qs_memvec[ssz];
+ QString* pqs_memvec[ssz];
+
+ QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_valuevec[ssz];
+
+ for(int i = 0; i < ssz; ++i)
  {
   void* lai = nullptr;
   memvec[i] = 0;
   qclo_valuevec[i] = {scopes_, {0, 0}};
+
   pqs_memvec[i] = &qs_memvec[i];
+
   FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+
   int ptr_depth = 0;
 
-  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[i], fnc, memvec[i],
-     qclo_valuevec[i], pqs_memvec[i], lai, ptr_depth);
-  args[i] = (quint64) lai;
+  if(i < s10_size)
+  {
+   if(i == 0)
+   {
+    FN_Codes fnc1 = check_init_raw_value(sigma_argument_, fnc, memvec[i],
+       qclo_valuevec[i], pqs_memvec[i], lai, ptr_depth);
+    s10_arg = (quint64) lai;
+   }
+   else
+   {
+    // //  only s10 arguments for now ...
+   }
+  }
+  else
+  {
+   FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[i - s10_size], fnc, memvec[i],
+      qclo_valuevec[i], pqs_memvec[i], lai, ptr_depth);
+   args[i - s10_size] = (quint64) lai;
+  }
  }
 
 
@@ -719,7 +827,15 @@ void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pRes
  }
  else
  {
-  ((s0_fn1_64_type) fn)( (quint64) &args );
+  switch (sl_byte_code)
+  {
+  case 99:
+   ((s0_fn1_64_type) fn)( (quint64) &args ); break;
+  case 949:
+   ((_s0_fn1_32_64_type) fn)( (quint32) *((quint64*) s10_arg), (quint64) &args ); break;
+  case 989:
+   ((s0_fn1_64_64_type) fn)( (quint64) *((quint64*) s10_arg), (quint64) &args ); break;
+  }
  }
  if(pResult)
  {
@@ -762,51 +878,72 @@ void KCM_Command_Runtime_Router::proceed_s0_0(void** pResult)
 
 void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
 {
- void* result = nullptr;
  int byte_code = 0;
  s0_fn1_p_type fn = table_.find_s0_declared_function_1(fuxe_name_,
    nullptr, &result_type_object_, byte_code);
  bool sr = table_.s0_string_return(fuxe_name_);
  if(fn)
  {
-   // raw_value is quint64* standing for void** ...
-  void* la0 = nullptr;
-  quint64 mem = 0;
-  QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
+  proceed_s0_1(pResult, fn, byte_code, sr);
+ }
+ else if(pResult)
+ {
+  *pResult = nullptr;
+ }
+}
 
-  QString qs_mem;
-  QString* pqs_mem = &qs_mem;
 
-  FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult, s0_fn1_p_type fn, int byte_code, bool sr, bool s10)
+{
+ void* result = nullptr;
 
-  int ptr_depth = 0;
-  FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[0], fnc, mem,
+ // raw_value is quint64* standing for void** ...
+ void* la0 = nullptr;
+ quint64 mem = 0;
+ QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
+
+ QString qs_mem;
+ QString* pqs_mem = &qs_mem;
+
+ FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+
+ int ptr_depth = 0;
+
+ if(s10)
+ {
+  FN_Codes fnc = check_init_raw_value(sigma_argument_, fnc, mem,
+    qclo_value, pqs_mem, la0, ptr_depth);
+ }
+ else
+ {
+  FN_Codes fnc = check_init_raw_value(lambda_arguments_[0], fnc, mem,
     qclo_value, pqs_mem, la0, ptr_depth);
 
-  if(result_type_object_)
+ }
+
+ if(result_type_object_)
+ {
+  if(sr)
   {
-   if(sr)
-   {
-    s0_fn1_p__s_type sfn = (s0_fn1_p__s_type) fn;
-    QString str_result = sfn( (void*) *((quint64*) la0) );
-    hold_string_result(str_result);
-   }
-   else
-   {
-    result = fn( (void*) *((quint64*) la0) );
-   }
+   s0_fn1_p__s_type sfn = (s0_fn1_p__s_type) fn;
+   QString str_result = sfn( (void*) *((quint64*) la0) );
+   hold_string_result(str_result);
   }
   else
   {
-   switch(byte_code)
-   {
-   case 94: ((s0_fn1_32_type) fn)( (quint32) *((quint64*) la0) );
-     break;
+   result = fn( (void*) *((quint64*) la0) );
+  }
+ }
+ else
+ {
+  switch(byte_code)
+  {
+  case 94: ((s0_fn1_32_type) fn)( (quint32) *((quint64*) la0) );
+   break;
 
-   default:
-   case 98: ((s0_fn1_64_type) fn)( (quint64) *((quint64*) la0) );
-     break;
-   }
+  default:
+  case 98: ((s0_fn1_64_type) fn)( (quint64) *((quint64*) la0) );
+   break;
   }
  }
  if(pResult)
@@ -814,6 +951,8 @@ void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
   *pResult = result;
  }
 }
+
+
 
 void KCM_Command_Runtime_Router::do_invoke_method(QVector<KCM_Command_Runtime_Argument*>& args)
 {

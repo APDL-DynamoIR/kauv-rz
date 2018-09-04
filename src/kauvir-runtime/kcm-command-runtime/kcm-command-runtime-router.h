@@ -282,11 +282,15 @@ public:
  void proceed_s0();
  void proceed_s1();
 
- void proceed_s0_argvec(s0_fn1_p_type fn, void** pResult);
+ void proceed_s0_argvec(s0_fn1_p_type fn, void** pResult, int byte_code, int s10_size = 0);
 
  void proceed_s0_0(void** pResult);
+
  void proceed_s0_1(void** pResult);
+ void proceed_s0_1(void** pResult, s0_fn1_p_type fn, int byte_code, bool sr, bool s10 = false);
+
  void proceed_s0_2(void** pResult);
+ void proceed_s0_2(void** pResult, s0_fn1_p_p_type fn, int byte_code, bool sr, bool s10 = false);
 
  void proceed_s1_0(void** pResult, void* raw_value);
  void proceed_s1_1(void** pResult, void* raw_value);

@@ -37,12 +37,15 @@ class KCM_Command_Runtime_Table
 {
  QMultiMap<QString, KCM_Channel_Group*> s1_declared_functions_;
  QMultiMap<QString, KCM_Channel_Group*> s0_declared_functions_;
+ QMultiMap<QString, KCM_Channel_Group*> s10_declared_functions_;
 
  QMap<KCM_Channel_Group, KCM_Channel_Group*> group_pointers_;
  KCM_Channel_Group* find_channel_group(const KCM_Channel_Group& channels);
 
  QMultiMap<QString, QPair<KCM_Channel_Group*, s1_fng_type>> s1_declared_functions_generic_;
  QMultiMap<QString, QPair<KCM_Channel_Group*, s0_fng_type>> s0_declared_functions_generic_;
+ QMultiMap<QString, QPair<KCM_Channel_Group*, s0_fng_type>> s10_declared_functions_generic_;
+
 
  QMultiMap<QString, QPair<KCM_Channel_Group*, _s1_fng_type>> _s1_declared_functions_generic_;
  QMultiMap<QString, QPair<KCM_Channel_Group*, _s0_fng_type>> _s0_declared_functions_generic_;
@@ -54,6 +57,7 @@ class KCM_Command_Runtime_Table
 
  QSet<QString>  s0_string_returns_;
  QSet<QString>  s1_string_returns_;
+ QSet<QString>  s10_string_returns_;
 
 public:
 
@@ -63,6 +67,7 @@ public:
 
  KCM_Channel_Group* add_s1_declared_function(QString name, const KCM_Channel_Group& channels);
  KCM_Channel_Group* add_s0_declared_function(QString name, const KCM_Channel_Group& channels);
+ KCM_Channel_Group* add_s10_declared_function(QString name, const KCM_Channel_Group& channels);
 
 
  void note_s0_string_return(QString n)
@@ -75,6 +80,12 @@ public:
   s1_string_returns_.insert(n);
  }
 
+ void note_s10_string_return(QString n)
+ {
+  s10_string_returns_.insert(n);
+ }
+
+
  bool s0_string_return(QString n)
  {
   return s0_string_returns_.contains(n);
@@ -84,6 +95,12 @@ public:
  {
   return s1_string_returns_.contains(n);
  }
+
+ bool s10_string_return(QString n)
+ {
+  return s10_string_returns_.contains(n);
+ }
+
 
  inline static void strip_hyphens(QString& s)
  {
@@ -104,7 +121,17 @@ public:
   s0_declared_functions_generic_.insert(name, {kcg, (s0_fng_type)fn});
  }
 
+ template<typename FN_type>
+ void add_s10_declared_function(QString name, KCM_Channel_Group* kcg, FN_type fn)
+ {
+  strip_hyphens(name);
+  s10_declared_functions_generic_.insert(name, {kcg, (s0_fng_type)fn});
+ }
+
+
  s0_fn1_p_type find_argvec_function(QString name);
+
+ s0_fn1_p_p_type find_s10_argvec_function(QString name, int& sl_byte_code);
 
 
  s0_fn1_p_type find_s0_declared_function_1(QString name,
@@ -112,6 +139,11 @@ public:
 
  s1_fng_type find_s1_declared_function_0(QString name,
    KCM_Channel_Group* kcg, const KCM_Type_Object** pkto);
+
+ s0_fn1_p_p_type find_s10_declared_function_1(QString name,
+   KCM_Channel_Group* kcg, const KCM_Type_Object** pkto, int& byte_code);
+
+
 };
 
 _KANS(CMD)
