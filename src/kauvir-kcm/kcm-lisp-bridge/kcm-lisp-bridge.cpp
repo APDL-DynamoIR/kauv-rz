@@ -154,6 +154,12 @@ quint64 KCM_Lisp_Bridge::get_interpreted_value_of_symbol(QString symbol_name, QS
   mode = "fixnum";
   return *((quint64*) v);
  }
+ if((*kto)->is_string_like())
+ {
+  QString* qs = (QString*) *(quint64*) v;
+  mode = "str";
+  return (quint64) qs;
+ }
  return v;
 }
 

@@ -1335,6 +1335,11 @@ BASIC_DEFINE_CALLBACK(symbol-init-via-type, symbol_init_via_type)
     {
      return ecl_make_fixnum(result);
     }
+    if(mode == "str")
+    {
+     QString* qs = (QString*) result;
+     return make_base_string_copy(qs->toStdString().c_str());
+    }
     return (cl_object) result;
    }
    return ECL_NIL;

@@ -377,12 +377,19 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::check_init_raw_
  if(kcra->bind_code().isEmpty())
  {
   QString* qs = (QString*) kcra->raw_value();
+
   if(kcra->type_name() == "str")
   {
+
+   // //  account for how scopes store strings ...
+   if(kcra->value_classification() ==
+     KCM_Command_Runtime_Argument::Value_Classification::QObject_Ptr)
+   {
+    qs = (QString*) *(quint64*) qs;
+   }
+
    *qs_mem = *qs;
    result = const_cast<void*>( (const void*) &qs_mem);
-
-   //?void* v0 = &qs_mem;
 
    ptr_depth = 2;
    return add_string_cast_to_fn_code(fnc);
