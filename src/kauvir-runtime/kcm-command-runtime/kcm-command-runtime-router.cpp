@@ -573,7 +573,7 @@ void KCM_Command_Runtime_Router::proceed_s1_1(void** pResult, void* raw_value)
  if(fn0)
  {
   bool sr = table_.s10_string_return(fuxe_name_);
-  proceed_s0_2(&result, fn0, byte_code, sr, true);
+  proceed_s0<2, s0_fn1_p_p_type>(&result, fn0, byte_code, sr, true);
   if(pResult)
   {
    *pResult = result;
@@ -655,7 +655,7 @@ void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
  if(fn0)
  {
   bool sr = table_.s10_string_return(fuxe_name_);
-  proceed_s0_1(&result, fn0, byte_code, sr, true);
+  proceed_s0<1, s0_fn1_p_type>(&result, fn0, byte_code, sr, true);
   if(pResult)
   {
    *pResult = result;
@@ -689,8 +689,6 @@ void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
 }
 
 
-
-
 void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
 {
  int byte_code = 0;
@@ -699,7 +697,7 @@ void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
  bool sr = table_.s0_string_return(fuxe_name_);
  if(fn)
  {
-  proceed_s0_2(pResult, fn, byte_code, sr, false);
+  proceed_s0<2, s0_fn1_p_p_type>(pResult, fn, byte_code, sr, false);
  }
  else if(pResult)
  {
@@ -707,90 +705,241 @@ void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
  }
 }
 
-
-void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult, s0_fn1_p_p_type fn, int byte_code, bool sr, bool s10)
+template<int c, typename fn_type>
+void KCM_Command_Runtime_Router::proceed_s0(void** pResult, fn_type fn, int byte_code, bool sr, bool s10)
 {
- void* result = nullptr;
- // raw_value is quint64* standing for void** ...
-
- void* la0 = nullptr;
-
-
  FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
 
+ // // populate a vec
+ QVector<quint64> args;
+ quint64 s10_arg;
+
+ int sz = lambda_arguments_.size();
 
 
- quint64 mem0 = 0;
- QString qs_mem0;
- QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
- QString* pqs_mem0 = &qs_mem0;
+ int s10_size = s10?1:0;
 
- int offset = 0;
+ int ssz = sz + s10_size;
 
- int ptr_depth0 = 0;
+ args.resize(ssz);
 
- if(s10)
+ quint64 memvec[ssz];
+ QString qs_memvec[ssz];
+ QString* pqs_memvec[ssz];
+
+ QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_valuevec[ssz];
+
+ for(int i = 0; i < ssz; ++i)
  {
-  ++offset;
-  FN_Codes fnc0 = check_init_raw_value(sigma_argument_, fnc, mem0,
-    qclo_value, pqs_mem0, la0, ptr_depth0);
+  void* lai = nullptr;
+  memvec[i] = 0;
+  qclo_valuevec[i] = {scopes_, {0, 0}};
+
+  pqs_memvec[i] = &qs_memvec[i];
+
+  FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
+
+  int ptr_depth = 0;
+
+  if(i < s10_size)
+  {
+   if(i == 0)
+   {
+    FN_Codes fnc1 = check_init_raw_value(sigma_argument_, fnc, memvec[i],
+       qclo_valuevec[i], pqs_memvec[i], lai, ptr_depth);
+    args[i] = (quint64) lai;
+   }
+   else
+   {
+    // //  only s10 arguments for now ...
+   }
+  }
+  else
+  {
+   FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[i - s10_size], fnc, memvec[i],
+      qclo_valuevec[i], pqs_memvec[i], lai, ptr_depth);
+   args[i] = (quint64) lai;
+  }
  }
- else
+
+ proceed_s0<c, fn_type>(args, pResult, fn, byte_code, sr);
+
+}
+
+template<int arg_count>
+struct tybc_;
+
+template<>
+struct tybc_<2>
+{
+ template<int byc, typename fn_type>
+ static void run(QVector<quint64>& args, void*& result,
+  fn_type fn)
  {
-  FN_Codes fnc0 = check_init_raw_value(lambda_arguments_[0], fnc, mem0,
-    qclo_value, pqs_mem0, la0, ptr_depth0);
+  result = ( (typename tybc<byc>::_r) fn)
+     ( (typename tybc<byc>::a0) *((quint64*) args[0]),  (typename tybc<byc>::a1) *((quint64*) args[1]) );
  }
 
- int ptr_depth1 = 0;
+ template<int byc, typename fn_type>
+ static void run(QVector<quint64>& args, QString& string_result, fn_type fn)
+ {
+  string_result = ( (typename tybc<byc>::_sr) fn)
+     ( (typename tybc<byc>::a0) *((quint64*) args[0]), (typename tybc<byc>::a1) *((quint64*) args[1]) );
 
- void* la1 = nullptr;
- quint64 mem1 = 0;
- QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value1 = {scopes_, {0, 0}};
- QString qs_mem1;
- QString* pqs_mem1 = &qs_mem1;
+ }
 
- //void* v0 = &pqs_mem0;
+ template<int byc, typename fn_type>
+ static void run(QVector<quint64>& args, fn_type fn)
+ {
+  ( (typename tybc<byc>::_nor) fn)
+       ( (typename tybc<byc>::a0) *((quint64*) args[0]), (typename tybc<byc>::a1) *((quint64*) args[1]) );
 
- FN_Codes fnc1 = check_init_raw_value(lambda_arguments_[1 - offset], fnc, mem1,
-   qclo_value1, pqs_mem1, la1, ptr_depth1);
-
- void* v1 = &pqs_mem1;
+ }
+};
 
 
+template<>
+struct tybc_<1>
+{
+ template<int byc, typename fn_type>
+ static void run(QVector<quint64>& args, void*& result,
+  fn_type fn)
+ {
+  result = ( (typename tybc<byc>::_r) fn)
+     ( (typename tybc<byc>::a0) *((quint64*) args[0]) );
+ }
+
+ template<int byc, typename fn_type>
+ static void run(QVector<quint64>& args, QString& string_result, fn_type fn)
+ {
+  string_result = ( (typename tybc<byc>::_sr) fn)
+     ( (typename tybc<byc>::a0) *((quint64*) args[0]) );
+
+ }
+
+ template<int byc, typename fn_type>
+ static void run(QVector<quint64>& args, fn_type fn)
+ {
+  ( (typename tybc<byc>::_nor) fn)
+       ( (typename tybc<byc>::a0) *((quint64*) args[0]) );
+
+ }
+};
+
+KANS_(CMD)
+
+template<>
+void KCM_Command_Runtime_Router::proceed_s0_r<2, s0_fn1_p_p_type>(QVector<quint64>& args, void*& result,
+  s0_fn1_p_p_type fn, int byte_code)
+{
+ switch(byte_code)
+ {
+ case 944: tybc_<2>::run<944, s0_fn1_p_p_type>(args, result, fn); break;
+ case 984: tybc_<2>::run<984, s0_fn1_p_p_type>(args, result, fn); break;
+ case 948: tybc_<2>::run<948, s0_fn1_p_p_type>(args, result, fn); break;
+ default:
+ case 988: tybc_<2>::run<988, s0_fn1_p_p_type>(args, result, fn); break;
+ }
+}
+
+template<>
+void KCM_Command_Runtime_Router::proceed_s0_sr<2, s0_fn1_p_p_type>(QVector<quint64>& args, //QString& str_result,
+  s0_fn1_p_p_type fn, int byte_code)
+{
+ QString str_result;
+ switch(byte_code)
+ {
+ case 944: tybc_<2>::run<944, s0_fn1_p_p_type>(args, str_result, fn); break;
+ case 984: tybc_<2>::run<984, s0_fn1_p_p_type>(args, str_result, fn); break;
+ case 948: tybc_<2>::run<948, s0_fn1_p_p_type>(args, str_result, fn); break;
+ default:
+ case 988: tybc_<2>::run<988, s0_fn1_p_p_type>(args, str_result, fn); break;
+ }
+ hold_string_result(str_result);
+}
+
+template<>
+void KCM_Command_Runtime_Router::proceed_s0_nor<2, s0_fn1_p_p_type>(QVector<quint64>& args, //QString& str_result,
+  s0_fn1_p_p_type fn, int byte_code)
+{
+ switch(byte_code)
+ {
+ case 944: tybc_<2>::run<944, s0_fn1_p_p_type>(args, fn); break;
+ case 984: tybc_<2>::run<984, s0_fn1_p_p_type>(args, fn); break;
+ case 948: tybc_<2>::run<948, s0_fn1_p_p_type>(args, fn); break;
+ default:
+ case 988: tybc_<2>::run<988, s0_fn1_p_p_type>(args, fn); break;
+ }
+}
+
+template<>
+void KCM_Command_Runtime_Router::proceed_s0_r<1, s0_fn1_p_type>(QVector<quint64>& args, void*& result,
+  s0_fn1_p_type fn, int byte_code)
+{
+ switch(byte_code)
+ {
+ case 94: tybc_<1>::run<94, s0_fn1_p_type>(args, result, fn); break;
+ default:
+ case 98: tybc_<1>::run<98, s0_fn1_p_type>(args, result, fn); break;
+ }
+}
+
+template<>
+void KCM_Command_Runtime_Router::proceed_s0_sr<1, s0_fn1_p_type>(QVector<quint64>& args, //QString& str_result,
+  s0_fn1_p_type fn, int byte_code)
+{
+ QString str_result;
+ switch(byte_code)
+ {
+ case 94: tybc_<1>::run<94, s0_fn1_p_type>(args, str_result, fn); break;
+ default:
+ case 98: tybc_<1>::run<98, s0_fn1_p_type>(args, str_result, fn); break;
+ }
+ hold_string_result(str_result);
+}
+
+template<>
+void KCM_Command_Runtime_Router::proceed_s0_nor<1, s0_fn1_p_type>(QVector<quint64>& args, //QString& str_result,
+  s0_fn1_p_type fn, int byte_code)
+{
+ switch(byte_code)
+ {
+ case 94: tybc_<1>::run<94, s0_fn1_p_type>(args, fn); break;
+ default:
+ case 98: tybc_<1>::run<98, s0_fn1_p_type>(args, fn); break;
+ }
+}
+
+template<int c, typename fn_type>
+void KCM_Command_Runtime_Router::proceed_s0(QVector<quint64>& args, void** pResult,
+  fn_type fn, int byte_code, bool sr)//, bool s10)
+{
+ void* result = nullptr;
  if(result_type_object_)
  {
   if(sr)
   {
-   s0_fn1_p_p__s_type sfn = (s0_fn1_p_p__s_type) fn;
-   QString str_result = sfn( (void*) *((quint64*) la0),
-                             (void*) *((quint64*) la1) );
-   hold_string_result(str_result);
+   proceed_s0_sr<c>(args, fn, byte_code);
   }
   else
   {
-   result = fn( (void*) *((quint64*) la0),  (void*) *((quint64*) la1) );
+   proceed_s0_r<c>(args, result, fn, byte_code);
   }
  }
  else
  {
-  switch(byte_code)
-  {
-  case 944: ((s0_fn1_32_32_type) fn)( (quint32) *((quint64*) la0),  (quint32) *((quint64*) la1) );
-   break;
-  case 984: ((s0_fn1_64_32_type) fn)( (quint64) *((quint64*) la0),  (quint32) *((quint64*) la1) );
-   break;
-  case 948: ((s0_fn1_32_64_type) fn)( (quint32) *((quint64*) la0),  (quint64) *((quint64*) la1) );
-   break;
-  default:
-  case 988: ((s0_fn1_64_64_type) fn)( (quint64) *((quint64*) la0),  (quint64) *((quint64*) la1) );
-   break;
-  }
+  proceed_s0_nor<c>(args, fn, byte_code);
  }
  if(pResult)
  {
   *pResult = result;
  }
 }
+
+_KANS(CMD)
+
+
+
 
 
 
@@ -912,6 +1061,7 @@ void KCM_Command_Runtime_Router::proceed_s0_0(void** pResult)
  }
 }
 
+
 void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
 {
  int byte_code = 0;
@@ -920,75 +1070,13 @@ void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
  bool sr = table_.s0_string_return(fuxe_name_);
  if(fn)
  {
-  proceed_s0_1(pResult, fn, byte_code, sr);
+  proceed_s0<1, s0_fn1_p_type>(pResult, fn, byte_code, sr);
  }
  else if(pResult)
  {
   *pResult = nullptr;
  }
 }
-
-
-void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult, s0_fn1_p_type fn, int byte_code, bool sr, bool s10)
-{
- void* result = nullptr;
-
- // raw_value is quint64* standing for void** ...
- void* la0 = nullptr;
- quint64 mem = 0;
- QPair<KCM_Scope_System*, QPair<int, quint64>> qclo_value = {scopes_, {0, 0}};
-
- QString qs_mem;
- QString* pqs_mem = &qs_mem;
-
- FN_Codes fnc = result_type_object_? FN_Codes::RET_CC:FN_Codes::NOR_CC;
-
- int ptr_depth = 0;
-
- if(s10)
- {
-  FN_Codes fnc = check_init_raw_value(sigma_argument_, fnc, mem,
-    qclo_value, pqs_mem, la0, ptr_depth);
- }
- else
- {
-  FN_Codes fnc = check_init_raw_value(lambda_arguments_[0], fnc, mem,
-    qclo_value, pqs_mem, la0, ptr_depth);
-
- }
-
- if(result_type_object_)
- {
-  if(sr)
-  {
-   s0_fn1_p__s_type sfn = (s0_fn1_p__s_type) fn;
-   QString str_result = sfn( (void*) *((quint64*) la0) );
-   hold_string_result(str_result);
-  }
-  else
-  {
-   result = fn( (void*) *((quint64*) la0) );
-  }
- }
- else
- {
-  switch(byte_code)
-  {
-  case 94: ((s0_fn1_32_type) fn)( (quint32) *((quint64*) la0) );
-   break;
-
-  default:
-  case 98: ((s0_fn1_64_type) fn)( (quint64) *((quint64*) la0) );
-   break;
-  }
- }
- if(pResult)
- {
-  *pResult = result;
- }
-}
-
-
 
 void KCM_Command_Runtime_Router::do_invoke_method(QVector<KCM_Command_Runtime_Argument*>& args)
 {

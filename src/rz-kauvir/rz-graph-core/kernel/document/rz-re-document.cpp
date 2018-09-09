@@ -71,11 +71,27 @@ void RE_Document::finalize_raw_text()
   {
    fn.append(".rz");
   }
+  else
+  {
+   int i = fn.lastIndexOf('.');
+   if(i < fn.size() - 1)
+   {
+    if(fn[i + 1] == '/')
+    {
+     fn.append(".rz");
+    }
+   } 
+  }
+  
   if(!fn.contains('/'))
   {
    fn.prepend(local_directory_ + '/');
   }
-
+  else if(fn.startsWith('.'))
+  {
+   fn.prepend(local_directory_ + '/');
+  }
+  
   QString nt;
   nt = ::load_file(fn);
   raw_text_.replace(index + diff, end, nt);

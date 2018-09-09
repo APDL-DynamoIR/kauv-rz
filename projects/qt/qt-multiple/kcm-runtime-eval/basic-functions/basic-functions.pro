@@ -20,6 +20,7 @@ HEADERS +=  \
 
 SOURCES +=  \
   $$SRC_DIR/rz-dynamo-basic-functions.cpp \
+  $$SRC_DIR/rz-dynamo-test-functions.cpp \
 
 CONFIG += no_keywords
 

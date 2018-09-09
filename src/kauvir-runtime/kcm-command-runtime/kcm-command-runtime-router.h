@@ -290,10 +290,33 @@ public:
  void proceed_s0_0(void** pResult);
 
  void proceed_s0_1(void** pResult);
- void proceed_s0_1(void** pResult, s0_fn1_p_type fn, int byte_code, bool sr, bool s10 = false);
+
+//? void proceed_s0_1(void** pResult, s0_fn1_p_type fn, int byte_code, bool sr, bool s10 = false);
 
  void proceed_s0_2(void** pResult);
- void proceed_s0_2(void** pResult, s0_fn1_p_p_type fn, int byte_code, bool sr, bool s10 = false);
+
+//? void proceed_s0_2(void** pResult, s0_fn1_p_p_type fn, int byte_code, bool sr, bool s10 = false);
+
+ template<int c, typename fn_type>
+ void proceed_s0(void** pResult, fn_type fn, int byte_code, bool sr, bool s10 = false);
+
+ template<int c, typename fn_type>
+ void proceed_s0(QVector<quint64>& args, void** pResult,
+   fn_type fn, int byte_code, bool sr);//, bool s10);
+
+
+ template<int c, typename fn_type>
+ void proceed_s0_r(QVector<quint64>& args, void*& result,
+   fn_type fn, int byte_code);
+
+ template<int c, typename fn_type>
+ void proceed_s0_sr(QVector<quint64>& args, //QString& str_result,
+   fn_type fn, int byte_code);
+
+ template<int c, typename fn_type>
+ void proceed_s0_nor(QVector<quint64>& args,
+   fn_type fn, int byte_code);
+
 
  void proceed_s1_0(void** pResult, void* raw_value);
  void proceed_s1_1(void** pResult, void* raw_value);

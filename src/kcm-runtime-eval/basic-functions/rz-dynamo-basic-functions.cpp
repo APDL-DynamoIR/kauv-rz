@@ -276,6 +276,8 @@ void fndoc_read(Fn_Doc* fnd, QString fn)
 
 void init_basic_functions_kci(Kauvir_Code_Model& kcm)
 {
+ init_test_functions_kci(kcm);
+
  Kauvir_Type_System* type_system = kcm.type_system();
 
  KCM_Command_Runtime_Table& table = *kcm.table();

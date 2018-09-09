@@ -19,13 +19,51 @@ class Kauvir_Universal_Class
 {
 };
 
+
+typedef quint64 u64t;
+typedef quint32 u32t;
+
+
+template<int byc>
+struct tybc;
+
+
+#define TYBC_2(bc, a, b) \
+template<> \
+struct tybc<bc> \
+{ \
+ typedef u##a##t a0; \
+ typedef u##b##t a1; \
+ typedef QString(*_sr)(a0, a1); \
+ typedef void*(*_r)(a0, a1); \
+ typedef void(*_nor)(a0, a1); \
+}; \
+
+TYBC_2(944, 32, 32)
+TYBC_2(948, 32, 64)
+TYBC_2(984, 64, 32)
+TYBC_2(988, 64, 64)
+
+
+
+#define TYBC_1(bc, a) \
+template<> \
+struct tybc<bc> \
+{ \
+ typedef u##a##t a0; \
+ typedef QString(*_sr)(a0); \
+ typedef void*(*_r)(a0); \
+ typedef void(*_nor)(a0); \
+}; \
+
+TYBC_1(94, 32)
+TYBC_1(98, 64)
+
 typedef void* pvt;
 typedef void*& pvrt;
 
 typedef pvt pvft;
 
-typedef quint64 u64t;
-typedef quint32 u32t;
 
 typedef void(Kauvir_Universal_Class::*fn0_type)();
 typedef void(Kauvir_Universal_Class::*fn1_type)(void*&);

@@ -26,6 +26,7 @@ USING_KANS(KCM)
 KANS_(Dynamo)
 
 void init_basic_functions_kci(Kauvir_Code_Model& kcm);
+void init_test_functions_kci(Kauvir_Code_Model& kcm);
 
 void* insert_envv(void* kind, void* test);
 
