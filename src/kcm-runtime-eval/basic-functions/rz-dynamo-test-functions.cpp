@@ -11,6 +11,10 @@
 
 #include "kauvir-code-model/kcm-channel-group.h"
 
+#include "phaon/PhaonLib/phaon-function.h"
+
+#include "kauvir-code-model/kcm-function-package.h"
+
 #include "kauvir-type-system/kauvir-type-system.h"
 
 #include "kauvir-code-model/kcm-callable-value.h"
@@ -101,9 +105,8 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-0-ss", g1);
-  table.add_s0_declared_function("test-0-ss", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_0_ss));
+  table.init_phaon_function(g1, "test-0-ss", 700, &test_0_ss);
+
   g1.clear_all();
  }
 
@@ -113,9 +116,8 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-0-s", g1);
-  table.add_s0_declared_function("test-0-s", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_0_s));
+  table.init_phaon_function(g1, "test-0-s", 700, &test_0_s);
+
   g1.clear_all();
  }
 
@@ -135,11 +137,10 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-s-ss", g1);
-  table.add_s0_declared_function("test-s-ss", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_s_ss));
-  table.note_s0_string_return("test_s_ss");
+  table.init_phaon_function(g1, "test_s_ss", 600, &test_s_ss);
+
   g1.clear_all();
+
  }
 
  {
@@ -153,10 +154,8 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-s-s", g1);
-  table.add_s0_declared_function("test-s-s", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_s_s));
-  table.note_s0_string_return("test_s_s");
+  table.init_phaon_function(g1, "test-s-s", 600, &test_s_s);
+
   g1.clear_all();
  }
 
@@ -176,9 +175,8 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-i-ss", g1);
-  table.add_s0_declared_function("test-i-ss", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_i_ss));
+  table.init_phaon_function(g1, "test-i-ss", 700, &test_i_ss);
+
   g1.clear_all();
  }
 
@@ -193,10 +191,9 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-i-s", g1);
-  table.add_s0_declared_function("test-i-s", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_i_s));
+  table.init_phaon_function(g1, "test-i-s", 700, &test_i_s);
   g1.clear_all();
+
  }
 
  {
@@ -210,9 +207,8 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s10_declared_function("test-0-S10-s", g1);
-  table.add_s10_declared_function("test-0-S10-s", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&fndoc_test_0_S10_s));
+  table.init_phaon_function(g1, "test-0-S10-s", 710, &fndoc_test_0_S10_s);
+
   g1.clear_all();
  }
 
@@ -222,14 +218,8 @@ void init_test_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  g1.add_lambda_carrier(
-    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
-     QString()
-    );
+  table.init_phaon_function(g1, "test-0-S10", 710, &fndoc_test_0_S10);
 
-  KCM_Channel_Group* kcg = table.add_s10_declared_function("test-0-S10", g1);
-  table.add_s10_declared_function("test-0-S10", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&fndoc_test_0_S10));
   g1.clear_all();
  }
 }

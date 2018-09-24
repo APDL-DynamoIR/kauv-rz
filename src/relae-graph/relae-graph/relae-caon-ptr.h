@@ -147,6 +147,11 @@ public:
   return value_;
  }
 
+ void* raw_value_as_pointer() const
+ {
+  return (void*) value_;
+ }
+
  template<typename U>
  caon_ptr<U> ptr_cast() const
  {
@@ -201,6 +206,11 @@ public:
  void set_checked()
  {
   value_ |= Checked_Ptr;
+ }
+
+ void set_array()
+ {
+  value_ |= Array_Ptr;
  }
 
  operator bool() const

@@ -34,6 +34,8 @@ HEADERS += \
   $$SRC_DIR/kcm-report-syntax.h \
   $$SRC_DIR/kcm-source-function.h \
   $$SRC_DIR/kcm-callable-value.h \
+  $$SRC_DIR/kcm-function-package.h \
+
 
 SOURCES += \
   $$SRC_DIR/kauvir-code-model.cpp \
@@ -51,7 +53,7 @@ SOURCES += \
   $$SRC_DIR/kcm-report-syntax.cpp \
   $$SRC_DIR/kcm-source-function.cpp \
   $$SRC_DIR/kcm-callable-value.cpp \
-
+  $$SRC_DIR/kcm-function-package.cpp \
 
 LIBS += -L$$TARGETSDIR -lkauvir-type-system -lkcm-scopes -lfn-doc
 

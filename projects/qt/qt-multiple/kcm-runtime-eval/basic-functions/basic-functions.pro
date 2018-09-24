@@ -26,4 +26,4 @@ CONFIG += no_keywords
 
 
 LIBS += -L$$TARGETSDIR -lkauvir-code-model -lkcm-command-runtime \
-   -lkcm-lisp-bridge -lfn-doc
+   -lkcm-lisp-bridge -lfn-doc -lPhaonLib

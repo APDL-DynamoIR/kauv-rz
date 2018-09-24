@@ -38,4 +38,4 @@ CONFIG += no_keywords
 
 
 LIBS += -L$$TARGETSDIR -lkcm-scopes -lkauvir-code-model \
-  -lkcm-command-package -lkcm-lisp-bridge
+  -lkcm-command-package -lkcm-lisp-bridge -lPhaonLib

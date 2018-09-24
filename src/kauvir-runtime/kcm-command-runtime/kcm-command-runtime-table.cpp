@@ -26,6 +26,12 @@ KCM_Command_Runtime_Table::KCM_Command_Runtime_Table(Kauvir_Type_System& type_sy
 }
 
 
+void KCM_Command_Runtime_Table::add_declared_function_package(QString name, Phaon_Function phf)
+{
+ strip_hyphens(name);
+ (*this)[name].push_back(phf);
+}
+
 
 KCM_Channel_Group* KCM_Command_Runtime_Table::find_channel_group(const KCM_Channel_Group& channels)
 {

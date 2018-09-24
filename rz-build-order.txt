@@ -18,6 +18,7 @@
 /kcm-runtime-eval       kcm-env
 /kcm-runtime-eval       fn-doc
 /kauvir-kcm             kauvir-code-model 
+/phaon                  PhaonLib 
 /kauvir-runtime         kcm-command-package
 /rz-dynamo              rz-dynamo-generator
 /kauvir-kcm             kcm-lisp-bridge

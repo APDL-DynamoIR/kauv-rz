@@ -97,8 +97,17 @@ void RE_Document::finalize_raw_text()
   raw_text_.replace(index + diff, end, nt);
   diff += nt.size() - end;
  }
+ 
+ if(posmap.isEmpty())
+ {
+  report_raw_text("..raw.txt", "_");
+ }
+ else
+ {
+  finalize_raw_text();
+ }
+ 
  report_raw_text("..raw.txt", "_");
-
 }
 
 void RE_Document::load_file(QString path)

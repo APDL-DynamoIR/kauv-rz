@@ -30,6 +30,10 @@
 
 #include "kcm-lisp-bridge/kcm-lisp-eval.h"
 
+#include "phaon/PhaonLib/phaon-function-vector.h"
+
+#include "kauvir-code-model/kcm-function-package.h"
+
 #include <QDebug>
 
 USING_KANS(KCL)
@@ -198,15 +202,26 @@ void KCM_Command_Runtime_Router::parse_command_package(KCM_Command_Package* cpkg
  }
 }
 
+Phaon_Function_Vector* KCM_Command_Runtime_Router::get_phaon_function_vector(QString fn)
+{
+ auto it = table_.find(fn);
+ if(it == table_.end())
+   return nullptr;
+
+ return &it.value();
+}
+
 void KCM_Command_Runtime_Router::proceed()
 {
+ Phaon_Function_Vector* pfv = get_phaon_function_vector(fuxe_name_);
+
  if(sigma_argument_)
  {
-  proceed_s1();
+  proceed_s1(pfv);
  }
  else
  {
-  proceed_s0();
+  proceed_s0(pfv);
  }
 }
 
@@ -219,27 +234,30 @@ KCM_Channel_Group* KCM_Command_Runtime_Router::get_channel_group()
 }
 
 
-void KCM_Command_Runtime_Router::proceed_s0()
+void KCM_Command_Runtime_Router::proceed_s0(Phaon_Function_Vector* pfv)
 {
  void* result;
 
- if(s0_fn1_p_type fn = table_.find_argvec_function(fuxe_name_))
+ if(!pfv)
  {
-  int default_argvec_bytecode = 99;
-  proceed_s0_argvec(fn, &result, default_argvec_bytecode);
-  goto set_result;
+  if(s0_fn1_p_type fn = table_.find_argvec_function(fuxe_name_))
+  {
+   int default_argvec_bytecode = 99;
+   proceed_s0_argvec(fn, &result, default_argvec_bytecode);
+   goto set_result;
+  }
  }
 
  switch(lambda_arguments_.size())
  {
  case 0:
-  proceed_s0_0(&result);
+  proceed_s0_0(pfv, &result);
   break;
  case 1:
-  proceed_s0_1(&result);
+  proceed_s0_1(pfv, &result);
   break;
  case 2:
-  proceed_s0_2(&result);
+  proceed_s0_2(pfv, &result);
   break;
  default:
   break;
@@ -251,16 +269,19 @@ set_result:
  }
 }
 
-void KCM_Command_Runtime_Router::proceed_s1()
+void KCM_Command_Runtime_Router::proceed_s1(Phaon_Function_Vector* pfv)
 {
  void* result = nullptr;
 
  int sl_byte_code;
 
- if(s0_fn1_p_p_type fn = table_.find_s10_argvec_function(fuxe_name_, sl_byte_code))
+ if(!pfv)
  {
-  proceed_s0_argvec( (s0_fn1_p_type) fn, &result, sl_byte_code, 1);
-  goto set_result;
+  if(s0_fn1_p_p_type fn = table_.find_s10_argvec_function(fuxe_name_, sl_byte_code))
+  {
+   proceed_s0_argvec( (s0_fn1_p_type) fn, &result, sl_byte_code, 1);
+   goto set_result;
+  }
  }
 
  {
@@ -277,13 +298,13 @@ void KCM_Command_Runtime_Router::proceed_s1()
   switch(lambda_arguments_.size())
   {
   case 0:
-   proceed_s1_0(&result, raw_value);
+   proceed_s1_0(pfv, &result, raw_value);
    break;
   case 1:
-   proceed_s1_1(&result, raw_value);
+   proceed_s1_1(pfv, &result, raw_value);
    break;
   case 2:
-   proceed_s1_2(&result, raw_value);
+   proceed_s1_2(pfv, &result, raw_value);
    break;
   default:
    break;
@@ -297,9 +318,41 @@ set_result:
  }
 }
 
-void KCM_Command_Runtime_Router::proceed_s1_2(void** pResult, void* raw_value)
+void KCM_Command_Runtime_Router::proceed_s1_2(Phaon_Function_Vector* pfv, void** pResult, void* raw_value)
 {
  void* result = nullptr;
+
+ int byte_code;
+ s0_fn1_p_p_type fn0;
+ bool sr;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
+ {
+  if(void* fnp = pfv->match_against_codes({6103, 7103}, mc, bc, &result_type_object_))
+  {
+   fn0 = (s0_fn1_p_p_type) fnp;
+   byte_code = bc;
+   sr = mc == 6103;
+  }
+  else byte_code = 0;
+ }
+ else
+ {
+
+ }
+ if(fn0)
+ {
+  //? proceed_s0<3, s0_fn1_p_p_type>(&result, fn0, byte_code, sr, true);
+  if(pResult)
+  {
+   *pResult = result;
+  }
+  return;
+ }
+
  s1_fng_type fn = table_.find_s1_declared_function_0(fuxe_name_, nullptr, &result_type_object_);
  if(fn)
  {
@@ -564,15 +617,39 @@ KCM_Command_Runtime_Router::FN_Codes KCM_Command_Runtime_Router::add_ptr_cast_to
 }
 
 
-void KCM_Command_Runtime_Router::proceed_s1_1(void** pResult, void* raw_value)
+void KCM_Command_Runtime_Router::proceed_s1_1(Phaon_Function_Vector* pfv, void** pResult, void* raw_value)
 {
  void* result = nullptr;
 
  int byte_code;
- s0_fn1_p_p_type fn0 = table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
+ s0_fn1_p_p_type fn0;
+ bool sr;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
+ {
+  if(void* fnp = pfv->match_against_codes({6102, 7102}, mc, bc, &result_type_object_))
+  {
+   fn0 = (s0_fn1_p_p_type) fnp;
+   byte_code = bc;
+   sr = mc == 6102;
+  }
+  else byte_code = 0;
+ }
+ else
+ {
+  fn0 = table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
+  if(fn0)
+  {
+   sr = table_.s10_string_return(fuxe_name_);
+  }
+ }
+
+
  if(fn0)
  {
-  bool sr = table_.s10_string_return(fuxe_name_);
   proceed_s0<2, s0_fn1_p_p_type>(&result, fn0, byte_code, sr, true);
   if(pResult)
   {
@@ -646,15 +723,38 @@ void KCM_Command_Runtime_Router::proceed_s1_1(void** pResult, void* raw_value)
 
 }
 
-void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
+void KCM_Command_Runtime_Router::proceed_s1_0(Phaon_Function_Vector* pfv, void** pResult, void* raw_value)
 {
  void* result = nullptr;
 
  int byte_code;
- s0_fn1_p_type fn0 = (s0_fn1_p_type) table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
+ s0_fn1_p_type fn0;
+ bool sr;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
+ {
+  if(void* fnp = pfv->match_against_codes({6101, 7101}, mc, bc, &result_type_object_))
+  {
+   fn0 = (s0_fn1_p_type) fnp;
+   byte_code = bc;
+   sr = mc == 6101;
+  }
+  else byte_code = 0;
+ }
+ else
+ {
+  s0_fn1_p_type fn0 = (s0_fn1_p_type) table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
+  if(fn0)
+  {
+   sr = table_.s10_string_return(fuxe_name_);
+  }
+ }
+
  if(fn0)
  {
-  bool sr = table_.s10_string_return(fuxe_name_);
   proceed_s0<1, s0_fn1_p_type>(&result, fn0, byte_code, sr, true);
   if(pResult)
   {
@@ -689,16 +789,39 @@ void KCM_Command_Runtime_Router::proceed_s1_0(void** pResult, void* raw_value)
 }
 
 
-void KCM_Command_Runtime_Router::proceed_s0_2(void** pResult)
+void KCM_Command_Runtime_Router::proceed_s0_2(Phaon_Function_Vector* pfv, void** pResult)
 {
  int byte_code = 0;
- s0_fn1_p_p_type fn = (s0_fn1_p_p_type) table_.find_s0_declared_function_1(fuxe_name_,
-   nullptr, &result_type_object_, byte_code);
- bool sr = table_.s0_string_return(fuxe_name_);
+
+ s0_fn1_p_p_type fn;
+ bool sr;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
+ {
+  if(void* fnp = pfv->match_against_codes({6002, 7002}, mc, bc, &result_type_object_))
+  {
+   fn = (s0_fn1_p_p_type) fnp;
+   byte_code = bc;
+   sr = mc == 6002;
+  }
+  else byte_code = 0;
+ }
+
+ else
+ {
+  fn = (s0_fn1_p_p_type) table_.find_s0_declared_function_1(fuxe_name_,
+    nullptr, &result_type_object_, byte_code);
+  sr = table_.s0_string_return(fuxe_name_);
+ }
+
  if(fn)
  {
   proceed_s0<2, s0_fn1_p_p_type>(pResult, fn, byte_code, sr, false);
  }
+
  else if(pResult)
  {
   *pResult = nullptr;
@@ -1028,13 +1151,37 @@ void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pRes
  }
 }
 
-void KCM_Command_Runtime_Router::proceed_s0_0(void** pResult)
+void KCM_Command_Runtime_Router::proceed_s0_0(Phaon_Function_Vector* pfv, void** pResult)
 {
  void* result = nullptr;
+
  int byte_code = 0;
- s0_fn1_p_type fn = table_.find_s0_declared_function_1(fuxe_name_,
-   nullptr, &result_type_object_, byte_code);
- bool sr = table_.s0_string_return(fuxe_name_);
+
+ s0_fn1_p_type fn;
+ bool sr;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
+ {
+  if(void* fnp = pfv->match_against_codes({6000, 7000}, mc, bc, &result_type_object_))
+  {
+   fn = (s0_fn1_p_type) fnp;
+   byte_code = bc;
+   sr = mc == 6000;
+  }
+  else byte_code = 0;
+ }
+
+ else
+ {
+  byte_code = 0;
+  fn = table_.find_s0_declared_function_1(fuxe_name_,
+    nullptr, &result_type_object_, byte_code);
+  sr = table_.s0_string_return(fuxe_name_);
+ }
+
  if(fn)
  {
   if(result_type_object_)
@@ -1062,12 +1209,35 @@ void KCM_Command_Runtime_Router::proceed_s0_0(void** pResult)
 }
 
 
-void KCM_Command_Runtime_Router::proceed_s0_1(void** pResult)
+void KCM_Command_Runtime_Router::proceed_s0_1(Phaon_Function_Vector* pfv, void** pResult)
 {
  int byte_code = 0;
- s0_fn1_p_type fn = table_.find_s0_declared_function_1(fuxe_name_,
-   nullptr, &result_type_object_, byte_code);
- bool sr = table_.s0_string_return(fuxe_name_);
+
+ s0_fn1_p_type fn;
+ bool sr;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
+ {
+  if(void* fnp = pfv->match_against_codes({6001, 7001}, mc, bc, &result_type_object_))
+  {
+   fn = (s0_fn1_p_type) fnp;
+   byte_code = bc;
+   sr = mc == 6001;
+  }
+  else byte_code = 0;
+ }
+
+ else
+ {
+  byte_code = 0;
+  fn = table_.find_s0_declared_function_1(fuxe_name_,
+    nullptr, &result_type_object_, byte_code);
+  sr = table_.s0_string_return(fuxe_name_);
+ }
+
  if(fn)
  {
   proceed_s0<1, s0_fn1_p_type>(pResult, fn, byte_code, sr);

@@ -28,6 +28,10 @@ KANS_CLASS_DECLARE(KCM ,KCM_Expression)
 KANS_CLASS_DECLARE(KCM ,KCM_Proxy_Scope)
 KANS_CLASS_DECLARE(KCM ,KCM_Callable_Value)
 
+KANS_CLASS_DECLARE(PhaonLib ,Phaon_Function_Vector)
+USING_KANS(PhaonLib)
+
+
 USING_KANS(KCM)
 
 KANS_(CMD)
@@ -282,18 +286,18 @@ public:
  KCM_Command_Runtime_Argument* parse_carrier_to_argument(KCM_Carrier& kcc, int pos);
 
  void proceed();
- void proceed_s0();
- void proceed_s1();
+ void proceed_s0(Phaon_Function_Vector* pfv);
+ void proceed_s1(Phaon_Function_Vector* pfv);
 
  void proceed_s0_argvec(s0_fn1_p_type fn, void** pResult, int byte_code, int s10_size = 0);
 
- void proceed_s0_0(void** pResult);
+ void proceed_s0_0(Phaon_Function_Vector* pfv, void** pResult);
 
- void proceed_s0_1(void** pResult);
+ void proceed_s0_1(Phaon_Function_Vector* pfv, void** pResult);
 
 //? void proceed_s0_1(void** pResult, s0_fn1_p_type fn, int byte_code, bool sr, bool s10 = false);
 
- void proceed_s0_2(void** pResult);
+ void proceed_s0_2(Phaon_Function_Vector* pfv, void** pResult);
 
 //? void proceed_s0_2(void** pResult, s0_fn1_p_p_type fn, int byte_code, bool sr, bool s10 = false);
 
@@ -317,14 +321,15 @@ public:
  void proceed_s0_nor(QVector<quint64>& args,
    fn_type fn, int byte_code);
 
+ Phaon_Function_Vector* get_phaon_function_vector(QString fn);
 
- void proceed_s1_0(void** pResult, void* raw_value);
- void proceed_s1_1(void** pResult, void* raw_value);
- void proceed_s1_2(void** pResult, void* raw_value);
+ void proceed_s1_0(Phaon_Function_Vector* pfv, void** pResult, void* raw_value);
+ void proceed_s1_1(Phaon_Function_Vector* pfv, void** pResult, void* raw_value);
+ void proceed_s1_2(Phaon_Function_Vector* pfv, void** pResult, void* raw_value);
 
- void proceed_s1_0_uc(void** pResult, void* raw_value);
- void proceed_s1_1_uc(void** pResult, void* raw_value);
- void proceed_s1_2_uc(void** pResult, void* raw_value);
+ void proceed_s1_0_uc(Phaon_Function_Vector* pfv, void** pResult, void* raw_value);
+ void proceed_s1_1_uc(Phaon_Function_Vector* pfv, void** pResult, void* raw_value);
+ void proceed_s1_2_uc(Phaon_Function_Vector* pfv, void** pResult, void* raw_value);
 
  FN_Codes check_init_raw_value(KCM_Command_Runtime_Argument* kcra,
    FN_Codes fnc, quint64& mem, QPair<KCM_Scope_System*, QPair<int, quint64>>& qclo_value,

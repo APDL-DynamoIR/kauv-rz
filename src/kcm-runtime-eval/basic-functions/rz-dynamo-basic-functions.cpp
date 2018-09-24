@@ -15,13 +15,13 @@
 
 #include "kauvir-code-model/kcm-callable-value.h"
 
-#include "fn-doc/fn-doc.h"
-
 #include "kauvir-runtime/kcm-command-runtime/kcm-command-runtime-table.h"
 
 #include "kauvir-runtime/kcm-command-runtime/kcm-command-runtime-router.h"
 
 #include "kcm-lisp-bridge/kcm-lisp-eval.h"
+
+#include "fn-doc/fn-doc.h"
 
 #include <QTextStream>
 
@@ -64,6 +64,8 @@ void lr(quint64 qclo)
  qDebug() << result;
 }
 
+
+
 void test_int_call(int num, KCM_Callable_Value* kcv)
 {
  qDebug() << num;
@@ -97,10 +99,6 @@ void test_dfr(quint64 qclo, quint64 qclo1)
 }
 
 
-int test_find(QString outstr, QString instr)
-{
- return outstr.indexOf(instr);
-}
 
 void test_calls(KCM_Callable_Value* kcv, KCM_Callable_Value* kcv1)
 {
@@ -149,6 +147,11 @@ void test_arg_vec_dfr_call(quint64 args_ptr)
  }
 }
 
+int test_find(QString outstr, QString instr)
+{
+ return outstr.indexOf(instr);
+}
+
 void test_arg_vec_str(quint64 args_ptr)
 {
  QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
@@ -159,6 +162,7 @@ void test_arg_vec_str(quint64 args_ptr)
   qDebug() << **qs;
  }
 }
+
 
 void test_if_then_else(quint64 args_ptr)
 {
@@ -196,11 +200,18 @@ void if_t_e(quint64 args_ptr)
  test_if_then_else(args_ptr);
 }
 
+void fndoc_read(Fn_Doc* fnd, QString fn)
+{
+ qDebug() << "Reading " << fn << " ...";
+ fnd->read(fn);
+}
+
 QString fndoc_test_summary(Fn_Doc* fnd)
 {
  QString summ = fnd->test_summary();
  return summ;
 }
+
 
 void* envv(void* kind)
 {
@@ -265,15 +276,6 @@ QString let_str(QString str)
  return str;
 }
 
-
-void fndoc_read(Fn_Doc* fnd, QString fn)
-{
- qDebug() << "Reading " << fn << " ...";
- fnd->read(fn);
-}
-
-
-
 void init_basic_functions_kci(Kauvir_Code_Model& kcm)
 {
  init_test_functions_kci(kcm);
@@ -284,13 +286,45 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
 
  KCM_Channel_Group g1(kcm.channel_names());
  {
+  g1.add_sigma_carrier(
+    {kcm.get_kcm_type_by_type_name( "Fn_Doc*" ), nullptr},
+     QString()
+    );
+
   g1.add_lambda_carrier(
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("prs", g1);
-  table.add_s0_declared_function("prs", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&prs));
+
+  table.init_phaon_function(g1, "read", 710, &fndoc_read);
+
+  g1.clear_all();
+ }
+
+ {
+  g1.add_sigma_carrier(
+    {kcm.get_kcm_type_by_type_name( "Fn_Doc*" ), nullptr},
+     QString()
+    );
+
+  g1.add_result_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+     QString()
+    );
+
+  table.init_phaon_function(g1, "test-summary", 610, &fndoc_test_summary);
+
+  g1.clear_all();
+ }
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+     QString()
+    );
+
+  table.init_phaon_function(g1, "prs", 700, &prs);
+
   g1.clear_all();
  }
 
@@ -303,9 +337,21 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test_prss", g1);
-  table.add_s0_declared_function("test_prss", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_prss));
+
+  table.init_phaon_function(g1, "test_prss", 700, &test_prss);
+
+  g1.clear_all();
+ }
+
+
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
+     QString()
+    );
+  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-arg-vec-calls", g1);
+  table.add_s0_declared_function("test-arg-vec-calls", kcg, reinterpret_cast<s0_fn1_p_type>
+                              (&test_arg_vec_calls));
   g1.clear_all();
  }
 
@@ -325,57 +371,8 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-find", g1);
-  table.add_s0_declared_function("test-find", kcg, reinterpret_cast<s0_fn1_p_p_type>
-                              (&test_find));
-  g1.clear_all();
- }
+  table.init_phaon_function(g1, "test-find", 700, &test_find);
 
- {
-  g1.add_sigma_carrier(
-    {kcm.get_kcm_type_by_type_name( "Fn_Doc*" ), nullptr},
-     QString()
-    );
-
-  g1.add_lambda_carrier(
-    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
-     QString()
-    );
-
-  KCM_Channel_Group* kcg = table.add_s10_declared_function("read", g1);
-  table.add_s10_declared_function("read", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&fndoc_read));
-  g1.clear_all();
- }
-
-
- {
-  g1.add_sigma_carrier(
-    {kcm.get_kcm_type_by_type_name( "Fn_Doc*" ), nullptr},
-     QString()
-    );
-
-  g1.add_result_carrier(
-    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
-     QString()
-    );
-
-  KCM_Channel_Group* kcg = table.add_s10_declared_function("test-summary", g1);
-  table.add_s10_declared_function("test-summary", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&fndoc_test_summary));
-  table.note_s10_string_return("test_summary");
-  g1.clear_all();
- }
-
-
- {
-  g1.add_lambda_carrier(
-    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
-     QString()
-    );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-arg-vec-calls", g1);
-  table.add_s0_declared_function("test-arg-vec-calls", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_arg_vec_calls));
   g1.clear_all();
  }
 
@@ -385,15 +382,18 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
   KCM_Channel_Group* kcg = table.add_s0_declared_function("test-arg-vec-str", g1);
+
   table.add_s0_declared_function("test-arg-vec-str", kcg, reinterpret_cast<s0_fn1_p_type>
                               (&test_arg_vec_str));
+
+ // table.init_phaon_function(g1, "test-find", 700, &test_find);
+
+
   g1.clear_all();
  }
 
  {
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-void", g1);
-  table.add_s0_declared_function("test-void", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_void));
+  table.init_phaon_function(g1, "test-void", 700, &test_void);
   g1.clear_all();
  }
 
@@ -421,6 +421,7 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
   g1.clear_all();
  }
 
+
  {
   g1.add_lambda_carrier(
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
@@ -432,15 +433,14 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
   g1.clear_all();
  }
 
-
  {
   g1.add_lambda_carrier(
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("prn", g1);
-  table.add_s0_declared_function("prn", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&prn));
+
+  table.init_phaon_function(g1, "prn", 700, &prn);
+
   g1.clear_all();
  }
 
@@ -453,9 +453,9 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("pr-two-n", g1);
-  table.add_s0_declared_function("pr-two-n", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&pr_two_n));
+
+  table.init_phaon_function(g1, "pr-two-n", 700, &pr_two_n);
+
   g1.clear_all();
  }
 
@@ -468,9 +468,9 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("prdn", g1);
-  table.add_s0_declared_function("prdn", kcg, reinterpret_cast<_s0_fn1_p_type>
-                              (&prdn));
+
+  table.init_phaon_function(g1, "prdn", 700, &prdn);
+
   g1.clear_all();
  }
 
@@ -481,9 +481,9 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-call", g1);
-  table.add_s0_declared_function("test-call", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_call));
+
+  table.init_phaon_function(g1, "test-call", 700, &test_call);
+
   g1.clear_all();
  }
 
@@ -498,22 +498,9 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-dfr", g1);
-  table.add_s0_declared_function("test-dfr", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_dfr));
-  g1.clear_all();
- }
 
- {
-  g1.add_lambda_carrier(
-    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ),
-     nullptr},
-     QString()
-    );
+  table.init_phaon_function(g1, "test-dfr", 700, &test_dfr);
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("lr", g1);
-  table.add_s0_declared_function("lr", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&lr));
   g1.clear_all();
  }
 
@@ -530,12 +517,22 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-calls", g1);
-  table.add_s0_declared_function("test-calls", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_calls));
+  table.init_phaon_function(g1, "test-calls", 700, &test_calls);
+
   g1.clear_all();
  }
 
+ {
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u64() ),
+     nullptr},
+     QString()
+    );
+
+  table.init_phaon_function(g1, "lr", 700, &lr);
+
+  g1.clear_all();
+ }
 
  {
   g1.add_lambda_carrier(
@@ -550,12 +547,10 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-dfr-call", g1);
-  table.add_s0_declared_function("test-dfr-call", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_dfr_call));
+  table.init_phaon_function(g1, "test-dfr-call", 700, &test_dfr_call);
+
   g1.clear_all();
  }
-
 
  {
   g1.add_lambda_carrier(
@@ -570,13 +565,10 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("test-int-call", g1);
-  table.add_s0_declared_function("test-int-call", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&test_int_call));
+  table.init_phaon_function(g1, "test-int-call", 700, &test_int_call);
+
   g1.clear_all();
  }
-
-
 
  {
   g1.add_result_carrier(
@@ -587,9 +579,9 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("let_num", g1);
-  table.add_s0_declared_function("let_num", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&let_num));
+
+  table.init_phaon_function(g1, "let_num", 700, &let_num);
+
   g1.clear_all();
  }
 
@@ -602,10 +594,9 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("let_str", g1);
-  table.add_s0_declared_function("let_str", kcg, reinterpret_cast<s0_fn1_p__s_type>
-                              (&let_str));
-  table.note_s0_string_return("let_str");
+
+  table.init_phaon_function(g1, "let_str", 700, &let_str);
+
   g1.clear_all();
 
  }
@@ -615,11 +606,17 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
      QString()
     );
+
   const KCM_Type_Object* kto = kcm.get_kcm_type_by_type_name("u64");
   g1.add_result_carrier({kto, nullptr},QString());
+
   KCM_Channel_Group* kcg = table.add_s0_declared_function("envv", g1);
   table.add_s0_declared_function("envv", kcg, reinterpret_cast<s0_fn1_p_type>
                                (&envv));
+
+
+ // table.init_phaon_function(g1, "let_num", 700, &let_num);
+
   g1.clear_all();
  }
 

@@ -24,6 +24,12 @@
 #include "kauvir-kcm/kauvir-type-system/kauvir-type-system.h"
 
 
+#include "phaon/PhaonLib/phaon-function.h"
+#include "phaon/PhaonLib/phaon-symbol-scope.h"
+
+#include "kauvir-code-model/kcm-function-package.h"
+
+
 
 KANS_CLASS_DECLARE(KCM ,KCM_Channel_Group)
 KANS_CLASS_DECLARE(KCM ,KCM_Type_Object)
@@ -31,9 +37,12 @@ KANS_CLASS_DECLARE(KCM ,KCM_Type_Object)
 USING_KANS(KCM)
 USING_KANS(Kauvir)
 
+USING_KANS(PhaonLib)
+
+
 KANS_(CMD)
 
-class KCM_Command_Runtime_Table
+class KCM_Command_Runtime_Table : public Phaon_Symbol_Scope
 {
  QMultiMap<QString, KCM_Channel_Group*> s1_declared_functions_;
  QMultiMap<QString, KCM_Channel_Group*> s0_declared_functions_;
@@ -64,6 +73,8 @@ public:
  KCM_Command_Runtime_Table(Kauvir_Type_System& type_system);
 
  ACCESSORS__GET(Kauvir_Type_System& ,type_system)
+
+ void add_declared_function_package(QString name, Phaon_Function phf);
 
  KCM_Channel_Group* add_s1_declared_function(QString name, const KCM_Channel_Group& channels);
  KCM_Channel_Group* add_s0_declared_function(QString name, const KCM_Channel_Group& channels);
@@ -143,6 +154,22 @@ public:
  s0_fn1_p_p_type find_s10_declared_function_1(QString name,
    KCM_Channel_Group* kcg, const KCM_Type_Object** pkto, int& byte_code);
 
+
+ template<typename FN_Type>
+ void init_phaon_function(const KCM_Channel_Group& g,
+    QString name, int head_code, FN_Type pfn)
+ {
+  KCM_Channel_Group* kcg = find_channel_group(g);
+
+  caon_ptr<KCM_Function_Package> kfp = new KCM_Function_Package(kcg);
+  kfp->init_byte_code(head_code);
+
+  Phaon_Function phf(pfn);
+
+  phf.augment(kfp);
+
+  add_declared_function_package(name, phf);
+ }
 
 };
 

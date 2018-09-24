@@ -7,4 +7,4 @@ kenv \= (envv "KCM_Env*");
 
 fnd -> init kenv;
 
-fnd -> test-0-S10-s;
+fnd -> test-0-S10-s "abcd";
