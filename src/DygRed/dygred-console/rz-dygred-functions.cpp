@@ -7,8 +7,6 @@
 
 #include "rz-dygred-functions.h"
 
-
-
 #include "udpipe.h"
 
 #include <QDebug>
@@ -17,7 +15,6 @@
 #include "dygred-sentence/dygred-corpus.h"
 
 #include "rz-graph-visit/rz-lisp-graph-visitor-dynamo.h"
-
 
 
 #include "kauvir-code-model/kauvir-code-model.h"
@@ -46,7 +43,7 @@ USING_KANS(KCL)
 KANS_(Dynamo)
 
 
-void _detokenize_(QString root, QString outfile, QStringList& infiles)
+int _detokenize_(QString root, QString outfile, QStringList& infiles)
 {
 
  qDebug() << "root: " << root;
@@ -67,15 +64,17 @@ void _detokenize_(QString root, QString outfile, QStringList& infiles)
  {
   qDebug() << "Detokenizer reported error code " << ec;
  }
+
+ return ec;
 }
 
-void detokenize(QString outfile, QString infile)
+int sdetokenize(QString outfile, QString infile)
 {
  QStringList infiles{infile};
- _detokenize_(UDPIPE_DATA_ROOT, outfile, infiles);
+ return _detokenize_(UDPIPE_DATA_ROOT, outfile, infiles);
 }
 
-void detokenize_multi(quint64 args_ptr)
+int detokenize_multi(quint64 args_ptr)
 {
  QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
 
@@ -96,10 +95,61 @@ void detokenize_multi(quint64 args_ptr)
   ++i;
  }
 
- _detokenize_(root, outfile, infiles);
-
+ return _detokenize_(root, outfile, infiles);
 }
 
+// //  "UNDER CONSTRUCTION" ...
+#ifdef HIDE
+QString parse_to_outfile(DygRed_Runtime_Environment* dre, QString outfile)
+{
+ DygRed_Corpus& dgc = dre->dgc();
+ QStringList infiles = dgc.expand_files();
+
+ QString outf = dgc.expand_external_file(outfile);
+
+ int result = main_parse(dre->model_file(),
+   infiles, outf);
+ if(result != 0)
+ {
+  qDebug() << "Error code: " << result;
+ }
+ return outfile;
+}
+
+void set_model_file(DygRed_Runtime_Environment* dre, QString mf)
+{
+ qDebug() << "mf: " << mf;
+ dre->set_model_file(mf);
+}
+
+
+DygRed_Corpus* get_corpus(DygRed_Runtime_Environment* dre)
+{
+ DygRed_Corpus* result = &dre->dgc();
+ return result;
+}
+
+#endif
+
+int detokenize(DygRed_Corpus* dgc, QString outfile)
+{
+ int result = dgc->detokenize(outfile);
+ qDebug() << "Detokenizer result: " << result;
+ return result;
+}
+
+void add_files(DygRed_Corpus* dgc, quint64 args_ptr)
+{
+ QVector<quint64>& args = *(QVector<quint64>*)(args_ptr);
+
+ QStringList qsl;
+ for(quint64 qui: args)
+ {
+  QString** qs = (QString**) qui;
+  qsl << **qs;
+ }
+ dgc->add_files(qsl);
+}
 
 
 void init_dygred_functions(Kauvir_Code_Model& kcm)
@@ -120,26 +170,130 @@ void init_dygred_functions(Kauvir_Code_Model& kcm)
      QString()
     );
 
+  g1.add_result_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
+     QString()
+    );
 
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("detokenize", g1);
-  table.add_s0_declared_function("detokenize", kcg, reinterpret_cast<s0_fn1_p_p_type>
-                              (&detokenize));
+  table.init_phaon_function(g1, "sdetokenize", 700, &sdetokenize);
+
   g1.clear_all();
  }
 
+// //  these functions not published in current repo ...
+// {
+//  g1.add_sigma_carrier({kcm.get_kcm_type_by_type_name(
+//   "DygRed_Runtime_Environment*" ), nullptr}, QString() );
+
+//  g1.add_lambda_carrier(
+//    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+//     QString()
+//    );
+
+//  table.init_phaon_function(g1, "set-model-file", 710, &set_model_file);
+
+//  g1.clear_all();
+// }
+
+// {
+//  g1.add_sigma_carrier(
+//    {
+//     kcm.get_kcm_type_by_type_name( "DygRed_Runtime_Environment*" ), nullptr
+//      //kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr
+//     },
+//     QString()
+//    );
+
+//  g1.add_result_carrier(
+//    {kcm.get_kcm_type_by_type_name( "DygRed_Corpus*" ), nullptr},
+//     QString()
+//    );
+
+//  table.init_phaon_function(g1, "get-corpus", 710, &get_corpus);
+
+//  g1.clear_all();
+// }
+
+ {
+  g1.add_sigma_carrier(
+    {
+     kcm.get_kcm_type_by_type_name( "DygRed_Corpus*" ), nullptr
+     },
+     QString()
+    );
+
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+     QString()
+    );
+
+  g1.add_result_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
+     QString()
+    );
+
+  table.init_phaon_function(g1, "detokenize", 710, &detokenize);
+
+  g1.clear_all();
+ }
+
+// //  these functions not published in current repo ...
+// {
+//  g1.add_sigma_carrier(
+//    {
+//     kcm.get_kcm_type_by_type_name( "DygRed_Runtime_Environment*" ), nullptr
+//     },
+//     QString()
+//    );
+
+//  g1.add_lambda_carrier(
+//    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+//     QString()
+//    );
+
+//  g1.add_result_carrier(
+//    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__str() ), nullptr},
+//     QString()
+//    );
+
+//  table.init_phaon_function(g1, "parse-to-outfile", 610, &parse_to_outfile);
+
+//  g1.clear_all();
+// }
+
+ {
+  g1.add_sigma_carrier(
+    {
+     kcm.get_kcm_type_by_type_name( "DygRed_Corpus*" ), nullptr
+     },
+     QString()
+    );
+
+  g1.add_lambda_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
+     QString()
+    );
+
+  table.init_phaon_function(g1, "add-files", 710, &add_files);
+
+  g1.clear_all();
+ }
 
  {
   g1.add_lambda_carrier(
     {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__argument_vector() ), nullptr},
      QString()
     );
-  KCM_Channel_Group* kcg = table.add_s0_declared_function("detokenize-multi", g1);
-  table.add_s0_declared_function("detokenize-multi", kcg, reinterpret_cast<s0_fn1_p_type>
-                              (&detokenize_multi));
+
+  g1.add_result_carrier(
+    {kcm.get_kcm_type_by_kauvir_type_object( &type_system->type_object__u32() ), nullptr},
+     QString()
+    );
+
+  table.init_phaon_function(g1, "detokenize-multi", 700, &detokenize_multi);
+
   g1.clear_all();
  }
-
-
 
 }
 

@@ -35,7 +35,10 @@ public:
 
  void* match_against_codes(const QSet<int>& codes, int& mc, int& rbc,
    const KCM_Type_Object** pkto = nullptr);
-
+   
+ void* find_argvec_function(int& mc, int& rbc,
+   const KCM_Type_Object** pkto = nullptr);
+   
  void* get_first();
 
 };

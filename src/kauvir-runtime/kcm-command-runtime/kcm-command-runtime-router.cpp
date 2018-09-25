@@ -238,16 +238,27 @@ void KCM_Command_Runtime_Router::proceed_s0(Phaon_Function_Vector* pfv)
 {
  void* result;
 
- if(!pfv)
+ s0_fn1_p_type fn;
+
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
  {
-  if(s0_fn1_p_type fn = table_.find_argvec_function(fuxe_name_))
-  {
-   int default_argvec_bytecode = 99;
-   proceed_s0_argvec(fn, &result, default_argvec_bytecode);
-   goto set_result;
-  }
+  fn = (s0_fn1_p_type) pfv->find_argvec_function(mc, bc);
+ }
+ else
+ {
+  fn = table_.find_argvec_function(fuxe_name_);
  }
 
+ if(fn)
+ {
+  int default_argvec_bytecode = 99;
+  proceed_s0_argvec(fn, &result, default_argvec_bytecode);
+  goto set_result;
+ }
+ 
  switch(lambda_arguments_.size())
  {
  case 0:
@@ -273,19 +284,28 @@ void KCM_Command_Runtime_Router::proceed_s1(Phaon_Function_Vector* pfv)
 {
  void* result = nullptr;
 
- int sl_byte_code;
+ s0_fn1_p_p_type fn;
 
- if(!pfv)
+ int mc = 0;
+ int bc = 0;
+
+ if(pfv)
  {
-  if(s0_fn1_p_p_type fn = table_.find_s10_argvec_function(fuxe_name_, sl_byte_code))
-  {
-   proceed_s0_argvec( (s0_fn1_p_type) fn, &result, sl_byte_code, 1);
-   goto set_result;
-  }
+  fn = (s0_fn1_p_p_type) pfv->find_argvec_function(mc, bc);
+ }
+ else
+ {
+  fn = table_.find_s10_argvec_function(fuxe_name_, bc);
  }
 
+ if(fn)
  {
-
+  proceed_s0_argvec((s0_fn1_p_type) fn, &result,
+    bc, 1);
+  goto set_result;
+ }
+ 
+ {
   QString code = sigma_argument_->bind_code();
   const KCM_Type_Object* kto = nullptr;
   const KCM_Type_Object* ckto = nullptr;
