@@ -193,6 +193,13 @@ void KCM_Lisp_Runtime::kcm_call(QString method_name, QString return_type_name,
 void KCM_Lisp_Runtime::kcm_call_0_v(QString method_name,
   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
 {
+ // //  for examination ...
+ if(method_name == "kcm_enter_runtime_scope")
+ {
+  bridge_.kcm_enter_runtime_scope();
+  return;
+ }
+
  QMetaObject::invokeMethod(&bridge_, method_name.toLatin1());
 }
 
@@ -200,6 +207,15 @@ void KCM_Lisp_Runtime::kcm_call_0_p(QString method_name, QString return_type_nam
   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
 {
  void* pv;
+
+ // //  for examination ...
+ if(method_name == "new_KCM_Channel_Group")
+ {
+  pv = bridge_.new_KCM_Channel_Group();
+  klras[0].set_pVoid(pv);
+  return;
+ }
+
  QMetaObject::invokeMethod(&bridge_, method_name.toLatin1(),
    QReturnArgument<void*>(return_type_name.toLatin1(), pv));
  klras[0].set_pVoid(pv);
@@ -235,6 +251,16 @@ void KCM_Lisp_Runtime::kcm_call_1_p(QString method_name, QString return_type_nam
   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
 {
  void* pv;
+
+ // //  for examination ...
+ if(method_name == "kcm_dissolve_to_nested_expression")
+ {
+  KCM_Channel_Group** a1 = (KCM_Channel_Group**) klras[1].pointer_for_qarg();
+  pv = bridge_.kcm_dissolve_to_nested_expression(*a1);
+  klras[0].set_pVoid(pv);
+  return;
+ }
+
  QMetaObject::invokeMethod(&bridge_, method_name.toLatin1(),
    QReturnArgument<void*>(return_type_name.toLatin1(), pv),
    QArgument<void*>(params[0], *klras[1].pointer_for_qarg()));
@@ -264,6 +290,24 @@ void KCM_Lisp_Runtime::kcm_call_1_s(QString method_name, QString return_type_nam
 void KCM_Lisp_Runtime::kcm_call_2_v(QString method_name,
   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
 {
+ // //  for examination ...
+ if(method_name == "_kcm_hold_opaque_lisp_value")
+ {
+  QString* a1 = (QString*) klras[1].pointer_for_qarg();
+  Opaque_Lisp_Value* a2 = (Opaque_Lisp_Value*) klras[2].pointer_for_qarg();
+  bridge_._kcm_hold_opaque_lisp_value(*a1, *a2);
+  return;
+ }
+
+ if(method_name == "_kcm_load_bridge")
+ {
+  QString* a1 = (QString*) klras[1].pointer_for_qarg();
+  Opaque_Lisp_Value* a2 = (Opaque_Lisp_Value*) klras[2].pointer_for_qarg();
+  bridge_._kcm_load_bridge(*a1, *a2);
+  return;
+ }
+
+
  QMetaObject::invokeMethod(&bridge_,
    method_name.toLatin1(),
    QArgument<void*>(params[0],
@@ -318,6 +362,24 @@ void KCM_Lisp_Runtime::kcm_call_2_s(QString method_name, QString return_type_nam
 void KCM_Lisp_Runtime::kcm_call_3_v(QString method_name,
   QVector<KCM_Lisp_Runtime_Argument>& klras, const QList<QByteArray>& params)
 {
+ // for examination ...
+ if(method_name == "kcm_kcg_add_fuxe_carrier")
+ {
+  KCM_Channel_Group** a1 = (KCM_Channel_Group**) klras[1].pointer_for_qarg();
+  const KCM_Type_Object** a2 = (const KCM_Type_Object**) klras[2].pointer_for_qarg();
+  QString* a3 = (QString*) klras[3].pointer_for_qarg();
+  bridge_.kcm_kcg_add_fuxe_carrier(*a1, *a2, *a3);
+  return;
+ }
+ if(method_name == "kcg_lambda_carrier_from_result_channel")
+ {
+  KCM_Channel_Group** a1 = (KCM_Channel_Group**) klras[1].pointer_for_qarg();
+  int* a2 = (int*) klras[2].pointer_for_qarg();
+  int* a3 = (int*) klras[3].pointer_for_qarg();
+  bridge_.kcg_lambda_carrier_from_result_channel(*a1, *a2, *a3);
+  return;
+ }
+
  QMetaObject::invokeMethod(&bridge_,
    method_name.toLatin1(),
    QArgument<void*>(params[0],
