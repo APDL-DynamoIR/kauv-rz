@@ -122,8 +122,6 @@ KCM_Command_Runtime_Argument* KCM_Command_Runtime_Router::parse_carrier_to_argum
 
   quint64 qv =  KCM_Lisp_Bridge::get_value_of_symbol(kcc.symbol(), scopes_, &rkto);
 
-  //?int x = *(int*) qv;
-
   if(rkto)
   {
    result->set_type_name(rkto->kauvir_type_object()->name());
@@ -242,23 +240,25 @@ void KCM_Command_Runtime_Router::proceed_s0(Phaon_Function_Vector* pfv)
 
  int mc = 0;
  int bc = 0;
+ bool sr = false;
 
  if(pfv)
  {
   fn = (s0_fn1_p_type) pfv->find_argvec_function(mc, bc);
+  sr = ((mc / 1000) == 6);
  }
  else
  {
-  fn = table_.find_argvec_function(fuxe_name_);
+  // tbd ...
  }
 
  if(fn)
  {
   int default_argvec_bytecode = 99;
-  proceed_s0_argvec(fn, &result, default_argvec_bytecode);
+  proceed_s0_argvec(fn, &result, default_argvec_bytecode, sr);
   goto set_result;
  }
- 
+
  switch(lambda_arguments_.size())
  {
  case 0:
@@ -295,7 +295,7 @@ void KCM_Command_Runtime_Router::proceed_s1(Phaon_Function_Vector* pfv)
  }
  else
  {
-  fn = table_.find_s10_argvec_function(fuxe_name_, bc);
+  // tbd ...
  }
 
  if(fn)
@@ -304,7 +304,7 @@ void KCM_Command_Runtime_Router::proceed_s1(Phaon_Function_Vector* pfv)
     bc, 1);
   goto set_result;
  }
- 
+
  {
   QString code = sigma_argument_->bind_code();
   const KCM_Type_Object* kto = nullptr;
@@ -365,7 +365,6 @@ void KCM_Command_Runtime_Router::proceed_s1_2(Phaon_Function_Vector* pfv, void**
  }
  if(fn0)
  {
-  //? proceed_s0<3, s0_fn1_p_p_type>(&result, fn0, byte_code, sr, true);
   if(pResult)
   {
    *pResult = result;
@@ -376,7 +375,7 @@ void KCM_Command_Runtime_Router::proceed_s1_2(Phaon_Function_Vector* pfv, void**
  s1_fng_type fn = table_.find_s1_declared_function_0(fuxe_name_, nullptr, &result_type_object_);
  if(fn)
  {
-  // raw_value is quint64* standing for void** ...
+  // //  raw_value is quint64* standing for void** ...
   Kauvir_Universal_Class* uo = (Kauvir_Universal_Class*) (* (void**)raw_value) ;
   void* la0 = nullptr;
   quint64 mem = 0;
@@ -409,8 +408,6 @@ void KCM_Command_Runtime_Router::proceed_s1_2(Phaon_Function_Vector* pfv, void**
    fn2_pp_type pfn = (fn2_pp_type) fn;
    (uo->*pfn)( (void*) *((quint64*) la0),  (void*) *((quint64*) la1));
   }
-
-  // // here?
 
   if(pResult)
   {
@@ -660,11 +657,7 @@ void KCM_Command_Runtime_Router::proceed_s1_1(Phaon_Function_Vector* pfv, void**
  }
  else
  {
-  fn0 = table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
-  if(fn0)
-  {
-   sr = table_.s10_string_return(fuxe_name_);
-  }
+  // tbd ...
  }
 
 
@@ -766,11 +759,7 @@ void KCM_Command_Runtime_Router::proceed_s1_0(Phaon_Function_Vector* pfv, void**
  }
  else
  {
-  s0_fn1_p_type fn0 = (s0_fn1_p_type) table_.find_s10_declared_function_1(fuxe_name_, nullptr, &result_type_object_, byte_code);
-  if(fn0)
-  {
-   sr = table_.s10_string_return(fuxe_name_);
-  }
+  // tbd ...
  }
 
  if(fn0)
@@ -832,9 +821,7 @@ void KCM_Command_Runtime_Router::proceed_s0_2(Phaon_Function_Vector* pfv, void**
 
  else
  {
-  fn = (s0_fn1_p_p_type) table_.find_s0_declared_function_1(fuxe_name_,
-    nullptr, &result_type_object_, byte_code);
-  sr = table_.s0_string_return(fuxe_name_);
+  // tbd ...
  }
 
  if(fn)
@@ -1055,7 +1042,7 @@ void KCM_Command_Runtime_Router::proceed_s0_nor<1, s0_fn1_p_type>(QVector<quint6
 
 template<int c, typename fn_type>
 void KCM_Command_Runtime_Router::proceed_s0(QVector<quint64>& args, void** pResult,
-  fn_type fn, int byte_code, bool sr)//, bool s10)
+  fn_type fn, int byte_code, bool sr)
 {
  void* result = nullptr;
  if(result_type_object_)
@@ -1086,10 +1073,10 @@ _KANS(CMD)
 
 
 
-void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pResult, int sl_byte_code, int s10_size)
+void KCM_Command_Runtime_Router::proceed_s0_argvec(s0_fn1_p_type fn, void** pResult,
+  int sl_byte_code, bool sr, int s10_size)
 {
  void* result = nullptr;
- bool sr = table_.s0_string_return(fuxe_name_);
 
  // // populate a vec
  QVector<quint64> args;
@@ -1196,10 +1183,7 @@ void KCM_Command_Runtime_Router::proceed_s0_0(Phaon_Function_Vector* pfv, void**
 
  else
  {
-  byte_code = 0;
-  fn = table_.find_s0_declared_function_1(fuxe_name_,
-    nullptr, &result_type_object_, byte_code);
-  sr = table_.s0_string_return(fuxe_name_);
+  // tbd ...
  }
 
  if(fn)
@@ -1252,10 +1236,7 @@ void KCM_Command_Runtime_Router::proceed_s0_1(Phaon_Function_Vector* pfv, void**
 
  else
  {
-  byte_code = 0;
-  fn = table_.find_s0_declared_function_1(fuxe_name_,
-    nullptr, &result_type_object_, byte_code);
-  sr = table_.s0_string_return(fuxe_name_);
+  // tbd ...
  }
 
  if(fn)

@@ -397,7 +397,7 @@ void init_basic_functions_kci(Kauvir_Code_Model& kcm)
      QString()
     );
 
-  table.init_phaon_function(g1, "test-arg-vec-dfr-call", 700, &test_arg_vec_dfr_cal);
+  table.init_phaon_function(g1, "test-arg-vec-dfr-call", 700, &test_arg_vec_dfr_call);
 
   g1.clear_all();
  }
