@@ -44,7 +44,7 @@ SOURCES += \
 LIBS += -L$$TARGETSDIR -lkcm-lisp-bridge  \
   -lkauvir-code-model -lkauvir-type-system -lrz-dynamo-generator
 
-LIBS += -L$$TARGETSDIR -lkcm-command-package -lkcm-command-runtime
+LIBS += -L$$TARGETSDIR -lkcm-command-package -lkcm-command-runtime -lPhaonLib
 
 # R/Z ...
 

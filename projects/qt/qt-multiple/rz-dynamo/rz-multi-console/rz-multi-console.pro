@@ -45,7 +45,7 @@ LIBS += -L$$TARGETSDIR -lkcm-lisp-bridge  \
   -lkauvir-code-model -lkauvir-type-system -lrz-dynamo-generator
 
 LIBS += -L$$TARGETSDIR -lkcm-command-package -lkcm-command-runtime \
-   -lkcm-direct-eval -lfn-doc
+   -lkcm-direct-eval -lfn-doc -lPhaonLib
 
 # R/Z ...
 

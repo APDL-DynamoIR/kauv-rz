@@ -236,7 +236,7 @@ void KCM_Command_Runtime_Router::proceed_s0(Phaon_Function_Vector* pfv)
 {
  void* result;
 
- s0_fn1_p_type fn;
+ s0_fn1_p_type fn = nullptr;
 
  int mc = 0;
  int bc = 0;
@@ -284,7 +284,7 @@ void KCM_Command_Runtime_Router::proceed_s1(Phaon_Function_Vector* pfv)
 {
  void* result = nullptr;
 
- s0_fn1_p_p_type fn;
+ s0_fn1_p_p_type fn = nullptr;
 
  int mc = 0;
  int bc = 0;
@@ -343,7 +343,7 @@ void KCM_Command_Runtime_Router::proceed_s1_2(Phaon_Function_Vector* pfv, void**
  void* result = nullptr;
 
  int byte_code;
- s0_fn1_p_p_type fn0;
+ s0_fn1_p_p_type fn0 = nullptr;
  bool sr;
 
  int mc = 0;
@@ -639,7 +639,7 @@ void KCM_Command_Runtime_Router::proceed_s1_1(Phaon_Function_Vector* pfv, void**
  void* result = nullptr;
 
  int byte_code;
- s0_fn1_p_p_type fn0;
+ s0_fn1_p_p_type fn0 = nullptr;
  bool sr;
 
  int mc = 0;
@@ -741,7 +741,7 @@ void KCM_Command_Runtime_Router::proceed_s1_0(Phaon_Function_Vector* pfv, void**
  void* result = nullptr;
 
  int byte_code;
- s0_fn1_p_type fn0;
+ s0_fn1_p_type fn0 = nullptr;
  bool sr;
 
  int mc = 0;
@@ -802,7 +802,7 @@ void KCM_Command_Runtime_Router::proceed_s0_2(Phaon_Function_Vector* pfv, void**
 {
  int byte_code = 0;
 
- s0_fn1_p_p_type fn;
+ s0_fn1_p_p_type fn = nullptr;
  bool sr;
 
  int mc = 0;
@@ -1164,7 +1164,7 @@ void KCM_Command_Runtime_Router::proceed_s0_0(Phaon_Function_Vector* pfv, void**
 
  int byte_code = 0;
 
- s0_fn1_p_type fn;
+ s0_fn1_p_type fn = nullptr;
  bool sr;
 
  int mc = 0;
@@ -1217,7 +1217,7 @@ void KCM_Command_Runtime_Router::proceed_s0_1(Phaon_Function_Vector* pfv, void**
 {
  int byte_code = 0;
 
- s0_fn1_p_type fn;
+ s0_fn1_p_type fn = nullptr;
  bool sr;
 
  int mc = 0;
