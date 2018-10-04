@@ -393,7 +393,9 @@ void RZ_Dynamo_Generator::write_recurring_symbols()
          "\n (kcm-code)"
          "\n (cmd-pkg)"
          "\n )"
-         "\n(setq kcg (ka::kc :|new_KCM_Channel_Group|) )";
+         "\n(setq kcg (ka::kc :|new_KCM_Channel_Group|) )"
+         "\n(setq kto (ka::kc :|kcm_type_object__u64|) )"
+            ;
 }
 
 void RZ_Dynamo_Generator::enter_scope()
