@@ -147,14 +147,14 @@ void KCM_Lisp_Bridge::kcm_finalize_nested_form_group(KCM_Expression* kcx)
 quint64 KCM_Lisp_Bridge::get_interpreted_value_of_symbol(QString symbol_name, QString& mode)
 {
  KCM_Scope_System* scopes = kcm_.scope_system();
- const KCM_Type_Object** kto;
- quint64 v = KCM_Lisp_Bridge::get_value_of_symbol(symbol_name, scopes, kto);
- if((*kto)->is_number_like())
+ const KCM_Type_Object* kto;
+ quint64 v = KCM_Lisp_Bridge::get_value_of_symbol(symbol_name, scopes, &kto);
+ if(kto->is_number_like())
  {
   mode = "fixnum";
   return *((quint64*) v);
  }
- if((*kto)->is_string_like())
+ if(kto->is_string_like())
  {
   QString* qs = (QString*) *(quint64*) v;
   mode = "str";
